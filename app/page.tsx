@@ -1,103 +1,162 @@
-import Image from "next/image";
+"use client";
+import SlideRenderer from "@/components/slide-render";
+import HeadingWidget from "@/components/widgets/headings";
+import { createWidgetsFromSlots } from "@/components/slideUtils";
+import {
+  HeadingAndParagraph,
+  OneParagraph,
+  TwoColumn,
+  textImageTemplate,
+  ThreeSections,
+  TitleSlide,
+} from "@/components/template";
 
-export default function Home() {
+import { ParagraphWidget } from "@/components/widgets/paragraph";
+import { FeatureCardWidget } from "@/components/widgets/cards/features";
+import { TestimonialWidget } from "@/components/widgets/cards/testimonial";
+import { BaseChartRender } from "@/components/widgets/charts/base";
+import { DrawerEditing } from "@/components/widgets/drawer";
+import { useSlideScale } from "@/lib/hooks/useSlideScale";
+import { useWidgetDeselect } from "@/lib/hooks/useWidgetDeselect";
+import { SLIDE_CONFIG } from "@/lib/config/slide";
+import { LayoutRegistry } from "@/lib/registry/layout";
+import { DraggableResizableWrapper } from "@/components/wrapper";
+import { BaseEmbed } from "@/components/widgets/embeds/base-embed";
+import { BasicCard } from "@/components/widgets/cards/basic";
+import { QuoteCard } from "@/components/widgets/cards/quotes";
+
+export default function App() {
+  // const [slideScale, setSlideScale] = useState(0.7);
+
+  const slideScale = useSlideScale();
+  useWidgetDeselect();
+  const widgets = createWidgetsFromSlots(
+    TitleSlide,
+    SLIDE_CONFIG.width,
+    SLIDE_CONFIG.height,
+    SLIDE_CONFIG.columns,
+    SLIDE_CONFIG.rows
+  );
+  // useEffect(() => {
+  //   const updateScale = () => {
+  //     const padding = 40;
+  //     const availableWidth = window.innerWidth - padding;
+  //     const availableHeight = window.innerHeight - padding;
+
+  //     const scaleX = availableWidth / containerWidth;
+  //     const scaleY = availableHeight / containerHeight;
+
+  //     setSlideScale(Math.min(scaleX, scaleY) * 0.9);
+  //   };
+
+  //   updateScale();
+  //   window.addEventListener("resize", updateScale);
+  //   return () => window.removeEventListener("resize", updateScale);
+  // }, []);
+
+  // useEffect(() => {
+  //   const handleClick = (e: MouseEvent) => {
+  //     const target = e.target as HTMLElement;
+
+  //     if (
+  //       target.closest("[data-widget]") ||
+  //       target.closest("[data-toolbar]") ||
+  //       target.closest("[widget-element]") ||
+  //       target.closest("[data-drawer]")
+  //     )
+  //       return;
+
+  //     useUIStore.getState().deselectWidget();
+  //   };
+
+  //   document.addEventListener("pointerdown", handleClick, true);
+  //   return () => document.removeEventListener("pointerdown", handleClick, true);
+  // }, []);
+  console.log(LayoutRegistry["title"].slots);
+  const slides = Array.from({ length: 10 }, (_, i) => i + 1);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <div className="bg-gray-50 min-h-screen overflow-hidden flex flex-col items-center py-6 font-sans">
+        <div className="flex flex-col items-center gap-10 w-full px-16">
+          {slides.map((num) => (
+            <div
+              key={num}
+              style={{
+                width: SLIDE_CONFIG.width * slideScale,
+                height: SLIDE_CONFIG.height * slideScale,
+                background: "black",
+                borderRadius: "10px",
+                paddingInline: "14px",
+                paddingBlock: "10px",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  transform: `scale(${slideScale})`,
+                  transformOrigin: "top left",
+                  width: SLIDE_CONFIG.width,
+                  height: SLIDE_CONFIG.height,
+                  transition: "transform 0.5s ease-out",
+                }}
+              >
+                {/* <SlideRenderer
+                  widgets={widgets}
+                  containerWidth={SLIDE_CONFIG.width}
+                  containerHeight={SLIDE_CONFIG.height}
+                /> */}
+                <HeadingWidget
+                  content={"hello world"}
+                  level={1}
+                  styles={{
+                    x: "400px",
+                    y: "400px",
+                    height: "250px",
+                    width: "200px",
+                  }}
+                />
+                <h1 className="text-white">createWidgetsFromSlots</h1>
+                <h2 className="text-white">createWidgetsFromSlots</h2>
+                <h3 className="text-white">wtf</h3>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+                {/* <ParagraphWidget content="gellow worl" /> */}
+                <DraggableResizableWrapper
+                  x={300}
+                  y={400}
+                  width={200}
+                  scale={0.8}
+                >
+                  {/* <FeatureCardWidget title="hello" body="mate"/> */}
+                  <QuoteCard />
+                </DraggableResizableWrapper>
+
+                {/* <TestimonialWidget /> */}
+                {/* <DraggableResizableWrapper x={500} y={100} width={400}>
+                  <BaseChartRender type="line" id="chart-101" />
+                </DraggableResizableWrapper> */}
+
+                <DraggableResizableWrapper
+                  x={100}
+                  y={300}
+                  width={200}
+                  scale={0.8}
+                  height={10}
+                >
+                  <BasicCard body={"Holy fuck"} />
+                </DraggableResizableWrapper>
+
+                {/* <BaseEmbed
+                  type="notion"
+                  link="https://guttural-pyramid-4b2.notion.site/cursor-for-writing-project-2101d155d470809b9becfafa31e965ac?source=copy_link"
+                /> */}
+              </div>
+            </div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+
+      <DrawerEditing />
+    </>
   );
 }
