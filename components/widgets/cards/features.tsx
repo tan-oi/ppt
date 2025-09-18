@@ -9,8 +9,6 @@ interface FeatureCard {
 }
 
 export const FeatureCardWidget: React.FC<FeatureCard> = ({ title, body }) => {
-  console.log(title);
-  console.log(body);
   const headingEditor = useEditor({
     immediatelyRender: false,
     extensions: [

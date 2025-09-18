@@ -33,7 +33,7 @@ export function Slide({
           borderRadius: "10px",
           paddingInline: "14px",
           paddingBlock: "10px",
-          background: "black",
+          background: "black", //changeable
           overflow: "hidden",
         }}
       >
@@ -45,21 +45,20 @@ export function Slide({
             height: SLIDE_CONFIG.height,
             transition: "transform 0.5s ease-out",
           }}
-          className="text-white relative"
+          className="relative"
         >
           {widgets.map((widget, i) => {
+            console.log(widget);
             const slotContent = data.content[widget.id];
             if (!slotContent) return null;
 
-            const { widgetType, data: widgetData } = slotContent;
-           
+            const { widgetType, data: widgetData, id: widgetId } = slotContent;
 
             const widgetInfo = WidgetRegistry[widgetType];
             if (!widgetInfo) return null;
 
             const WidgetComponent = widgetInfo.component;
-           console.log(widget.id)
-            
+
             return (
               <DraggableResizableWrapper
                 key={i}
@@ -77,6 +76,7 @@ export function Slide({
                     width: widget.width,
                     content: widget.content,
                   }}
+                  id={widgetId}
                   {...widgetData}
                 />
               </DraggableResizableWrapper>

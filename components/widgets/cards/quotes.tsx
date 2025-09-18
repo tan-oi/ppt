@@ -29,6 +29,8 @@ export const QuoteCard = ({
       type: "doc",
       content: [
         { type: "paragraph", content: [{ type: "text", text: person }] },
+        { type: "paragraph" },
+        { type: "paragraph" },
         { type: "paragraph", content: [{ type: "text", text: company }] },
       ],
     },

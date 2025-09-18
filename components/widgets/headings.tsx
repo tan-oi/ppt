@@ -12,7 +12,7 @@ interface HeadingWidgetProps {
   content?: string;
   level?: 1 | 2 | 3;
   editable?: boolean;
-  key?: string;
+  id?: string;
   className?: string;
   styles?: any;
 }
@@ -29,9 +29,10 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   editable = true,
   className,
   styles,
+  id
 }) => {
   const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
-
+  
   const editor = useEditor({
     immediatelyRender: false,
 
