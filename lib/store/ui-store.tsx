@@ -1,9 +1,29 @@
 import { create } from "zustand";
 
+interface Position {
+  clickX: number;
+  clickY: number;
+  widgetX: number;
+  widgetY: number;
+  widgetWidth: number;
+  widgetHeight: number;
+  relativeX: number;
+  relativeY: number;
+  aboveX: number;
+  aboveY: number;
+  centerX: number;
+  centerY: number;
+}
+
 interface WidgetData {
   slideIndex: number;
   id: string;
-  data: any;
+  data: {
+    editor?: any;
+    number?: string;
+    position?: Position;
+    [key: string]: any;
+  };
   type: "editoral" | "drawer";
 }
 

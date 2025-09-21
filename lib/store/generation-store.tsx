@@ -15,9 +15,9 @@ interface GenerationInterface {
 export const useGenerationStore = create<GenerationInterface>((set) => ({
   userInstruction: "",
   result: "",
-  setResult(data) {
-    result: data;
-  },
+  setResult : (data) => set({
+    result : data
+  }),
   setUserInstruction: (data) =>
     set({
       userInstruction: data,

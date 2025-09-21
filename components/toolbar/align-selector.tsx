@@ -28,7 +28,7 @@ export function AlignSelector() {
   const [align, setAlign] = useState<any>(<TextAlignLeftIcon />);
   const [open, setOpen] = useState(false);
   const editBuffer = useUIStore((s) => s.editBuffer);
-  const { editor } = editBuffer;
+  const { editor } = editBuffer.data;
   const alignmentOptions = [
     { label: "Left", icon: <TextAlignLeftIcon />, value: "left" },
     { label: "Right", icon: <TextAlignRightIcon />, value: "right" },

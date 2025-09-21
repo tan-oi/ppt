@@ -24,12 +24,13 @@ const colors = [
   "#a855f7",
   "#fff",
   "#000",
-  "#f97316"
+  "#f97316",
 ];
 
 export function ColorSelector() {
   const editBuffer = useUIStore((s) => s.editBuffer);
-  const editor = editBuffer.editor;
+  const editor = editBuffer.data.editor;
+
   const [selected, setSelected] = useState<string | null>("#fff");
   const [open, setOpen] = useState<boolean>(false);
 

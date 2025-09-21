@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect } from "react";
 import { useUIStore } from "@/lib/store/ui-store";
 
@@ -16,8 +16,19 @@ export function useWidgetDeselect() {
       useUIStore.getState().deselectWidget();
     };
 
+    const handleScroll = () => {
+      useUIStore.getState().deselectWidget();
+    };
+
     document.addEventListener("pointerdown", handleClick, true);
-    return () =>
+    window.addEventListener("scroll", handleScroll, true);
+
+    return () => {
       document.removeEventListener("pointerdown", handleClick, true);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
   }, []);
 }
+
+
+//scroll works as well.

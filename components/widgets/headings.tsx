@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Heading from "@tiptap/extension-heading";
@@ -17,12 +17,6 @@ interface HeadingWidgetProps {
   styles?: any;
 }
 
-// const styles = {
-//   1: "text-3xl font-semibold",
-//   2: "text-2xl font-semibold",
-//   3: "text-xl font-semibold",
-// };
-
 const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   content = "Your heading text",
   level = 1,
@@ -32,6 +26,7 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   id
 }) => {
   const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
+  const widgetRef = useRef<HTMLDivElement>(null);
   
   const editor = useEditor({
     immediatelyRender: false,
@@ -79,31 +74,57 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
     }
   }, [content, editor, level]);
 
-  // const getHeadingStyle = styles[level as keyof typeof styles] || styles[1];
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!widgetRef.current) return;
+
+    // Get the bounding rectangle of the widget
+    const rect = widgetRef.current.getBoundingClientRect();
+    
+    // Calculate positions
+    const position = {
+      // Click position relative to viewport
+      clickX: event.clientX,
+      clickY: event.clientY,
+      
+      // Widget position relative to viewport
+      widgetX: rect.left,
+      widgetY: rect.top,
+      widgetWidth: rect.width,
+      widgetHeight: rect.height,
+      
+      // Click position relative to widget
+      relativeX: event.clientX - rect.left,
+      relativeY: event.clientY - rect.top,
+      
+      // Position for rendering something above the widget
+      aboveX: rect.left,
+      aboveY: rect.top - 10, // 10px above the widget
+      
+      // Center of the widget
+      centerX: rect.left + rect.width / 2,
+      centerY: rect.top + rect.height / 2,
+    };
+
+    updateSelectWidget({
+      slideIndex: 1,
+      id: id || "heading-widget-1",
+      data: {
+        editor: editor,
+        number: "1",
+        position: position, 
+      },
+      type: "editoral",
+    });
+  };
 
   return (
     <div
+      ref={widgetRef}
       data-widget
-      // className="absolute"
       style={{
         zIndex: "20",
-        // top: styles?.y || "400px",
-
-        // left: styles?.x || "400px",
-        // width: styles?.width || "180px",
-        // height: styles?.height || "250px",
       }}
-      onClick={() => {
-        updateSelectWidget({
-          slideIndex: 1,
-          id: "heading-widget-1",
-          data: {
-            editor: editor,
-            number: "1",
-          },
-          type: "editoral",
-        });
-      }}
+      onClick={handleClick}
     >
       <div
         className={cn(
@@ -118,24 +139,6 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
           )}
         />
       </div>
-      {/* <button
-        onClick={() => editor?.commands.setFontSize("60px")}
-        className="text-white"
-      >
-        Set Large Font
-      </button>
-      <button
-        onClick={() => editor?.commands.setFontSize("24px")}
-        className="text-white ml-2"
-      >
-        Set Normal Font
-      </button>
-      <button
-        onClick={() => editor?.commands.unsetFontSize()}
-        className="text-white ml-2"
-      >
-        Reset Font Size
-      </button> */}
     </div>
   );
 };

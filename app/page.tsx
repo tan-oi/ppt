@@ -141,15 +141,16 @@ export default function App() {
                   y={300}
                   width={200}
                   scale={0.8}
+                  // height={10}
                   height={10}
                 >
-                  <BasicCard body={"Holy fuck"} />
+                  <BasicCard body={"Holy fuck amanafasfagagagsagagags"} />
                 </DraggableResizableWrapper>
 
-                {/* <BaseEmbed
+                 <BaseEmbed
                   type="notion"
                   link="https://guttural-pyramid-4b2.notion.site/cursor-for-writing-project-2101d155d470809b9becfafa31e965ac?source=copy_link"
-                /> */}
+                /> 
               </div>
             </div>
           ))}

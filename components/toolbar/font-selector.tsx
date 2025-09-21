@@ -27,7 +27,7 @@ export function FontSizeDropDown() {
   const [selectedName, setSelectedName] = useState<string>("Medium");
 
   const editBuffer = useUIStore((s) => s.editBuffer);
-  console.log(editBuffer.data);
+ 
   const editor = editBuffer.data.editor;
 
   const fontSizeOptions = [

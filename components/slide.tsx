@@ -1,8 +1,7 @@
 import { SLIDE_CONFIG } from "@/lib/config/slide";
-import { LayoutRegistry } from "@/lib/registry/layout";
-import { createWidgetsFromSlots } from "./slideUtils";
-import { WidgetRegistry } from "@/lib/registry/widget";
-import { DraggableResizableWrapper } from "./wrapper";
+import { usePresentationStore } from "@/lib/store/presentation-store";
+import { Button } from "./ui/button";
+import { WidgetWrapper } from "./widget-wrapper";
 
 export function Slide({
   data,
@@ -13,17 +12,6 @@ export function Slide({
   id: string;
   slideScale: number;
 }) {
-  const layout = LayoutRegistry[data.layoutId];
-
-  const slots = layout.slots;
-
-  const widgets = createWidgetsFromSlots(
-    slots,
-    SLIDE_CONFIG.width,
-    SLIDE_CONFIG.height,
-    SLIDE_CONFIG.columns,
-    SLIDE_CONFIG.rows
-  );
   return (
     <>
       <div
@@ -33,7 +21,7 @@ export function Slide({
           borderRadius: "10px",
           paddingInline: "14px",
           paddingBlock: "10px",
-          background: "black", //changeable
+          background: "black",
           overflow: "hidden",
         }}
       >
@@ -47,40 +35,21 @@ export function Slide({
           }}
           className="relative"
         >
-          {widgets.map((widget, i) => {
-            console.log(widget);
-            const slotContent = data.content[widget.id];
-            if (!slotContent) return null;
+          <Button
+            onClick={() => {
+              console.log(usePresentationStore.getState().slides);
 
-            const { widgetType, data: widgetData, id: widgetId } = slotContent;
+              console.log("#############");
 
-            const widgetInfo = WidgetRegistry[widgetType];
-            if (!widgetInfo) return null;
+              console.log(usePresentationStore.getState().widgets);
+            }}
+          >
+            holy shit
+          </Button>
 
-            const WidgetComponent = widgetInfo.component;
-
-            return (
-              <DraggableResizableWrapper
-                key={i}
-                x={widget.x}
-                y={widget.y}
-                height={widget.height}
-                width={widget.width}
-                scale={slideScale}
-              >
-                <WidgetComponent
-                  styles={{
-                    x: widget.x,
-                    y: widget.y,
-                    height: widget.height,
-                    width: widget.width,
-                    content: widget.content,
-                  }}
-                  id={widgetId}
-                  {...widgetData}
-                />
-              </DraggableResizableWrapper>
-            );
+          {data?.widgetIds.map((ids) => {
+            console.log(ids);
+            return <WidgetWrapper widgetId={ids} slideScale={slideScale} />;
           })}
         </div>
       </div>

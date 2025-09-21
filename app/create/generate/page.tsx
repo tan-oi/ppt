@@ -1,16 +1,4 @@
 import { GenerateClient } from "@/components/generate/client";
-import { Text } from "@/components/generate/text";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export default async function GeneratePPT({
   searchParams,
