@@ -13,17 +13,21 @@ interface Layout {
   description?: string;
   recommendedContent?: string;
   layoutType: string;
-
 }
 
 export const LayoutRegistry: Record<string, Layout> = {
+  "free-context": {
+    slots: [],
+    description: "no specific position",
+    name: "Free-Fall",
+    layoutType: "Only Text",
+  },
   "main-pointer": {
     slots: OneParagraph,
     name: "Focused Paragraph",
     description:
       "One large paragraph block for important concise explanation or storytelling",
     layoutType: "Only Text",
-  
   },
   "heading-paragraph": {
     slots: HeadingAndParagraph,
@@ -44,15 +48,13 @@ export const LayoutRegistry: Record<string, Layout> = {
       "Three evenly spaced sections for structured, segmented content",
     layoutType: "Only Text",
   },
-  "title": {
+  title: {
     slots: TitleSlide,
     name: "Hero Title Slide",
     description: "Main title and subtitle for impactful introduction",
     layoutType: "Only Text",
   },
 };
-
-
 
 /* --background: oklch(0.1797 0.0043 308.1928);
   --foreground: oklch(0.8109 0 0);

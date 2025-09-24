@@ -5,11 +5,13 @@ import { WidgetRegistry } from "@/lib/registry/widget";
 export function WidgetWrapper({
   widgetId,
   slideScale,
+  slideId,
 }: {
   widgetId: string;
   slideScale: number;
+  slideId: string;
 }) {
-  const widget = usePresentationStore.getState().getWidget(widgetId);
+  const widget = usePresentationStore.getState().getWidget(slideId, widgetId);
 
   if (!widget) {
     console.warn(`Widget ${widgetId} not found in store`);
@@ -40,7 +42,7 @@ export function WidgetWrapper({
           y: position.y,
           height: position.height,
           width: position.width,
-          content: widgetData.content,
+          content: widgetData?.content,
         }}
         id={widgetId}
         {...widgetData}

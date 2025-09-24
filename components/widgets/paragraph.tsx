@@ -15,7 +15,7 @@ interface ParagraphWidgetProps {
 }
 
 export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
-  content = "",
+  content = "Hey! here's a paragraph",
   editable = true,
   className,
   styles,
