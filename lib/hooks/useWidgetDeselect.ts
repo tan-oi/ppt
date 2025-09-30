@@ -10,7 +10,8 @@ export function useWidgetDeselect() {
         target.closest("[data-widget]") ||
         target.closest("[data-toolbar]") ||
         target.closest("[widget-element]") ||
-        target.closest("[data-drawer]")
+        target.closest("[data-drawer]") ||
+        target.closest("[data-widget-interactive]")
       )
         return;
       useUIStore.getState().deselectWidget();
@@ -29,6 +30,5 @@ export function useWidgetDeselect() {
     };
   }, []);
 }
-
 
 //scroll works as well.

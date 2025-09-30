@@ -14,6 +14,7 @@ import {
   transformAndStorePresentation,
 } from "@/lib/helper";
 import { DraggableButton } from "./draggable-button";
+import { DockBase } from "./dock/base";
 
 export function Presentation({
   llmToBeCalled,
@@ -24,7 +25,6 @@ export function Presentation({
 }) {
   const slides = usePresentationStore((s) => s.slides);
   const setType = usePresentationStore((s) => s.setType);
-  console.log(llmToBeCalled);
   const { status, sendMessage } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/trail",
@@ -68,31 +68,85 @@ export function Presentation({
   return (
     <>
       <DndContext
+        // onDragEnd={(event) => {
+        //   console.log(event);
+
+        //   const { active, over, delta, activatorEvent } = event;
+        //   let finalX, finalY;
+
+        //   if (activatorEvent) {
+        //     finalX = activatorEvent.clientX + delta.x;
+        //     finalY = activatorEvent.clientY + delta.y;
+
+        //     console.log("Final mouse position:", { x: finalX, y: finalY });
+        //   }
+
+        //   const slug = active?.data?.current?.slug;
+        //   const slideId = String(over?.id);
+        //   const addWidget = usePresentationStore.getState().addWidget;
+
+        //   addWidget(slideId, slug, { x: finalX, y: finalY });
+        // }}
+
         onDragEnd={(event) => {
-          console.log(event);
+          console.log("Full event:", event);
 
           const { active, over, delta, activatorEvent } = event;
-          let finalX, finalY;
-          if (activatorEvent) {
-            finalX = activatorEvent.clientX + delta.x;
-            finalY = activatorEvent.clientY + delta.y;
-            console.log("Final mouse position:", { x: finalX, y: finalY });
+
+          if (!over || !activatorEvent) {
+            console.log("No drop target or activator event");
+            return;
           }
+
+          const slideContainer = document.getElementById(String(over.id));
+
+          if (!slideContainer) {
+            console.error("Could not find slide container with id:", over.id);
+            return;
+          }
+
+          const containerRect = slideContainer.getBoundingClientRect();
+          const finalScreenX = activatorEvent.clientX + delta.x;
+          const finalScreenY = activatorEvent.clientY + delta.y;
+
+          const relativeX = finalScreenX - containerRect.left;
+          const relativeY = finalScreenY - containerRect.top;
+
+          const actualX = relativeX / slideScale;
+          const actualY = relativeY / slideScale;
+
+          console.log("Debug info:", {
+            activatorEvent: {
+              x: activatorEvent.clientX,
+              y: activatorEvent.clientY,
+            },
+            delta,
+            finalScreen: { x: finalScreenX, y: finalScreenY },
+            containerRect: {
+              left: containerRect.left,
+              top: containerRect.top,
+              width: containerRect.width,
+              height: containerRect.height,
+            },
+            relative: { x: relativeX, y: relativeY },
+            scaled: { x: actualX, y: actualY },
+            slideScale,
+          });
 
           const slug = active?.data?.current?.slug;
           const slideId = String(over?.id);
           const addWidget = usePresentationStore.getState().addWidget;
 
-          addWidget(slideId, slug, { x: finalX, y: finalY });
+          addWidget(slideId, slug, { x: actualX, y: actualY });
         }}
       >
-        <div className="modern bg-primary min-h-screen overflow-hidden flex flex-col items-center py-6 font-sans">
+        <div className="velvet-night font-heading bg-white min-h-screen overflow-hidden flex flex-col items-center py-6 font-sans">
           <div className="fixed top-4 right-4 z-10">
             <DraggableButton />
           </div>
 
-          <div className="fixed bg-gray-50/50 background-blur-2xl bottom-6 z-100 text-black">
-            hello
+          <div className="fixed background-blur-2xl bottom-6 z-100">
+            <DockBase />
           </div>
           <div className="flex flex-col items-center gap-10">
             {slides.map((item: any, i: number) => (

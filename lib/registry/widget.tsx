@@ -1,6 +1,7 @@
 import { BasicCard } from "@/components/widgets/cards/basic";
 import { FeatureCardWidget } from "@/components/widgets/cards/features";
 import { QuoteCard } from "@/components/widgets/cards/quotes";
+import { BaseChartRender } from "@/components/widgets/charts/base";
 import headings from "@/components/widgets/headings";
 import { ParagraphWidget } from "@/components/widgets/paragraph";
 
@@ -63,4 +64,13 @@ export const WidgetRegistry: Record<string, Objects> = {
     },
     description: "A testimonial card",
   },
+  // barChart: {
+  //   slug: "barChart",
+  //   type: "chart",
+  //   component: BaseChartRender,
+  //   defaultData: {
+  //     chartData: null,
+  //   },
+  //   description: "A bar chart to visualize data",
+  // },
 };

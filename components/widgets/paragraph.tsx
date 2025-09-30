@@ -5,12 +5,13 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { TextStyle, FontSize, Color } from "@tiptap/extension-text-style";
 import TextAlign from "@tiptap/extension-text-align";
+import { useWidgetSelection } from "@/lib/hooks/useWidgetSelection";
 
 interface ParagraphWidgetProps {
   content?: string;
   editable?: boolean;
   className?: string;
-  id?: string;
+  id: string;
   styles?: any;
 }
 
@@ -19,7 +20,9 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
   editable = true,
   className,
   styles,
+  id,
 }) => {
+  const { widgetRef, handleClick } = useWidgetSelection(id);
   const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
   const editor = useEditor({
     immediatelyRender: false,
@@ -59,25 +62,27 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
   return (
     <>
       <div
-        className="backdrop-blur-xl focus-within:ring-blue-400 focus-within:shadow-[0_0_0_2px_rgba(59,130,246,0.3)] focus-within:ring-1 focus-within:rounded focus-within:ring-offset-transparent text-white text-base"
+        ref={widgetRef}
+        className="backdrop-blur-xl  text-foreground text-base"
         style={{
           zIndex: "22",
-          // top: styles.y,
-          // left: styles.x,
-          // width: styles.width,
-          // height: styles.height,
+
           overflow: "hidden",
         }}
         data-widget
         onClick={() => {
-          updateSelectWidget({
-            slideIndex: 2,
-            id: "paragraph-widget-1",
-            data: {
-              editor: editor,
-              number: "1",
-            },
-            type: "editoral",
+          // updateSelectWidget({
+          //   slideIndex: 2,
+          //   id: id,
+          //   data: {
+          //     editor: editor,
+          //     number: "1",
+          //   },
+          //   type: "editoral",
+          // });
+          handleClick({
+            editor: editor,
+            number: "2",
           });
         }}
       >

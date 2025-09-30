@@ -1,6 +1,7 @@
 import { usePresentationStore } from "@/lib/store/presentation-store";
 import { DraggableResizableWrapper } from "./wrapper";
 import { WidgetRegistry } from "@/lib/registry/widget";
+import { useUIStore } from "@/lib/store/ui-store";
 
 export function WidgetWrapper({
   widgetId,
@@ -11,7 +12,10 @@ export function WidgetWrapper({
   slideScale: number;
   slideId: string;
 }) {
-  const widget = usePresentationStore.getState().getWidget(slideId, widgetId);
+  const widget = usePresentationStore((s) => s.getWidget(slideId, widgetId));
+
+  const selectedWidget = useUIStore((s) => s.selectedWidget?.id === widgetId);
+
 
   if (!widget) {
     console.warn(`Widget ${widgetId} not found in store`);
@@ -31,10 +35,11 @@ export function WidgetWrapper({
   return (
     <DraggableResizableWrapper
       x={position.x}
-      y={position.y}
+      y={position.y}  
       height={position.height}
       width={position.width}
       scale={slideScale}
+      selected={selectedWidget}
     >
       <WidgetComponent
         styles={{

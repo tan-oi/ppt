@@ -1,18 +1,11 @@
 import { create } from "zustand";
 
 interface Position {
-  clickX: number;
-  clickY: number;
-  widgetX: number;
+  // widgetX: number;
   widgetY: number;
-  widgetWidth: number;
-  widgetHeight: number;
-  relativeX: number;
-  relativeY: number;
-  aboveX: number;
-  aboveY: number;
+
   centerX: number;
-  centerY: number;
+  // centerY: number;
 }
 
 interface WidgetData {

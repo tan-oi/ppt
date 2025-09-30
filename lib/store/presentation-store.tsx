@@ -107,6 +107,8 @@ interface Slide {
 }
 
 interface PresentationState {
+  theme?: string;
+  setTheme: (theme: string) => void;
   type: "llm" | "db";
   setType: (type: "llm" | "db") => void;
 
@@ -226,4 +228,9 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
     const slide = get().slides.find((s) => s.id === slideId);
     return slide?.widgets[widgetId] || null;
   },
+
+  setTheme: (theme) =>
+    set({
+      theme: theme,
+    }),
 }));

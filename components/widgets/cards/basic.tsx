@@ -1,3 +1,4 @@
+import { useWidgetSelection } from "@/lib/hooks/useWidgetSelection";
 import { cn } from "@/lib/utils";
 import { TextAlign } from "@tiptap/extension-text-align";
 import { Color, FontSize, TextStyle } from "@tiptap/extension-text-style";
@@ -5,18 +6,21 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 
 export const BasicCard = ({
-  body,
+  content = "A card",
+  id,
   className,
   editable = true,
 }: {
-  body: string;
+  content: string;
   className?: string;
   editable?: boolean;
+  id: string;
 }) => {
-    console.log(body)
+  const { widgetRef, handleClick } = useWidgetSelection(id);
+
   const editor = useEditor({
     immediatelyRender: false,
-    content : body,
+    content: content,
     extensions: [
       StarterKit,
       TextStyle,
@@ -38,22 +42,26 @@ export const BasicCard = ({
       }),
     ],
     editable: true,
-    onCreate: ({ editor }) => {
-      editor.commands.setTextAlign("center");
-
-      editor.commands.setFontSize("24px");
-    },
   });
 
   return (
     <>
-      <div data-widget className="text-white bg-accent rounded-xl">
+      <div
+        data-widget
+        ref={widgetRef}
+        onClick={() => {
+          handleClick({
+            editor,
+            number: "3",
+          });
+        }}
+        className="rounded
+        backdrop-blur-xl 
+        bg-gray-50/5 text-foreground h-full w-full border border-sm border-secondary min-h-24 shadow-sm"
+      >
         <div
           className={
-            (cn(
-              "text-white tracking-wide transition-all duration-200 focus-within:ring-1 focus-within:ring-blue-400 focus-within:ring-offset-1 focus-within:ring-offset-transparent focus-within:rounded"
-            ),
-            className)
+            (cn("tracking-wide transition-all duration-200 "), className)
           }
         >
           <EditorContent

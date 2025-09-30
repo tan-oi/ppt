@@ -1,0 +1,89 @@
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from "../ui/dropdown-menu";
+import {
+  BarChart,
+  CardSim,
+  Heading,
+  LineChart,
+  ParkingSquareIcon,
+  Plus,
+  Sparkle,
+} from "lucide-react";
+import { DraggableMenuItem } from "./draggableItems";
+export function InsertElements() {
+  const elements = [
+    {
+      name: "Heading",
+      id: "heading",
+      slug: "heading",
+      icon: Heading,
+    },
+    {
+      name: "Paragraph",
+      id: "paragraph",
+      slug: "paragraph",
+      icon: ParkingSquareIcon,
+    },
+    {
+      name: "Basic card",
+      id: "basic-card",
+      slug: "basicCard",
+      icon: CardSim,
+    },
+    {
+      name: "Feature card",
+      id: "feature-card",
+      slug: "featureCard",
+      icon: Sparkle,
+    },
+    {
+      name: "Bar Chart",
+      id: "bar-chart",
+      slug: "barChart",
+      icon: BarChart,
+    },
+    {
+      name: "Line Chart",
+      id: "line-chart",
+      slug: "lineChart",
+      icon: LineChart,
+    },
+  ];
+  return (
+    <div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors">
+            <Plus size={18} className="text-zinc-400" />
+            <span className="text-sm text-zinc-300">Insert</span>
+          </button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent
+          sideOffset={16}
+          className="h-108 w-xs overflow-y-hidden p-2 border border-zinc-800 bg-zinc-900/95 backdrop-blur-md rounded-lg shadow-xl w-80"
+          style={{
+            overflow: "visible",
+          }}
+        >
+          <DropdownMenuLabel className="text-sm text-zinc-300 flex flex-col space-y-0.5 px-2">
+            <span>Insert Widget</span>
+            <span className="text-xs text-zinc-500">Drag to slide</span>
+          </DropdownMenuLabel>
+
+          <DropdownMenuSeparator className="my-2 bg-zinc-800" />
+
+          {elements.map((element) => (
+            <DraggableMenuItem key={element.id} element={element} />
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}

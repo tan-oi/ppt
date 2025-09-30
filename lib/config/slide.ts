@@ -9,7 +9,13 @@ export const DEFAULT_POSITIONS: Record<
   string,
   { x: number; y: number; width: number; height: number }
 > = {
-  heading: { x: 400, y: 100, width: 400, height: 80 },
-  paragraph: { x: 100, y: 200, width: 600, height: 200 },
+  heading: { x: 400, y: 100, width: 300, height: 60 },
+  paragraph: { x: 100, y: 200, width: 200, height: 60 },
   featureCard: { x: 100, y: 300, width: 300, height: 250 },
+  basicCard: {
+    x: 400,
+    y: 200,
+    width: 200,
+    height: 200,
+  },
 };
