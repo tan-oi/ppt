@@ -1,5 +1,6 @@
 import { BasicCard } from "@/components/widgets/cards/basic";
 import { FeatureCardWidget } from "@/components/widgets/cards/features";
+import { ListCard } from "@/components/widgets/cards/list";
 import { QuoteCard } from "@/components/widgets/cards/quotes";
 import { BaseChartRender } from "@/components/widgets/charts/base";
 import headings from "@/components/widgets/headings";
@@ -58,12 +59,23 @@ export const WidgetRegistry: Record<string, Objects> = {
     type: "text",
     component: QuoteCard,
     defaultData: {
-      body: "",
-      person: "",
-      company: "",
+      body: "Good job building this",
+      person: "Sam Altman, CEO",
+      company: "Openai",
     },
     description: "A testimonial card",
   },
+  listCard: {
+    slug: "listCard",
+    type: "text",
+    component: ListCard,
+    defaultData: {
+      content:
+        "<ul><li>First item</li><li>Second item</li><li>Third item</li></ul>",
+    },
+    description: "A list card",
+  },
+
   barChart: {
     slug: "barChart",
     type: "chart",

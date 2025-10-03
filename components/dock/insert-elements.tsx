@@ -17,6 +17,7 @@ import {
   Sparkle,
   AreaChart,
   Quote,
+  List,
 } from "lucide-react";
 import { DraggableMenuItem } from "./draggableItems";
 export function InsertElements() {
@@ -50,6 +51,12 @@ export function InsertElements() {
       id: "quotes-card",
       slug: "quoteCard",
       icon: Quote,
+    },
+    {
+      name: "List Card",
+      id: "list-card",
+      slug: "listCard",
+      icon: List,
     },
     {
       name: "Bar Chart",

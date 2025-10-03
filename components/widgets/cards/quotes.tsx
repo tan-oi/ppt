@@ -17,7 +17,11 @@ export const QuoteCard = ({
   person = "Sam Altman, CEO",
   company = "OpenAI",
 }: QuoteCard) => {
-  const { widgetRef, handleClick } = useWidgetSelection(id);
+  
+  const { widgetRef: mainRef, handleClick: mainClick } = useWidgetSelection(id);
+
+  const { widgetRef: secondaryRef, handleClick: secondaryClick } =
+    useWidgetSelection(id);
 
   const mainEditor = useEditor({
     immediatelyRender: false,
@@ -42,7 +46,7 @@ export const QuoteCard = ({
       }),
     ],
 
-    content: body,
+    content: body || "hello",
     onCreate: ({ editor }) => {
       editor.commands.setTextAlign("center");
       editor.commands.setFontSize("32px");
@@ -55,17 +59,18 @@ export const QuoteCard = ({
     content: {
       type: "doc",
       content: [
-        { type: "paragraph", content: [{ type: "text", text: person }] },
-        { type: "paragraph" },
-        { type: "paragraph" },
-        { type: "paragraph", content: [{ type: "text", text: company }] },
+        { type: "paragraph", content: [{ type: "text", text: person || "" }] },
+        { type: "paragraph", content: [] },
+        { type: "paragraph", content: [] },
+        { type: "paragraph", content: [{ type: "text", text: company || "" }] },
       ],
     },
   });
 
+  console.log(body);
   return (
     <>
-      <div className="flex flex-col bg-accent/40 justify-between p-4 rounded-xl focus-within:ring-white focus-within:ring-1 relative z-100 backdrop-blur-xl">
+      <div className="w-full h-full flex flex-col bg-accent/40 justify-between p-4 rounded-xl relative z-100 backdrop-blur-xl">
         <Quote
           size={28}
           className="absolute -top-3 -left-2 text-gray-300 rotate-180"
@@ -75,15 +80,37 @@ export const QuoteCard = ({
           className="absolute -bottom-2 -right-2 text-gray-300"
         />
 
-        <EditorContent
-          editor={mainEditor}
-          className="outline-none font-bold text-2xl text-primary [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0"
-        />
-        <div className="size-10"></div>
-        <EditorContent
-          editor={secondaryEditor}
-          className="outline-none text-foreground font-thin [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0"
-        />
+        <div
+          data-widget
+          ref={mainRef}
+          onClick={() =>
+            mainClick({
+              editor: mainEditor,
+              number: "1",
+            })
+          }
+          className="mb-2"
+        >
+          <EditorContent
+            editor={mainEditor}
+            className="outline-none font-bold text-2xl text-primary [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 "
+          />
+        </div>
+        <div
+          ref={secondaryRef}
+          data-widget
+          onClick={() =>
+            secondaryClick({
+              editor: secondaryEditor,
+              number: "12",
+            })
+          }
+        >
+          <EditorContent
+            editor={secondaryEditor}
+            className="outline-none text-foreground font-thin [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0"
+          />
+        </div>
       </div>
     </>
   );

@@ -20,6 +20,12 @@ export const DEFAULT_POSITIONS: Record<
     width: 200,
     height: 200,
   },
+  listCard: {
+    x: 400,
+    y: 200,
+    width: 300,
+    height: 400,
+  },
   barChart: {
     x: 200,
     y: 400,
