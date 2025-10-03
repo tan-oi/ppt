@@ -1,6 +1,7 @@
 import { Layers, Palette, Play, Plus } from "lucide-react";
 import { ThemeSelector } from "./theme-selector";
 import { InsertElements } from "./insert-elements";
+import { SlideManager } from "./slide-manager";
 
 export function DockBase() {
   return (
@@ -10,15 +11,13 @@ export function DockBase() {
 
         <InsertElements />
 
-        <button className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors">
-          <Layers size={18} className="text-zinc-400" />
-          <span className="text-sm text-zinc-300">Slides</span>
-        </button>
+      <SlideManager/>
 
         <button className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors">
           <Play size={18} className="text-zinc-400" />
           <span className="text-sm text-zinc-300">Present</span>
         </button>
+        
       </div>
     </div>
   );

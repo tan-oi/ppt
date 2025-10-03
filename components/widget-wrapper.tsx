@@ -16,7 +16,6 @@ export function WidgetWrapper({
 
   const selectedWidget = useUIStore((s) => s.selectedWidget?.id === widgetId);
 
-
   if (!widget) {
     console.warn(`Widget ${widgetId} not found in store`);
     return null;
@@ -35,7 +34,7 @@ export function WidgetWrapper({
   return (
     <DraggableResizableWrapper
       x={position.x}
-      y={position.y}  
+      y={position.y}
       height={position.height}
       width={position.width}
       scale={slideScale}

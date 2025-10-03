@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Bar, BarChart, XAxis } from "recharts";
 
 import {
@@ -16,9 +16,10 @@ export const BarChartBase: React.FC<BarChart> = ({
   chartConfig,
   chartData,
 }) => {
+  console.log(chartData);
   return (
     <>
-      <ChartContainer config={chartConfig}>
+      <ChartContainer config={chartConfig} className="w-full h-full">
         <BarChart accessibilityLayer data={chartData}>
           <rect
             x="0"

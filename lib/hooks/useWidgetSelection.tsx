@@ -24,7 +24,7 @@ export function useWidgetSelection(widgetId: string) {
         position,
         ...additionalData,
       },
-      type: "editoral",
+      type: additionalData?.type ?? "editoral",
     });
   };
 

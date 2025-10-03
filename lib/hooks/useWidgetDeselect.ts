@@ -17,16 +17,23 @@ export function useWidgetDeselect() {
       useUIStore.getState().deselectWidget();
     };
 
-    const handleScroll = () => {
+    const handleScroll = (e: Event) => {
+      const target = e.target as HTMLElement;
+      if (target instanceof Element && target.closest("[data-drawer]")) {
+        return;
+      }
+      
       useUIStore.getState().deselectWidget();
     };
 
     document.addEventListener("pointerdown", handleClick, true);
     window.addEventListener("scroll", handleScroll, true);
+    document.addEventListener("scroll", handleScroll, true);
 
     return () => {
       document.removeEventListener("pointerdown", handleClick, true);
       window.removeEventListener("scroll", handleScroll, true);
+      document.removeEventListener("scroll", handleScroll, true);
     };
   }, []);
 }

@@ -12,8 +12,11 @@ import {
   Heading,
   LineChart,
   ParkingSquareIcon,
+  PieChart,
   Plus,
   Sparkle,
+  AreaChart,
+  Quote,
 } from "lucide-react";
 import { DraggableMenuItem } from "./draggableItems";
 export function InsertElements() {
@@ -43,6 +46,12 @@ export function InsertElements() {
       icon: Sparkle,
     },
     {
+      name: "Quotes Card",
+      id: "quotes-card",
+      slug: "quoteCard",
+      icon: Quote,
+    },
+    {
       name: "Bar Chart",
       id: "bar-chart",
       slug: "barChart",
@@ -53,6 +62,18 @@ export function InsertElements() {
       id: "line-chart",
       slug: "lineChart",
       icon: LineChart,
+    },
+    {
+      name: "Area Chart",
+      id: "area-chart",
+      slug: "areaChart",
+      icon: AreaChart,
+    },
+    {
+      name: "Pie chart",
+      id: "pie-chart",
+      slug: "pieChart",
+      icon: PieChart,
     },
   ];
   return (
@@ -67,7 +88,7 @@ export function InsertElements() {
 
         <DropdownMenuContent
           sideOffset={16}
-          className="h-108 w-xs overflow-y-hidden p-2 border border-zinc-800 bg-zinc-900/95 backdrop-blur-md rounded-lg shadow-xl w-80"
+          className="h-108 w-xs overflow-y-hidden p-2 border border-zinc-800 bg-zinc-900/90 backdrop-blur-md rounded-lg shadow-xl w-80"
           style={{
             overflow: "visible",
           }}

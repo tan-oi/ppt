@@ -68,7 +68,7 @@ export const HeadingAndParagraph: Slot[] = [
     id: "paragraph-1",
     type: "text",
     columnStart: 8,
-    columnEnd: 18,
+    columnEnd: 16,
     rowStart: 10,
     rowEnd: 20,
     defaultComponent: ParagraphWidget,

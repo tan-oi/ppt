@@ -8,6 +8,7 @@ import { ChartConfig } from "@/components/ui/chart";
 import { LineChartBase } from "./line-chart";
 import { useUIStore } from "@/lib/store/ui-store";
 import { PieChartBase } from "./pie-chart";
+import { useWidgetSelection } from "@/lib/hooks/useWidgetSelection";
 
 interface BaseChartRenderProps {
   type: "bar" | "area" | "line" | "pie";
@@ -45,36 +46,31 @@ const chartRegistry: Record<
 
 export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
   type,
-  data,
+  data = null,
   id,
   className,
 }) => {
+  console.log(type, "typeis");
   const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
+  const { widgetRef, handleClick } = useWidgetSelection(id);
   const ChartComponent = chartRegistry[type];
 
   return (
     <div
+      ref={widgetRef}
+      data-widget
       className="cursor-pointer"
       style={{
         zIndex: 20,
-        // top: "100px",
-        // left: "500px",
-        // width: "400px",
-        // // height: "280px",
       }}
-      onClick={() => {
-        updateSelectWidget({
-          slideIndex: 1,
-          id: "chart-101",
-          data: {
-            type: type,
-            data: data ?? defaultData,
-          },
+      onClick={() =>
+        handleClick({
           type: "drawer",
-        });
-      }}
+          data: data ?? defaultData,
+        })
+      }
     >
-      <Card className="border-none">
+      <Card className="border-none min-w-[180px] min-h-[200px] w-full h-full">
         <CardHeader>
           <CardTitle className="text-muted-foreground text-sm font-mono">
             {type} chart

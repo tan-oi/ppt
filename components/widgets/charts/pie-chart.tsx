@@ -33,7 +33,7 @@ export const PieChartBase: React.FC<PieChartProps> = ({
   return (
     <ChartContainer
       config={chartConfig}
-      className="[&_.recharts-text]:fill-background mx-auto aspect-square max-h-[250px]"
+      className="[&_.recharts-text]:fill-background mx-auto w-full h-full"
     >
       <PieChart>
         <ChartTooltip

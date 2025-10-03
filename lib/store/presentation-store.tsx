@@ -2,7 +2,10 @@
 
 import { nanoid } from "nanoid";
 import { create } from "zustand";
-import { DEFAULT_POSITIONS } from "../config/slide";
+import { DEFAULT_POSITIONS, SLIDE_CONFIG } from "../config/slide";
+import { LayoutRegistry } from "../registry/layout";
+import { createWidgetsFromSlots } from "@/components/slideUtils";
+import { WidgetRegistry } from "../registry/widget";
 
 // interface WidgetData {
 //   // slideIndex: number;
@@ -104,6 +107,7 @@ interface Slide {
   widgets: {
     [widgetId: string]: WidgetData;
   };
+  theme: string;
 }
 
 interface PresentationState {
@@ -120,12 +124,13 @@ interface PresentationState {
 
   slides: Slide[] | [];
   addSlide: (slide: Slide) => void;
-
+  addSlideAfterCurrent: (slug?: string) => string;
   deleteSlide: (slideId: string) => void;
 
   addWidget: (
     slideId: string,
     widgetType: string,
+    defaultData?: any,
     position?: Partial<WidgetData["position"]>
   ) => string;
 
@@ -137,6 +142,7 @@ interface PresentationState {
 
   deleteWidget: (slideId: string, widgetId: string) => void;
   getWidget: (slideId: string, widgetId: string) => WidgetData | null;
+  updateSlideTheme: (slideId: string, theme: string) => void;
 }
 
 export const usePresentationStore = create<PresentationState>((set, get) => ({
@@ -160,24 +166,82 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       slides: [...state.slides, slide],
     })),
 
+  addSlideAfterCurrent: (layoutSlug) => {
+    const { slides, currentSlide, theme } = get();
+    const currentIndex = slides.findIndex((s) => s.id === currentSlide);
+
+    const newSlide: Slide = {
+      id: nanoid(10),
+      slideNumber: 0,
+      heading: "",
+      widgets: {},
+      theme: theme || "starter",
+    };
+
+    const newSlides = [...slides];
+    console.log(newSlides);
+    const insertAt = currentIndex >= 0 ? currentIndex + 1 : slides.length;
+    newSlides.splice(insertAt, 0, newSlide);
+
+    set({
+      slides: newSlides,
+      currentSlide: newSlide.id,
+    });
+
+    if (layoutSlug && LayoutRegistry[layoutSlug]) {
+      const layout = LayoutRegistry[layoutSlug];
+
+      const positions = createWidgetsFromSlots(
+        layout.slots,
+        SLIDE_CONFIG.width,
+        SLIDE_CONFIG.height,
+        SLIDE_CONFIG.columns,
+        SLIDE_CONFIG.rows
+      );
+
+      positions.forEach((pos) => {
+        const slot = layout.slots.find((s) => s.id === pos.id);
+        if (!slot) return;
+
+        let widgetType = "paragraph";
+
+        for (const [slug, widget] of Object.entries(WidgetRegistry)) {
+          if (widget.component === slot.defaultComponent) {
+            widgetType = slug;
+            break;
+          }
+        }
+
+        const defaultData = WidgetRegistry[widgetType]?.defaultData || null;
+
+        get().addWidget(
+          newSlide.id,
+          widgetType,
+          { x: pos.x, y: pos.y, width: pos.width, height: pos.height },
+          defaultData
+        );
+      });
+    }
+
+    return newSlide.id;
+  },
+
   deleteSlide: (slideId) =>
     set((state) => ({
       slides: state.slides.filter((slide) => slide.id !== slideId),
     })),
 
-  addWidget: (slideId, widgetType, position) => {
+  addWidget: (slideId, widgetType, position, defaultData) => {
     const widgetId = nanoid(7);
     const defaultConfig = DEFAULT_POSITIONS[widgetType];
-    console.log(position);
-    console.log(defaultConfig);
 
     const finalPosition = { ...defaultConfig, ...position };
 
-    console.log(finalPosition);
+    console.log(defaultData);
     const widget: WidgetData = {
       id: widgetId,
       widgetType,
-      data: null,
+      data: defaultData ?? null,
       position: {
         ...defaultConfig,
         ...position,
@@ -233,4 +297,15 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
     set({
       theme: theme,
     }),
+
+  updateSlideTheme: (slideId: string, theme: string) => {
+    console.log(slideId);
+    console.log(theme);
+
+    set((state) => ({
+      slides: state.slides.map((slide) =>
+        slide.id === slideId ? { ...slide, theme } : slide
+      ),
+    }));
+  },
 }));

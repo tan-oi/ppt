@@ -24,12 +24,13 @@ interface UIStore {
   toolbarOpen: boolean;
   drawerOpen: boolean;
   selectedWidget: WidgetData | null;
-
+ 
   updateSelectWidget: ({ slideIndex, id, data, type }: WidgetData) => void;
 
   editBuffer: any | null;
   updateEditBuffer: (changes: any) => void;
   deselectWidget: () => void;
+  setDrawer: () => void;
 }
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -37,6 +38,11 @@ export const useUIStore = create<UIStore>((set) => ({
   drawerOpen: false,
   editBuffer: null,
   selectedWidget: null,
+
+  setDrawer: () =>
+    set((state) => ({
+      drawerOpen: !state.drawerOpen,
+    })),
 
   updateSelectWidget: ({ slideIndex, id, data, type }) =>
     set({
@@ -47,8 +53,8 @@ export const useUIStore = create<UIStore>((set) => ({
         type,
       },
       editBuffer: { data },
-      toolbarOpen: type === "editoral" ? true : false,
-      drawerOpen: type === "drawer" ? true : false,
+      toolbarOpen: true,
+      // drawerOpen: type === "drawer" ? true : false,
     }),
 
   deselectWidget: () =>

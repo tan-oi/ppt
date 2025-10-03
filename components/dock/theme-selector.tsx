@@ -1,97 +1,40 @@
+//, i also need to add the language change support, make it change when the themes of 2 slides are different, it is only taking of that of the first slide
+
 import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Palette } from "lucide-react";
+import { Palette, Check } from "lucide-react";
 
-import { Separator } from "../ui/separator";
-import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
-
-const themes = [
-  {
-    id: "modern",
-    name: "Modern",
-    bgColor: "#ffffff",
-    accentColor: "#3b82f6",
-    fontFamily: "Inter, sans-serif",
-  },
-  {
-    id: "dark",
-    name: "Dark Mode",
-    bgColor: "#1e293b",
-    accentColor: "#06b6d4",
-    fontFamily: "Roboto, sans-serif",
-  },
-  {
-    id: "nature",
-    name: "Nature",
-    bgColor: "#f0fdf4",
-    accentColor: "#22c55e",
-    fontFamily: "Georgia, serif",
-  },
-  {
-    id: "sunset",
-    name: "Sunset",
-    bgColor: "#fff7ed",
-    accentColor: "#f97316",
-    fontFamily: "Lora, serif",
-  },
-  {
-    id: "corporate",
-    name: "Corporate",
-    bgColor: "#f8fafc",
-    accentColor: "#475569",
-    fontFamily: "Arial, sans-serif",
-  },
-  {
-    id: "vibrant",
-    name: "Vibrant",
-    bgColor: "#fef3c7",
-    accentColor: "#ec4899",
-    fontFamily: "Poppins, sans-serif",
-  },
-];
+import { themes } from "@/lib/config/theme";
+import { usePresentationStore } from "@/lib/store/presentation-store";
+import { cn } from "@/lib/utils";
 
 export function ThemeSelector() {
-  const [scope, setScope] = useState("current");
-  const [globalTheme, setGlobalTheme] = useState("modern");
+  const theme = usePresentationStore((s) => s.theme);
+  const setTheme = usePresentationStore((s) => s.setTheme);
+  const currentSlide = usePresentationStore((s) => s.currentSlide);
+  const [scope, setScope] = useState<"current" | "all">("all");
+
   const [currentSlideTheme, setCurrentSlideTheme] = useState<string | null>(
     null
   );
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleThemeSelect = (themeId: string) => {
+  const handleThemeSelect = (selectedTheme: (typeof themes)[0]) => {
     if (scope === "all") {
-      setGlobalTheme(themeId);
-      setCurrentSlideTheme(null);
+      setTheme(selectedTheme.slug);
     } else {
-      setCurrentSlideTheme(themeId);
+      usePresentationStore
+        .getState()
+        .updateSlideTheme(currentSlide as string, selectedTheme.slug);
+      setCurrentSlideTheme(selectedTheme.slug);
     }
-  };
-
-  const getAppliedLabel = (themeId: string) => {
-    if (currentSlideTheme === themeId) {
-      return "Applied Locally";
-    }
-    if (globalTheme === themeId && !currentSlideTheme) {
-      return "Applied Globally";
-    }
-    if (globalTheme === themeId) {
-      return "Global Default";
-    }
-    return null;
-  };
-
-  const isThemeActive = (themeId: string) => {
-    return (
-      (scope === "current" && currentSlideTheme === themeId) ||
-      (scope === "all" && globalTheme === themeId) ||
-      (scope === "current" && !currentSlideTheme && globalTheme === themeId)
-    );
   };
 
   return (
@@ -105,26 +48,40 @@ export function ThemeSelector() {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           sideOffset={16}
-          className="h-108 w-72 overflow-y-hidden p-4 border-none bg-zinc-900/60 backdrop-blur-md rounded-xl"
+          className="h-108 w-72 overflow-y-scroll p-4 border-none bg-zinc-900/95 backdrop-blur-md rounded-xl"
         >
           <div className="mb-3">
             <div className="w-full flex items-center justify-between gap-4 relative">
               <div
-                className="absolute
-                translate-x-[calc(100%+16px)]
-              w-[calc(50%-8px)] bg-zinc-500/30  h-full"
+                className={cn(
+                  "absolute w-[calc(50%-8px)] bg-zinc-500/30 h-full transition-transform duration-200 rounded",
+                  {
+                    "translate-x-0": scope === "current",
+                    "translate-x-[calc(100%+16px)]": scope === "all",
+                  }
+                )}
               ></div>
               <Button
-                className="flex-1 text-sm bg-transparent 
-                border-px rounded border-zinc-800
-                shadow-none hover:text-zinc-300"
+                className={cn(
+                  "flex-1 text-sm bg-transparent border-px rounded border-zinc-800 shadow-none hover:text-zinc-300 relative z-10",
+                  {
+                    "text-white": scope === "current",
+                  }
+                )}
                 variant={"outline"}
+                onClick={() => setScope("current")}
               >
                 Current
               </Button>
               <Button
-                className="flex-1 text-sm bg-transparent border-px border-zinc-800 rounded shadow-none"
+                className={cn(
+                  "flex-1 text-sm bg-transparent border border-zinc-800 rounded shadow-none relative z-10",
+                  {
+                    "text-white": scope === "all",
+                  }
+                )}
                 variant={"outline"}
+                onClick={() => setScope("all")}
               >
                 All slides
               </Button>
@@ -133,36 +90,38 @@ export function ThemeSelector() {
 
           <DropdownMenuSeparator className="mb-2" />
           <div className="space-y-2">
-            {themes.map((theme) => {
-              const appliedLabel = getAppliedLabel(theme.id);
-              const isActive = isThemeActive(theme.id);
+            {themes.map((themeOption) => {
+              const isSelected =
+                scope === "all"
+                  ? theme === themeOption.slug
+                  : currentSlideTheme === themeOption.slug;
 
               return (
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  key={themeOption.slug}
+                  onSelect={() => handleThemeSelect(themeOption)}
+                >
                   <Button
                     variant={"outline"}
                     size={"lg"}
-                    className="border-none 
-                  group
-                  hover:bg-zinc-500/20
-                  hover:shadow-sm
-                  bg-transparent
-                  px-0 shadow-none h-full w-full"
+                    className={cn(
+                      "border-none group hover:bg-zinc-500/20 hover:shadow-sm bg-transparent px-0 shadow-none h-full w-full relative",
+                      {
+                        "bg-zinc-500/20": isSelected,
+                      }
+                    )}
                   >
                     <div className="w-full flex items-center justify-start h-full gap-4 p-1.5">
                       <div
-                        className="w-4 h-10
-                    flex items-center
-                  
-                    flex-1 justify-center"
+                        className="w-4 h-10 flex items-center flex-1 justify-center"
                         style={{
-                          background: theme.bgColor,
+                          background: themeOption.backgroundColor,
                         }}
                       >
                         <p
                           className="center text-xs"
                           style={{
-                            color: theme.accentColor,
+                            color: themeOption.accentColor,
                           }}
                         >
                           hola!
@@ -170,8 +129,15 @@ export function ThemeSelector() {
                       </div>
 
                       <p className="flex-2 text-start text-sm font-mono text-zinc-300 group-hover:text-gray-50">
-                        {theme.name}
+                        {themeOption.name}
                       </p>
+
+                      {isSelected && (
+                        <Check
+                          size={16}
+                          className="text-green-400 ml-auto absolute right-2"
+                        />
+                      )}
                     </div>
                   </Button>
                 </DropdownMenuItem>

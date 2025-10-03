@@ -19,7 +19,7 @@ export const WidgetRegistry: Record<string, Objects> = {
     type: "text",
     component: headings,
     defaultData: {
-      content: "Your heading",
+      content: "Insert headings",
       level: 1,
     },
     description:
@@ -30,7 +30,7 @@ export const WidgetRegistry: Record<string, Objects> = {
     type: "text",
     component: ParagraphWidget,
     defaultData: {
-      content: "Your paragraph starts here...",
+      content: "Your paragraph starts",
     },
     description: "Normal paragraphs to write",
   },
@@ -64,13 +64,40 @@ export const WidgetRegistry: Record<string, Objects> = {
     },
     description: "A testimonial card",
   },
-  // barChart: {
-  //   slug: "barChart",
-  //   type: "chart",
-  //   component: BaseChartRender,
-  //   defaultData: {
-  //     chartData: null,
-  //   },
-  //   description: "A bar chart to visualize data",
-  // },
+  barChart: {
+    slug: "barChart",
+    type: "chart",
+    component: BaseChartRender,
+    defaultData: {
+      type: "bar",
+    },
+    description: "A bar chart to visualize data",
+  },
+  lineChart: {
+    slug: "lineChart",
+    type: "chart",
+    component: BaseChartRender,
+    defaultData: {
+      type: "line",
+    },
+    description: "A line chart",
+  },
+  areaChart: {
+    slug: "areaChart",
+    type: "chart",
+    component: BaseChartRender,
+    defaultData: {
+      type: "area",
+    },
+    description: "A area chart",
+  },
+  pieChart: {
+    slug: "pieChart",
+    type: "chart",
+    component: BaseChartRender,
+    defaultData: {
+      type: "pie",
+    },
+    description: "A line chart",
+  },
 };
