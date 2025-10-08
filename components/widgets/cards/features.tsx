@@ -1,6 +1,7 @@
 "use client";
 
 import { useWidgetSelection } from "@/lib/hooks/useWidgetSelection";
+import { useUIStore } from "@/lib/store/ui-store";
 import { TextAlign } from "@tiptap/extension-text-align";
 import { Color, FontSize, TextStyle } from "@tiptap/extension-text-style";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -10,18 +11,21 @@ interface FeatureCard {
   title: string;
   body: string;
   id: string;
+  slideId: string;
 }
 
 export const FeatureCardWidget: React.FC<FeatureCard> = ({
   title,
   body,
   id,
+  slideId,
 }) => {
+  const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const { widgetRef: headingRef, handleClick: handleHeadingClick } =
-    useWidgetSelection(id);
+    useWidgetSelection(id, slideId);
 
   const { widgetRef: paragraphRef, handleClick: handleParagraphClick } =
-    useWidgetSelection(id);
+    useWidgetSelection(id, slideId);
 
   const headingEditor = useEditor({
     immediatelyRender: false,
@@ -43,7 +47,12 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
     ],
     content: title,
     onUpdate: ({ editor }) => {
-      console.log(editor.getJSON());
+      updateEditBuffer({
+        widgetData: {
+          title: editor.getJSON(),
+          body: paragraphEditor?.getJSON(),
+        },
+      });
     },
   });
 
@@ -75,7 +84,12 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
       }),
     ],
     onUpdate: ({ editor }) => {
-      console.log(editor.getJSON());
+      updateEditBuffer({
+        widgetData: {
+          title: editor.getJSON(),
+          body: paragraphEditor?.getJSON(),
+        },
+      });
     },
   });
   return (
@@ -90,7 +104,7 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
         onClick={() => {
           handleHeadingClick({
             editor: headingEditor,
-            number: "19",
+            widgetType: "feature",
           });
         }}
       >
@@ -107,12 +121,12 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
         onClick={() => {
           handleParagraphClick({
             editor: paragraphEditor,
-            number: "20",
+            widgetType: "feature",
           });
         }}
       >
         <EditorContent
-          className="outline-none leading-5 text-md text-foreground [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0"
+          className="outline-none leading-5 text-md text-foreground [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.PrposeMirror]:p-0 [&_.ProseMirror]:m-0"
           editor={paragraphEditor}
         />
       </div>

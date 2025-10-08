@@ -4,8 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 
 type RowData = Record<string, string | number>;
 
+type Data = {
+  data: RowData[];
+  chartType: "bar" | "line" | "area" | "pie";
+};
 interface ChartTableProps {
-  data?: RowData[];
+  data?: Data;
 }
 
 interface EditingCell {
@@ -17,8 +21,9 @@ export function ChartTable(props: ChartTableProps) {
   const MAX_ROWS = 8;
   const MAX_COLUMNS = 8;
 
+  console.log(props);
   const [data, setData] = useState<RowData[]>(
-    props.data || [
+    props?.data?.data || [
       { month: "January", desktop: 186.4, mobile: 80, computer: 20, ipod: 20 },
       { month: "February", desktop: 305, mobile: 200, computer: 20, ipod: 40 },
       { month: "March", desktop: 237, mobile: 120, computer: 20, ipod: 40 },
@@ -37,7 +42,7 @@ export function ChartTable(props: ChartTableProps) {
 
   useEffect(() => {
     if (!editingCell) {
-      useUIStore.getState().updateEditBuffer(data)
+      useUIStore.getState().updateEditBuffer(data);
       console.log(data);
     }
   }, [editingCell, data]);
@@ -108,6 +113,12 @@ export function ChartTable(props: ChartTableProps) {
     <div
       className="bg-secondary rounded-xl overflow-hidden border border-slate-700"
       data-drawer
+      onBlur={() => {
+        console.log("hey");
+        const chartData = JSON.stringify(data, null, 2);
+        useUIStore.getState().updateEditBuffer(chartData);
+        console.log(useUIStore.getState().editBuffer);
+      }}
     >
       <div className="overflow-x-auto">
         <table className="w-full">

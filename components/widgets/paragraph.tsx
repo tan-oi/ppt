@@ -13,6 +13,7 @@ interface ParagraphWidgetProps {
   className?: string;
   id: string;
   styles?: any;
+  slideId: string;
 }
 
 export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
@@ -21,9 +22,10 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
   className,
   styles,
   id,
+  slideId,
 }) => {
-  const { widgetRef, handleClick } = useWidgetSelection(id);
-  const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
+  const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
+  const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -51,7 +53,11 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
     content,
     editable,
     onUpdate: ({ editor }) => {
-      console.log(editor.getJSON());
+      updateEditBuffer({
+        widgetData: {
+          content: editor.getJSON(),
+        },
+      });
     },
     onCreate: ({ editor }) => {
       editor.commands.setTextAlign("center");
@@ -63,7 +69,7 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
     <>
       <div
         ref={widgetRef}
-        className="backdrop-blur-xl  text-foreground text-base"
+        className="backdrop-blur-xl text-foreground text-base w-full h-full"
         style={{
           zIndex: "22",
 
@@ -82,7 +88,7 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
           // });
           handleClick({
             editor: editor,
-            number: "2",
+            widgetType: "text",
           });
         }}
       >

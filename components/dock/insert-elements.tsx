@@ -18,6 +18,11 @@ import {
   AreaChart,
   Quote,
   List,
+  Wand,
+  LineSquiggle,
+  Link,
+  Forward,
+  Pill,
 } from "lucide-react";
 import { DraggableMenuItem } from "./draggableItems";
 export function InsertElements() {
@@ -59,6 +64,24 @@ export function InsertElements() {
       icon: List,
     },
     {
+      name: "Icon Card",
+      id: "icon-card",
+      slug: "iconCard",
+      icon: Wand,
+    },
+    {
+      name: "Divider",
+      id: "divider",
+      slug: "divider",
+      icon: LineSquiggle,
+    },
+    {
+      name: "link",
+      id: "link",
+      slug: "buttonLink",
+      icon: Link,
+    },
+    {
       name: "Bar Chart",
       id: "bar-chart",
       slug: "barChart",
@@ -82,6 +105,18 @@ export function InsertElements() {
       slug: "pieChart",
       icon: PieChart,
     },
+    {
+      name: "Progress bar",
+      id: "progress-bar",
+      slug: "progressBar",
+      icon: Forward,
+    },
+    {
+      name: "Badge/Pill",
+      id: "badge-pill",
+      slug: "badge",
+      icon: Pill,
+    },
   ];
   return (
     <div>
@@ -95,18 +130,13 @@ export function InsertElements() {
 
         <DropdownMenuContent
           sideOffset={16}
-          className="h-108 w-xs overflow-y-hidden p-2 border border-zinc-800 bg-zinc-900/90 backdrop-blur-md rounded-lg shadow-xl w-80"
-          style={{
-            overflow: "visible",
-          }}
+          className="h-108 w-xs p-2 overflow-y-auto border border-zinc-800 bg-zinc-900/90 backdrop-blur-md rounded-lg shadow-xl w-80"
         >
           <DropdownMenuLabel className="text-sm text-zinc-300 flex flex-col space-y-0.5 px-2">
             <span>Insert Widget</span>
             <span className="text-xs text-zinc-500">Drag to slide</span>
           </DropdownMenuLabel>
-
           <DropdownMenuSeparator className="my-2 bg-zinc-800" />
-
           {elements.map((element) => (
             <DraggableMenuItem key={element.id} element={element} />
           ))}

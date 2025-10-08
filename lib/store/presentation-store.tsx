@@ -233,17 +233,21 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
 
   addWidget: (slideId, widgetType, position, defaultData) => {
     const widgetId = nanoid(7);
-    const defaultConfig = DEFAULT_POSITIONS[widgetType];
+    const widgetConfig = WidgetRegistry[widgetType];
+    const defaultPosition = widgetConfig?.defaultPosition || {
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+    };
 
-    const finalPosition = { ...defaultConfig, ...position };
-
-    console.log(defaultData);
+    console.log(widgetType);
     const widget: WidgetData = {
       id: widgetId,
       widgetType,
-      data: defaultData ?? null,
+      data: defaultData ?? widgetConfig?.defaultData ?? null,
       position: {
-        ...defaultConfig,
+        ...defaultPosition,
         ...position,
       },
     };

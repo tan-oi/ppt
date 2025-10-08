@@ -1,4 +1,5 @@
 import { useWidgetSelection } from "@/lib/hooks/useWidgetSelection";
+import { useUIStore } from "@/lib/store/ui-store";
 import { TextAlign } from "@tiptap/extension-text-align";
 import { Color, FontSize, TextStyle } from "@tiptap/extension-text-style";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -8,12 +9,15 @@ export function ListCard({
   type = "bullet",
   content = "<ul><li>First item</li><li>Second item</li><li>Third item</li></ul>",
   id,
+  slideId,
 }: {
   type?: "bullet" | "ordered";
   content?: string;
   id: string;
+  slideId: string;
 }) {
-  const { widgetRef, handleClick } = useWidgetSelection(id);
+  const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
+  const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -62,6 +66,13 @@ export function ListCard({
         editor.commands.toggleBulletList();
       }
     },
+    onUpdate: ({ editor }) => {
+      updateEditBuffer({
+        widgetData: {
+          content: editor.getJSON(),
+        },
+      });
+    },
   });
 
   return (
@@ -71,7 +82,7 @@ export function ListCard({
       onClick={() => {
         handleClick({
           editor,
-          number: "4",
+          widgetType: "list",
         });
       }}
       className="w-full h-full bg-muted p-4 rounded overflow-hidden"

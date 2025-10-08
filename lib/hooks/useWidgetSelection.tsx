@@ -1,8 +1,8 @@
-'use client';
-import { useRef } from 'react';
-import { useUIStore } from '@/lib/store/ui-store';
+"use client";
+import { useRef } from "react";
+import { useUIStore } from "@/lib/store/ui-store";
 
-export function useWidgetSelection(widgetId: string) {
+export function useWidgetSelection(widgetId: string, slideId: string) {
   const widgetRef = useRef<HTMLDivElement>(null);
   const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
 
@@ -18,13 +18,13 @@ export function useWidgetSelection(widgetId: string) {
     };
 
     updateSelectWidget({
-      slideIndex: 1,
+      slideId: slideId,
       id: widgetId,
+      widgetType: additionalData?.widgetType,
       data: {
         position,
         ...additionalData,
       },
-      type: additionalData?.type ?? "editoral",
     });
   };
 

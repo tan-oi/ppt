@@ -15,6 +15,7 @@ interface HeadingWidgetProps {
   id: string;
   className?: string;
   styles?: any;
+  slideId: string;
 }
 
 const HeadingWidget: React.FC<HeadingWidgetProps> = ({
@@ -24,11 +25,11 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   className,
   styles,
   id,
+  slideId,
 }) => {
 
-
-  const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
-  const { widgetRef, handleClick } = useWidgetSelection(id);
+  const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
+  const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
   // const widgetRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
@@ -59,10 +60,15 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
         ],
       }),
     ],
-    content : content,
+    content: content,
     editable,
     onUpdate: ({ editor }) => {
-      console.log(editor.getJSON());
+      console.log("im");
+      updateEditBuffer({
+        widgetData: {
+          content: editor.getJSON(),
+        },
+      });
     },
     onCreate: ({ editor }) => {
       editor.commands.setTextAlign("center");
@@ -104,7 +110,7 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   // };
 
   return (
-    <div
+    <div className="w-full h-full"
       ref={widgetRef}
       data-widget
       style={{
@@ -113,15 +119,12 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
       onClick={() => {
         handleClick({
           editor: editor,
-          number: "1",
+          widgetType: "text",
         });
       }}
     >
       <div
-        className={cn(
-          "tracking-wide transition-all duration-200",
-          className
-        )}
+        className={cn("tracking-wide transition-all duration-200", className)}
       >
         <EditorContent
           editor={editor}

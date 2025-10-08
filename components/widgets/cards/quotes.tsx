@@ -10,18 +10,22 @@ interface QuoteCard {
   person?: string;
   company?: string;
   id: string;
+  slideId: string;
 }
 export const QuoteCard = ({
   id,
   body = "Good job building this",
   person = "Sam Altman, CEO",
   company = "OpenAI",
+  slideId,
 }: QuoteCard) => {
-  
-  const { widgetRef: mainRef, handleClick: mainClick } = useWidgetSelection(id);
+  const { widgetRef: mainRef, handleClick: mainClick } = useWidgetSelection(
+    id,
+    slideId
+  );
 
   const { widgetRef: secondaryRef, handleClick: secondaryClick } =
-    useWidgetSelection(id);
+    useWidgetSelection(id, slideId);
 
   const mainEditor = useEditor({
     immediatelyRender: false,
@@ -67,7 +71,7 @@ export const QuoteCard = ({
     },
   });
 
-  console.log(body);
+  
   return (
     <>
       <div className="w-full h-full flex flex-col bg-accent/40 justify-between p-4 rounded-xl relative z-100 backdrop-blur-xl">
@@ -86,10 +90,10 @@ export const QuoteCard = ({
           onClick={() =>
             mainClick({
               editor: mainEditor,
-              number: "1",
+              widgetType: "quote",
             })
           }
-          className="mb-2"
+          className=""
         >
           <EditorContent
             editor={mainEditor}
@@ -102,7 +106,7 @@ export const QuoteCard = ({
           onClick={() =>
             secondaryClick({
               editor: secondaryEditor,
-              number: "12",
+              widgetType: "quote",
             })
           }
         >

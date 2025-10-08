@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { usePresentationStore } from "./presentation-store";
 
 interface Position {
   // widgetX: number;
@@ -9,31 +10,45 @@ interface Position {
 }
 
 interface WidgetData {
-  slideIndex: number;
+  slideId: string;
   id: string;
+  widgetType:
+    | "text"
+    | "feature"
+    | "quote"
+    | "list"
+    | "table"
+    | "stat"
+    | "chart"
+    | "image"
+    | "basic"
+    | "link"
+    | "divider"
+    | "badge";
+
   data: {
     editor?: any;
-    number?: string;
+    chartType?: "bar" | "pie" | "line" | "area";
     position?: Position;
     [key: string]: any;
   };
-  type: "editoral" | "drawer";
 }
 
 interface UIStore {
   toolbarOpen: boolean;
   drawerOpen: boolean;
   selectedWidget: WidgetData | null;
- 
-  updateSelectWidget: ({ slideIndex, id, data, type }: WidgetData) => void;
+
+  updateSelectWidget: ({ slideId, id, widgetType, data }: WidgetData) => void;
 
   editBuffer: any | null;
   updateEditBuffer: (changes: any) => void;
-  deselectWidget: () => void;
+  deselectWidgetAndRemoveToolbar: () => void;
+  deselectWidgetAndAddData: () => void;
   setDrawer: () => void;
 }
 
-export const useUIStore = create<UIStore>((set) => ({
+export const useUIStore = create<UIStore>((set, get) => ({
   toolbarOpen: false,
   drawerOpen: false,
   editBuffer: null,
@@ -44,25 +59,52 @@ export const useUIStore = create<UIStore>((set) => ({
       drawerOpen: !state.drawerOpen,
     })),
 
-  updateSelectWidget: ({ slideIndex, id, data, type }) =>
+  updateSelectWidget: ({ slideId, id, widgetType, data }) =>
     set({
       selectedWidget: {
-        slideIndex,
+        slideId,
         id,
+        widgetType,
         data,
-        type,
       },
       editBuffer: { data },
       toolbarOpen: true,
       // drawerOpen: type === "drawer" ? true : false,
     }),
 
-  deselectWidget: () =>
+  deselectWidgetAndRemoveToolbar: () => {
+    const { editBuffer } = get();
     set({
       selectedWidget: null,
       toolbarOpen: false,
       drawerOpen: false,
-    }),
+      editBuffer: null,
+    });
+  },
+
+  deselectWidgetAndAddData: () => {
+    const { selectedWidget, editBuffer } = get();
+    const slideId = selectedWidget?.slideId;
+    const widgetId = selectedWidget?.id;
+
+    console.log(selectedWidget);
+    console.log(editBuffer);
+
+    if (editBuffer.widgetData) {
+      usePresentationStore
+        .getState()
+        .updateWidget(slideId as string, widgetId as string, {
+          data: editBuffer.widgetData,
+        });
+    }
+
+    set({
+      selectedWidget: null,
+      toolbarOpen: false,
+      drawerOpen: false,
+      editBuffer: null,
+    });
+  },
 
   updateEditBuffer: (changes: any) =>
     set((state) => ({

@@ -1,4 +1,5 @@
 import { useWidgetSelection } from "@/lib/hooks/useWidgetSelection";
+import { useUIStore } from "@/lib/store/ui-store";
 import { cn } from "@/lib/utils";
 import { TextAlign } from "@tiptap/extension-text-align";
 import { Color, FontSize, TextStyle } from "@tiptap/extension-text-style";
@@ -10,13 +11,16 @@ export const BasicCard = ({
   id,
   className,
   editable = true,
+  slideId,
 }: {
   content: string;
   className?: string;
   editable?: boolean;
   id: string;
+  slideId: string;
 }) => {
-  const { widgetRef, handleClick } = useWidgetSelection(id);
+  const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
+  const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -42,6 +46,11 @@ export const BasicCard = ({
       }),
     ],
     editable: true,
+    onUpdate: ({ editor }) => {
+      updateEditBuffer({
+        body: editor.getJSON(),
+      });
+    },
   });
 
   return (
@@ -52,7 +61,7 @@ export const BasicCard = ({
         onClick={() => {
           handleClick({
             editor,
-            number: "3",
+            widgetType: "text",
           });
         }}
         className="rounded

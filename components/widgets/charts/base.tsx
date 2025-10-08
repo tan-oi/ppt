@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
 import { BarChartBase } from "./bar-chart";
-// import { PieChartBase } from "./pie-chart"
 
 import { AreaChartBase } from "./area-chart";
 import { ChartConfig } from "@/components/ui/chart";
@@ -15,6 +14,8 @@ interface BaseChartRenderProps {
   data?: any;
   id: string;
   className?: string;
+  slideId: string;
+  config?: any;
 }
 
 const defaultData = [
@@ -34,7 +35,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const chartRegistry: Record<
+export const chartRegistry: Record<
   BaseChartRenderProps["type"],
   React.ComponentType<{ chartData: any; chartConfig: ChartConfig }>
 > = {
@@ -49,11 +50,19 @@ export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
   data = null,
   id,
   className,
+  slideId,
+  ...props
 }) => {
-  console.log(type, "typeis");
+  const config = props.config;
+  console.log("config:", config);
+  console.log("data:", data);
+
   const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
-  const { widgetRef, handleClick } = useWidgetSelection(id);
+  const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
   const ChartComponent = chartRegistry[type];
+
+  const chartConfigToUse = config ?? chartConfig;
+  const chartDataToUse = data ?? defaultData;
 
   return (
     <div
@@ -65,9 +74,13 @@ export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
       }}
       onClick={() =>
         handleClick({
-          type: "drawer",
-          data: data ?? defaultData,
-        })
+          widgetType: "chart",
+          data: {
+            type: type,
+            data: chartDataToUse,
+            config: chartConfigToUse,
+          },
+      })
       }
     >
       <Card className="border-none min-w-[180px] min-h-[200px] w-full h-full">
@@ -78,8 +91,8 @@ export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
         </CardHeader>
         <CardContent className="w-full h-full">
           <ChartComponent
-            chartData={data ?? defaultData}
-            chartConfig={chartConfig}
+            chartData={chartDataToUse}
+            chartConfig={chartConfigToUse}
           />
         </CardContent>
       </Card>

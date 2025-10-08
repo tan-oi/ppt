@@ -3,11 +3,11 @@
 import { useSlideScale } from "@/lib/hooks/useSlideScale";
 import { useWidgetDeselect } from "@/lib/hooks/useWidgetDeselect";
 import { Slide } from "./slide";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePresentationStore } from "@/lib/store/presentation-store";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { DndContext } from "@dnd-kit/core";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
 import {
   needsTransformation,
   populateStores,
@@ -32,6 +32,8 @@ export function Presentation({
   const drawerOpen = useUIStore((s) => s.drawerOpen);
   const pptTheme = usePresentationStore((s) => s.theme);
   const setType = usePresentationStore((s) => s.setType);
+  const [activeElement, setActiveElement] = useState<any>(null);
+
   const { status, sendMessage } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/trail",
@@ -69,8 +71,12 @@ export function Presentation({
   useSlideUrlSync(slideIds);
   useWidgetDeselect();
 
+  const handleDragStart = useCallback((event: any) => {
+    setActiveElement(event.active.data.current);
+  }, []);
   const handleDragEnd = useCallback(
     (event: any) => {
+      setActiveElement(null);
       console.log("Full event:", event);
 
       const { active, over, delta, activatorEvent } = event;
@@ -120,7 +126,12 @@ export function Presentation({
       const addWidget = usePresentationStore.getState().addWidget;
 
       const data = WidgetRegistry[slug].defaultData;
+      console.log(data);
       addWidget(slideId, slug, { x: actualX, y: actualY }, data);
+
+      requestAnimationFrame(() => {
+        setActiveElement(null);
+      });
     },
     [slideScale]
   );
@@ -131,29 +142,7 @@ export function Presentation({
 
   return (
     <>
-      <DndContext
-        // onDragEnd={(event) => {
-        //   console.log(event);
-
-        //   const { active, over, delta, activatorEvent } = event;
-        //   let finalX, finalY;
-
-        //   if (activatorEvent) {
-        //     finalX = activatorEvent.clientX + delta.x;
-        //     finalY = activatorEvent.clientY + delta.y;
-
-        //     console.log("Final mouse position:", { x: finalX, y: finalY });
-        //   }
-
-        //   const slug = active?.data?.current?.slug;
-        //   const slideId = String(over?.id);
-        //   const addWidget = usePresentationStore.getState().addWidget;
-
-        //   addWidget(slideId, slug, { x: finalX, y: finalY });
-        // }}
-
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div
           className={cn(
             "bg-container min-h-screen overflow-hidden flex flex-col items-center py-6",
@@ -178,6 +167,16 @@ export function Presentation({
             ))}
           </div>
         </div>
+        <DragOverlay dropAnimation={null}>
+          {activeElement ? (
+            <div className="w-80 bg-zinc-800/95 backdrop-blur-md rounded-lg px-3 py-2 shadow-2xl border border-zinc-600 flex items-center gap-2">
+              <activeElement.icon size={16} className="text-zinc-300" />
+              <span className="text-sm text-zinc-300">
+                {activeElement.name}
+              </span>
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
       {drawerOpen && <DrawerEditing />}
     </>

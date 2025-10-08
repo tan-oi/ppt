@@ -6,6 +6,9 @@ export function useWidgetDeselect() {
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
+      const isToolbarOpen = useUIStore.getState().toolbarOpen;
+      console.log("hey");
+
       if (
         target.closest("[data-widget]") ||
         target.closest("[data-toolbar]") ||
@@ -14,16 +17,21 @@ export function useWidgetDeselect() {
         target.closest("[data-widget-interactive]")
       )
         return;
-      useUIStore.getState().deselectWidget();
+      if (isToolbarOpen) {
+        useUIStore.getState().deselectWidgetAndAddData();
+      }
     };
 
     const handleScroll = (e: Event) => {
       const target = e.target as HTMLElement;
+      const isToolbarOpen = useUIStore.getState().toolbarOpen;
       if (target instanceof Element && target.closest("[data-drawer]")) {
         return;
       }
-      
-      useUIStore.getState().deselectWidget();
+
+      if (isToolbarOpen) {
+        useUIStore.getState().deselectWidgetAndRemoveToolbar();
+      }
     };
 
     document.addEventListener("pointerdown", handleClick, true);
