@@ -27,7 +27,6 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   id,
   slideId,
 }) => {
-
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
   // const widgetRef = useRef<HTMLDivElement>(null);
@@ -65,9 +64,7 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
     onUpdate: ({ editor }) => {
       console.log("im");
       updateEditBuffer({
-        widgetData: {
-          content: editor.getJSON(),
-        },
+        content: editor.getJSON(),
       });
     },
     onCreate: ({ editor }) => {
@@ -110,7 +107,8 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   // };
 
   return (
-    <div className="w-full h-full"
+    <div
+      className="w-full h-full"
       ref={widgetRef}
       data-widget
       style={{

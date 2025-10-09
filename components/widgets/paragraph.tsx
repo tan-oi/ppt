@@ -54,9 +54,7 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
     editable,
     onUpdate: ({ editor }) => {
       updateEditBuffer({
-        widgetData: {
-          content: editor.getJSON(),
-        },
+        content: editor.getJSON(),
       });
     },
     onCreate: ({ editor }) => {

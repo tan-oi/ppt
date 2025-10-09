@@ -17,13 +17,17 @@ export function useWidgetSelection(widgetId: string, slideId: string) {
       centerY: rect.top + rect.height / 2,
     };
 
+    const { widgetType, data, editor, ...rest } = additionalData || {};
+
     updateSelectWidget({
       slideId: slideId,
       id: widgetId,
-      widgetType: additionalData?.widgetType,
+      widgetType: widgetType,
       data: {
         position,
-        ...additionalData,
+        editor,
+        ...data,
+        ...rest,
       },
     });
   };

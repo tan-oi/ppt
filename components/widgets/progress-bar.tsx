@@ -27,30 +27,50 @@ export function ProgressBarWidget({
   className,
 }: ProgressBarWidgetProps) {
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
-  const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
 
-  const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
+  const isSelected = useUIStore((s) => s.selectedWidget?.id === id);
+
+  const editBuffer = useUIStore((s) => s.editBuffer);
+
+  const currentData =
+    isSelected && editBuffer?.widgetData
+      ? editBuffer.widgetData
+      : {
+          percentage,
+          showPercentage,
+          color,
+          backgroundColor,
+          label,
+        };
+
+  const clampedPercentage = Math.min(Math.max(currentData.percentage, 0), 100);
 
   return (
     <div
       className="w-full h-full flex items-center justify-center p-4 cursor-pointer"
       data-widget
-      // ref={widgetRef}
+      ref={widgetRef}
       onClick={() => {
-        updateEditBuffer({
-          widgetData: {
-            percentage: 60,
-            label: "hey",
+        handleClick({
+          data: {
+            percentage: currentData.percentage,
+            label: currentData.label,
+            color: currentData.color,
+            backgroundColor: currentData.backgroundColor,
+            showPercentage: currentData.showPercentage,
           },
+          widgetType: "progress",
         });
       }}
     >
       <div className="w-full space-y-2">
-        {(label || showPercentage) && (
+        {(currentData.label || currentData.showPercentage) && (
           <div className="flex justify-between items-center text-sm font-medium text-gray-700">
-            {label && <span>{label}</span>}
-            {showPercentage && (
-              <span style={{ color }}>{clampedPercentage}%</span>
+            {currentData.label && <span>{currentData.label}</span>}
+            {currentData.showPercentage && (
+              <span style={{ color: currentData.color }}>
+                {clampedPercentage}%
+              </span>
             )}
           </div>
         )}
@@ -58,7 +78,7 @@ export function ProgressBarWidget({
         <div
           className="w-full rounded-full overflow-hidden"
           style={{
-            backgroundColor,
+            backgroundColor: currentData.backgroundColor,
             height: `${height}px`,
           }}
         >
@@ -66,7 +86,7 @@ export function ProgressBarWidget({
             className="h-full rounded-full transition-all duration-300 ease-out"
             style={{
               width: `${clampedPercentage}%`,
-              backgroundColor: color,
+              backgroundColor: currentData.color,
             }}
           />
         </div>

@@ -1,14 +1,6 @@
 import { create } from "zustand";
 import { usePresentationStore } from "./presentation-store";
 
-interface Position {
-  // widgetX: number;
-  widgetY: number;
-
-  centerX: number;
-  // centerY: number;
-}
-
 interface WidgetData {
   slideId: string;
   id: string;
@@ -24,14 +16,10 @@ interface WidgetData {
     | "basic"
     | "link"
     | "divider"
-    | "badge";
-
-  data: {
-    editor?: any;
-    chartType?: "bar" | "pie" | "line" | "area";
-    position?: Position;
-    [key: string]: any;
-  };
+    | "badge"
+    | "progress"
+    | "icon";
+  data: any;
 }
 
 interface UIStore {
@@ -41,8 +29,11 @@ interface UIStore {
 
   updateSelectWidget: ({ slideId, id, widgetType, data }: WidgetData) => void;
 
-  editBuffer: any | null;
-  updateEditBuffer: (changes: any) => void;
+  editBuffer: {
+    widgetData: any;
+  } | null;
+
+  updateEditBuffer: (changes: Partial<any>) => void;
   deselectWidgetAndRemoveToolbar: () => void;
   deselectWidgetAndAddData: () => void;
   setDrawer: () => void;
@@ -67,13 +58,13 @@ export const useUIStore = create<UIStore>((set, get) => ({
         widgetType,
         data,
       },
-      editBuffer: { data },
+      editBuffer: {
+        widgetData: { ...data },
+      },
       toolbarOpen: true,
-      // drawerOpen: type === "drawer" ? true : false,
     }),
 
   deselectWidgetAndRemoveToolbar: () => {
-    const { editBuffer } = get();
     set({
       selectedWidget: null,
       toolbarOpen: false,
@@ -84,19 +75,24 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
   deselectWidgetAndAddData: () => {
     const { selectedWidget, editBuffer } = get();
-    const slideId = selectedWidget?.slideId;
-    const widgetId = selectedWidget?.id;
 
-    console.log(selectedWidget);
-    console.log(editBuffer);
-
-    if (editBuffer.widgetData) {
-      usePresentationStore
-        .getState()
-        .updateWidget(slideId as string, widgetId as string, {
-          data: editBuffer.widgetData,
-        });
+    if (!selectedWidget || !editBuffer?.widgetData) {
+      set({
+        selectedWidget: null,
+        toolbarOpen: false,
+        drawerOpen: false,
+        editBuffer: null,
+      });
+      return;
     }
+
+    const { slideId, id } = selectedWidget;
+
+    const { position, editor, ...dataToSave } = editBuffer.widgetData;
+
+    usePresentationStore.getState().updateWidget(slideId, id, {
+      data: dataToSave,
+    });
 
     set({
       selectedWidget: null,
@@ -106,11 +102,14 @@ export const useUIStore = create<UIStore>((set, get) => ({
     });
   },
 
-  updateEditBuffer: (changes: any) =>
+  updateEditBuffer: (changes: Partial<any>) => {
     set((state) => ({
       editBuffer: {
-        ...state.editBuffer,
-        ...changes,
+        widgetData: {
+          ...state.editBuffer?.widgetData,
+          ...changes,
+        },
       },
-    })),
+    }));
+  },
 }));

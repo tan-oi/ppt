@@ -39,7 +39,7 @@ export function BadgeWidget({
         onClick={() =>
           handleClick({
             widgetType: "badge",
-            payload: {
+            data: {
               color: currentData.color,
               backgroundColor: currentData.backgroundColor,
             },

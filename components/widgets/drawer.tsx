@@ -99,12 +99,11 @@ export function DrawerEditing() {
   const drawerSync = useUIStore((s) => s.drawerOpen);
   const editBuffer = useUIStore((s) => s.editBuffer);
   const pptTheme = usePresentationStore((s) => s.theme);
-  const selectedWidget = useUIStore((s) => s.selectedWidget);
   const handleSubmit = (data: any) => console.log(data);
-  console.log(editBuffer.data);
-  const chartType = editBuffer?.data?.data?.type;
-  const chartData = editBuffer?.data?.data?.data;
-  const chartConfig = editBuffer?.data?.data?.config;
+
+  const chartType = editBuffer?.widgetData?.type;
+  const chartData = editBuffer?.widgetData?.data;
+  const chartConfig = editBuffer?.widgetData?.config;
   //@ts-ignore
   const ChartComponent = chartRegistry[chartType];
 

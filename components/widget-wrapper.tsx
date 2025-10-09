@@ -49,6 +49,7 @@ export function WidgetWrapper({
           content: widgetData?.content,
         }}
         id={widgetId}
+        slideId={slideId}
         {...widgetData}
       />
     </DraggableResizableWrapper>

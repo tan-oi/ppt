@@ -6,24 +6,13 @@ import { PaintBucket } from "lucide-react";
 export function DividerToolbar() {
   const editBuffer = useUIStore((s) => s.editBuffer);
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
-  const widgetData = editBuffer.data.payload;
+  
+  if (!editBuffer?.widgetData) return null;
 
-  console.log(editBuffer);
+  const widgetData = editBuffer.widgetData;  
 
-  //make it better.
   const handleUpdate = (key: string, value: any) => {
-    const updatedWidgetData = {
-      ...editBuffer.data.payload,
-      [key]: value,
-    };
-
-    updateEditBuffer({
-      data: {
-        ...editBuffer.data,
-        payload: updatedWidgetData,
-      },
-      widgetData: updatedWidgetData,
-    });
+    updateEditBuffer({ [key]: value }); 
   };
 
   return (

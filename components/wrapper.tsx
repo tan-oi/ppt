@@ -36,12 +36,12 @@ export function DraggableResizableWrapper({
       enableResizing={selected}
       disableDragging={!selected}
       bounds="parent"
-      onDragStop={(e, d) => {
-        onDragStop?.(d.x, d.y);
+      onDragStop={(x, y) => {
+        console.log("drag finished", x, y);
       }}
       enableUserSelectHack={false}
-      onResizeStop={(e, dir, ref, delta, pos) => {
-        onResizeStop?.(ref.offsetWidth, ref.offsetHeight, pos.x, pos.y);
+      onResizeStop={(w, h, x, y) => {
+        console.log("Resize finished:", { width: w, height: h, x, y });
       }}
     >
       {children}

@@ -28,7 +28,7 @@ export function ButtonLinkWidget({
   const editBuffer = useUIStore((s) => s.editBuffer);
 
   const currentData =
-    isSelected && editBuffer.widgetData
+    isSelected && editBuffer?.widgetData
       ? editBuffer?.widgetData
       : {
           url,
@@ -99,7 +99,7 @@ export function ButtonLinkWidget({
       onClick={() =>
         handleClick({
           widgetType: "link",
-          payload: {
+          data: {
             variant: currentData.variant,
             text: currentData.text,
             color: currentData.color,

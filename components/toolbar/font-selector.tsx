@@ -20,16 +20,14 @@ import { Button } from "../ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { useUIStore } from "@/lib/store/ui-store";
-import { cn } from "@/lib/utils";
 
 export function FontSizeDropDown() {
   const [selectedValue, setSelectedValue] = useState<number>(16);
   const [selectedName, setSelectedName] = useState<string>("Medium");
 
   const editBuffer = useUIStore((s) => s.editBuffer);
- 
-  const editor = editBuffer.data.editor;
 
+  const editor = editBuffer?.widgetData?.editor;
   const fontSizeOptions = [
     { label: "Extra Small", value: 12 },
     { label: "Small", value: 14 },
@@ -98,6 +96,7 @@ export function FontSizeDropDown() {
     }
   };
 
+  if (!editor) return null;
   return (
     <>
       <TooltipProvider>
@@ -134,7 +133,9 @@ export function FontSizeDropDown() {
                   onClick={() => {
                     handleOptionSelect(option.value, option.label);
                   }}
-                  className={`cursor-pointer ${selectedValue === option.value ? "bg-accent/70" : ""}`}
+                  className={`cursor-pointer ${
+                    selectedValue === option.value ? "bg-accent/70" : ""
+                  }`}
                 >
                   <span>{option.label}</span>
                   <span className="ml-auto text-xs text-muted-foreground">

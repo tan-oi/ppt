@@ -48,10 +48,8 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
     content: title,
     onUpdate: ({ editor }) => {
       updateEditBuffer({
-        widgetData: {
-          title: editor.getJSON(),
-          body: paragraphEditor?.getJSON(),
-        },
+        title: editor.getJSON(),
+        body: paragraphEditor?.getJSON(),
       });
     },
   });
@@ -85,10 +83,8 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
     ],
     onUpdate: ({ editor }) => {
       updateEditBuffer({
-        widgetData: {
-          title: editor.getJSON(),
-          body: paragraphEditor?.getJSON(),
-        },
+        title: editor.getJSON(),
+        body: paragraphEditor?.getJSON(),
       });
     },
   });

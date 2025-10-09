@@ -5,6 +5,29 @@ export const SLIDE_CONFIG = {
   rows: 24,
 };
 
+export const commonIcons = [
+  { label: "Money", icon: "DollarSign" },
+  { label: "Growth", icon: "TrendingUp" },
+  { label: "Decline", icon: "TrendingDown" },
+  { label: "Bar Chart", icon: "BarChart3" },
+  { label: "Pie Chart", icon: "PieChart" },
+  { label: "Line Chart", icon: "LineChart" },
+  { label: "Global", icon: "Globe" },
+  { label: "Location", icon: "MapPin" },
+  { label: "Building", icon: "Building" },
+  { label: "Business", icon: "Briefcase" },
+  { label: "Goal", icon: "Target" },
+  { label: "Calendar", icon: "Calendar" },
+  { label: "Time", icon: "Clock" },
+  { label: "Team", icon: "Users" },
+  { label: "Achievement", icon: "Award" },
+  { label: "Idea", icon: "Lightbulb" },
+  { label: "Success", icon: "CheckCircle" },
+  { label: "Error", icon: "XCircle" },
+  { label: "Favorite", icon: "Star" },
+  { label: "Love", icon: "Heart" },
+];
+
 export const DEFAULT_POSITIONS: Record<
   string,
   { x: number; y: number; width: number; height: number }

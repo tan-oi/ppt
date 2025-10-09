@@ -68,9 +68,7 @@ export function ListCard({
     },
     onUpdate: ({ editor }) => {
       updateEditBuffer({
-        widgetData: {
-          content: editor.getJSON(),
-        },
+        content: editor.getJSON(),
       });
     },
   });

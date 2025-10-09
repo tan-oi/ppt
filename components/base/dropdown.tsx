@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 
 interface DropdownOption {
   label: string;
-  value: string | number;
+  value: string | number ;
 }
 
 interface BaseDropdownProps {
@@ -59,10 +59,9 @@ export function BaseDropdown({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = inputType === "number" 
-      ? Number(e.target.value) 
-      : e.target.value;
-    
+    const inputValue =
+      inputType === "number" ? Number(e.target.value) : e.target.value;
+
     if (inputValue) {
       setSelectedValue(inputValue);
       onChange(inputValue);
@@ -93,7 +92,8 @@ export function BaseDropdown({
           </TooltipContent>
         </Tooltip>
 
-        <DropdownMenuContent sideOffset={10}
+        <DropdownMenuContent
+          sideOffset={10}
           widget-element="true"
           className="my-2 w-40 max-w-[230px] min-w-[120px] border-none bg-popover/95 backdrop-filter-xl"
         >

@@ -22,8 +22,8 @@ export const DividerWidget: React.FC<DividerWidgetProps> = ({
 }) => {
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
 
-  const selectedWidget = useUIStore((s) => s.selectedWidget);
-  const isSelected = selectedWidget?.id === id;
+  const isSelected = useUIStore((s) => s.selectedWidget?.id === id);
+  // const isSelected = selectedWidget?.id === id;
   const editBuffer = useUIStore((s) => s.editBuffer);
 
   const currentData =
@@ -41,7 +41,7 @@ export const DividerWidget: React.FC<DividerWidgetProps> = ({
       onClick={() => {
         handleClick({
           widgetType: "divider",
-          payload: {
+          data: {
             style: currentData.style,
             thickness: currentData.thickness,
             color: currentData.color,

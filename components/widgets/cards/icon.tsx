@@ -1,6 +1,5 @@
-//add how to edit + label + add its own type in toolbar and store.
-
 import { useWidgetSelection } from "@/lib/hooks/useWidgetSelection";
+import { useUIStore } from "@/lib/store/ui-store";
 import * as LucideIcons from "lucide-react";
 
 interface IconWidgetProps {
@@ -21,7 +20,6 @@ interface IconWidgetProps {
 export function IconWidget({
   id,
   slideId,
-
   isEditable,
   className,
   iconName,
@@ -32,11 +30,25 @@ export function IconWidget({
   labelPosition,
 }: IconWidgetProps) {
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
+  const selectedWidget = useUIStore((s) => s.selectedWidget?.id === id);
+  const editBuffer = useUIStore((s) => s.editBuffer);
 
-  const IconComponent = (LucideIcons as any)[iconName];
+  const currentData =
+    selectedWidget && editBuffer?.widgetData
+      ? editBuffer.widgetData
+      : {
+          label,
+          iconName,
+          iconColor,
+          showLabel,
+          labelPosition,
+          iconSize,
+        };
+
+  const IconComponent = (LucideIcons as any)[currentData.iconName];
 
   const getFlexDirection = () => {
-    switch (labelPosition) {
+    switch (currentData.labelPosition) {
       case "bottom":
         return "flex-col";
       case "top":
@@ -50,7 +62,9 @@ export function IconWidget({
     }
   };
 
-  const isVertical = labelPosition === "top" || labelPosition === "bottom";
+  const isVertical =
+    currentData.labelPosition === "top" ||
+    currentData.labelPosition === "bottom";
   const alignItems = isVertical ? "items-center" : "items-center";
   const gap = isVertical ? "gap-2" : "gap-3";
 
@@ -61,7 +75,15 @@ export function IconWidget({
       ref={widgetRef}
       onClick={() => {
         handleClick({
-          widgetType: "text",
+          widgetType: "icon",
+          data: {
+            label: currentData.label,
+            showLabel: currentData.showLabel,
+            labelPosition: currentData.labelPosition,
+            iconColor: currentData.iconColor,
+            iconSize: currentData.iconSize,
+            iconName: currentData.iconName,
+          },
         });
       }}
     >
@@ -69,21 +91,25 @@ export function IconWidget({
         className={`w-full h-full flex ${getFlexDirection()} ${alignItems} ${gap} justify-center ${className}`}
       >
         {IconComponent ? (
-          <IconComponent size={iconSize} color={iconColor} strokeWidth={2} />
+          <IconComponent
+            size={currentData.iconSize}
+            color={currentData.iconColor}
+            strokeWidth={2}
+          />
         ) : (
           <LucideIcons.HelpCircle
-            size={iconSize}
+            size={currentData.iconSize}
             color="#9CA3AF"
             strokeWidth={2}
           />
         )}
 
-        {showLabel && label && (
+        {currentData.showLabel && currentData.label && (
           <span
             className="text-sm font-medium text-gray-700"
-            style={{ color: iconColor }}
+            style={{ color: currentData.iconColor }}
           >
-            {label}
+            {currentData.label}
           </span>
         )}
       </div>

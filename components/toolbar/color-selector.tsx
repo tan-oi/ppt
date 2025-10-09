@@ -29,8 +29,7 @@ const colors = [
 
 export function ColorSelector() {
   const editBuffer = useUIStore((s) => s.editBuffer);
-  const editor = editBuffer.data.editor;
-
+  const editor = editBuffer?.widgetData?.editor; 
   const [selected, setSelected] = useState<string | null>("#fff");
   const [open, setOpen] = useState<boolean>(false);
 
@@ -64,6 +63,8 @@ export function ColorSelector() {
 
     editor.commands.setColor(c);
   };
+
+  if(!editor) return null;
   return (
     <TooltipProvider>
       <Popover open={open} onOpenChange={setOpen}>

@@ -12,20 +12,12 @@ export function LinkToolbar() {
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
 
   console.log(editBuffer);
-  const widgetData = editBuffer.data.payload;
-  const handleUpdate = (key: string, value: any) => {
-    const updatedWidgetData = {
-      ...editBuffer.data.payload,
-      [key]: value,
-    };
+  if (!editBuffer?.widgetData) return null;
 
-    updateEditBuffer({
-      data: {
-        ...editBuffer.data,
-        payload: updatedWidgetData,
-      },
-      widgetData: updatedWidgetData,
-    });
+  const widgetData = editBuffer.widgetData;
+
+  const handleUpdate = (key: string, value: any) => {
+    updateEditBuffer({ [key]: value });
   };
 
   return (

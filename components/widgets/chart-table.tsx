@@ -23,7 +23,8 @@ export function ChartTable(props: ChartTableProps) {
 
   console.log(props);
   const [data, setData] = useState<RowData[]>(
-    props?.data?.data || [
+    //@ts-ignore
+    props?.data || [
       { month: "January", desktop: 186.4, mobile: 80, computer: 20, ipod: 20 },
       { month: "February", desktop: 305, mobile: 200, computer: 20, ipod: 40 },
       { month: "March", desktop: 237, mobile: 120, computer: 20, ipod: 40 },
@@ -42,8 +43,9 @@ export function ChartTable(props: ChartTableProps) {
 
   useEffect(() => {
     if (!editingCell) {
-      useUIStore.getState().updateEditBuffer(data);
-      console.log(data);
+      useUIStore.getState().updateEditBuffer({
+        data: data,
+      });
     }
   }, [editingCell, data]);
   const updateCell = (rowIndex: number, colName: string, value: string) => {
@@ -114,10 +116,9 @@ export function ChartTable(props: ChartTableProps) {
       className="bg-secondary rounded-xl overflow-hidden border border-slate-700"
       data-drawer
       onBlur={() => {
-        console.log("hey");
-        const chartData = JSON.stringify(data, null, 2);
-        useUIStore.getState().updateEditBuffer(chartData);
-        console.log(useUIStore.getState().editBuffer);
+        useUIStore.getState().updateEditBuffer({
+          data: data,
+        });
       }}
     >
       <div className="overflow-x-auto">
