@@ -91,7 +91,7 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
   return (
     <div
       data-widget
-      className="w-full h-full bg-muted p-4 rounded flex flex-col gap-2 overflow-hidden z-20"
+      className="w-full h-full bg-gray-50/5 backdrop-blur-xl p-4 rounded flex flex-col gap-2 overflow-hidden z-20"
       style={{}}
     >
       <div
@@ -105,7 +105,7 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
         }}
       >
         <EditorContent
-          className="outline-none font-semibold text-primary text-sm
+          className="outline-none font-semibold text-accent text-sm
         [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0"
           editor={headingEditor}
         />

@@ -7,6 +7,13 @@ export function useWidgetSelection(widgetId: string, slideId: string) {
   const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
 
   const handleClick = (additionalData?: any) => {
+    const { isProcessing } = useUIStore.getState();
+
+    if (isProcessing) {
+      console.log("⏳ Cannot switch widgets during processing");
+      return;
+    }
+
     if (!widgetRef.current) return;
 
     const rect = widgetRef.current.getBoundingClientRect();

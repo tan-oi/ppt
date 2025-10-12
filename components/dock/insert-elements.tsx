@@ -23,6 +23,7 @@ import {
   Link,
   Forward,
   Pill,
+  Image,
 } from "lucide-react";
 import { DraggableMenuItem } from "./draggableItems";
 export function InsertElements() {
@@ -116,6 +117,12 @@ export function InsertElements() {
       id: "badge-pill",
       slug: "badge",
       icon: Pill,
+    },
+    {
+      name: "Image",
+      id: "image",
+      slug: "image",
+      icon: Image,
     },
   ];
   return (

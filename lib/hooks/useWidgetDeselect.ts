@@ -8,6 +8,7 @@ export function useWidgetDeselect() {
       const target = e.target as HTMLElement;
       const isToolbarOpen = useUIStore.getState().toolbarOpen;
       console.log("hey");
+      console.log(isToolbarOpen);
 
       if (
         target.closest("[data-widget]") ||

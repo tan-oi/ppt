@@ -6,7 +6,8 @@ import { ListCard } from "@/components/widgets/cards/list";
 import { QuoteCard } from "@/components/widgets/cards/quotes";
 import { BaseChartRender } from "@/components/widgets/charts/base";
 import { DividerWidget } from "@/components/widgets/divider";
-import headings from "@/components/widgets/headings";
+import { HeadingWidget } from "@/components/widgets/headings";
+import { ImageWidget } from "@/components/widgets/image";
 import { ButtonLinkWidget } from "@/components/widgets/links/base";
 import { ParagraphWidget } from "@/components/widgets/paragraph";
 import { ProgressBarWidget } from "@/components/widgets/progress-bar";
@@ -29,7 +30,7 @@ export const WidgetRegistry: Record<string, WidgetConfig> = {
   heading: {
     slug: "heading",
     type: "text",
-    component: headings,
+    component: HeadingWidget,
     defaultData: {
       content: "Add Your Heading Here",
       level: 1,
@@ -251,5 +252,18 @@ export const WidgetRegistry: Record<string, WidgetConfig> = {
       height: 80,
     },
     description: "Visual badge/pill component",
+  },
+  image: {
+    slug: "image",
+    type: "image",
+    component: ImageWidget,
+    defaultData: {
+      imageUrl:
+        "https://cdn.cosmos.so/9f93c036-e0fd-4e83-8ff2-bace67bf9886?format=jpeg",
+      alt: "Slide image demo",
+      objectFit: "contain",
+    },
+    defaultPosition: { x: 150, y: 150, width: 400, height: 300 },
+    description: "Add images to your slides with upload support",
   },
 };

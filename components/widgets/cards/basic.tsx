@@ -66,7 +66,7 @@ export const BasicCard = ({
         }}
         className="rounded
         backdrop-blur-xl 
-        bg-gray-50/5 text-foreground h-full w-full border border-sm border-secondary min-h-24 shadow-sm"
+        bg-gray-50/5 text-foreground h-full w-full border border-sm border-secondary overflow-hidden shadow-sm"
       >
         <div
           className={

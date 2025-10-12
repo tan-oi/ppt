@@ -1,92 +1,9 @@
-// import { create } from "zustand";
-
 import { nanoid } from "nanoid";
 import { create } from "zustand";
-import { DEFAULT_POSITIONS, SLIDE_CONFIG } from "../config/slide";
+import { SLIDE_CONFIG } from "../config/slide";
 import { LayoutRegistry } from "../registry/layout";
 import { createWidgetsFromSlots } from "@/components/slideUtils";
 import { WidgetRegistry } from "../registry/widget";
-
-// interface WidgetData {
-//   // slideIndex: number;
-//   id: string;
-//   data: any;
-//   // type: "editoral" | "drawer";
-//   position: {
-//     x: number;
-//     y: number;
-//     height: number;
-//     width: number;
-//   };
-//   widgetType?: string;
-//   slideId: string;
-// }
-
-// interface Slide {
-//   id: string;
-//   // widget: WidgetData[];
-//   background?: string;
-//   slideNumber: number;
-//   heading?: string;
-//   layoutId: string;
-//   widgetIds: string[];
-// }
-
-// interface PresentationState {
-//   type: "llm" | "db";
-//   setType: (type: "llm" | "db") => void;
-//   currentSlideIndex: number;
-//   currentWidgetId: string;
-//   slides: Slide[] | [];
-//   setCurrentSlide: (id: number) => void;
-//   addSlide: (slide: Slide) => void;
-//   deleteSlide: (slide: Slide) => void;
-//   widgets: WidgetData[] | [];
-//   addWidget: (
-//     data: Omit<WidgetData, "slideId"> | null,
-//     slideId: string,
-//     widgetId: string
-//   ) => void;
-//   getWidget: (id: string) => WidgetData | null;
-// }
-
-// export const usePresentationStore = create<PresentationState>((set, get) => ({
-//   widgets: [],
-//   type: "db",
-//   setType: (type) =>
-//     set({
-//       type,
-//     }),
-//   currentSlideIndex: 1,
-//   currentWidgetId: "",
-//   slides: [],
-
-//   addSlide: (slide) =>
-//     set((state) => ({
-//       slides: [...state.slides, slide],
-//     })),
-
-//   deleteSlide: (slide) => set({}),
-
-//   addWidget: (data, slideId, widgetId) =>
-//     set((state) => ({
-//       widgets: [
-//         ...state.widgets,
-//         {
-//           id: widgetId,
-//           data: data?.data,
-//           position: data.position,
-//           widgetType: data?.widgetType,
-//           slideId: slideId,
-//         },
-//       ],
-//     })),
-//   setCurrentSlide: (id) => set({ currentSlideIndex: id }),
-
-//   getWidget: (widgetId: string) => {
-//     return get().widgets.find((w) => w.id === widgetId) || null;
-//   },
-// }));
 
 interface WidgetData {
   id: string;
@@ -140,6 +57,16 @@ interface PresentationState {
     updates: Partial<WidgetData>
   ) => void;
 
+  updateWidgetPosition: (
+    slideId: string,
+    widgetId: string,
+    position: {
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+    }
+  ) => void;
   deleteWidget: (slideId: string, widgetId: string) => void;
   getWidget: (slideId: string, widgetId: string) => WidgetData | null;
   updateSlideTheme: (slideId: string, theme: string) => void;
@@ -276,6 +203,27 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
             }
           : slide
       ),
+    })),
+
+  updateWidgetPosition: (slideId, widgetId, position) =>
+    set((state) => ({
+      slides: state.slides.map((slide) => {
+        if (slide.id !== slideId) return slide;
+
+        return {
+          ...slide,
+          widgets: {
+            ...slide.widgets,
+            [widgetId]: {
+              ...slide.widgets[widgetId],
+              position: {
+                ...slide.widgets[widgetId].position,
+                ...position,
+              },
+            },
+          },
+        };
+      }),
     })),
 
   deleteWidget: (slideId, widgetId) =>

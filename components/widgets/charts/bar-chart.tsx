@@ -1,5 +1,5 @@
 "use client";
-import { Bar, BarChart, XAxis } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -21,60 +21,94 @@ export const BarChartBase: React.FC<BarChartProps> = ({
 
   return (
     <ChartContainer config={chartConfig} className="w-full h-full">
-      <BarChart accessibilityLayer data={chartData}>
-        <rect
-          x="0"
-          y="0"
-          width="100%"
-          height="85%"
-          fill="url(#default-multiple-pattern-dots)"
-        />
+      <BarChart
+        accessibilityLayer
+        data={chartData}
+        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+      >
         <defs>
-          <DottedBackgroundPattern />
+          {dataKeys.map((key, idx) => (
+            <linearGradient
+              key={key}
+              id={`gradient-${key}`}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <stop
+                offset="0%"
+                stopColor={
+                  chartConfig[key]?.color || `hsl(${idx * 60}, 70%, 50%)`
+                }
+                stopOpacity={0.9}
+              />
+              <stop
+                offset="100%"
+                stopColor={
+                  chartConfig[key]?.color || `hsl(${idx * 60}, 70%, 50%)`
+                }
+                stopOpacity={0.3}
+              />
+            </linearGradient>
+          ))}
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
+
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="currentColor"
+          className="opacity-20"
+          vertical={false}
+        />
+
         <XAxis
           dataKey={xAxisKey}
           tickLine={false}
-          tickMargin={10}
+          tickMargin={12}
           axisLine={false}
-          tickFormatter={(value) => 
+          className="text-xs"
+          tick={{ fill: "currentColor", opacity: 0.6 }}
+          tickFormatter={(value) =>
             typeof value === "string" ? value.slice(0, 3) : value
           }
         />
-        <ChartTooltip
-          cursor={false}
-          content={<ChartTooltipContent indicator="dashed" />}
+
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          className="text-xs"
+          tick={{ fill: "currentColor", opacity: 0.6 }}
+          width={40}
         />
+
+        <ChartTooltip
+          cursor={{ fill: "hsl(var(--muted))", opacity: 0.1 }}
+          content={
+            <ChartTooltipContent
+              indicator="dot"
+              className="backdrop-blur-sm bg-background/95 border-border/50"
+            />
+          }
+        />
+
         {dataKeys.map((key) => (
           <Bar
             key={key}
             dataKey={key}
-            fill={`var(--color-${key})`}
-            radius={4}
+            fill={`url(#gradient-${key})`}
+            radius={[8, 8, 0, 0]}
+            maxBarSize={60}
+            filter="url(#glow)"
           />
         ))}
       </BarChart>
     </ChartContainer>
-  );
-};
-
-const DottedBackgroundPattern = () => {
-  return (
-    <pattern
-      id="default-multiple-pattern-dots"
-      x="0"
-      y="0"
-      width="10"
-      height="10"
-      patternUnits="userSpaceOnUse"
-    >
-      <circle
-        className="dark:text-muted/40 text-muted"
-        cx="2"
-        cy="2"
-        r="1"
-        fill="currentColor"
-      />
-    </pattern>
   );
 };

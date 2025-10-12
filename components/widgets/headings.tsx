@@ -62,62 +62,27 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
     content: content,
     editable,
     onUpdate: ({ editor }) => {
-      console.log("im");
       updateEditBuffer({
         content: editor.getJSON(),
       });
     },
     onCreate: ({ editor }) => {
-      editor.commands.setTextAlign("center");
-      // if (level === 1) {
-      //   editor.commands.setFontSize("48px");
-      // }
+      editor.chain().selectAll().setFontSize("32px").run();
     },
   });
 
-  // useEffect(() => {
-  //   if (editor && content) {
-  //     editor.commands.setContent(`<h${level}>${content}</h${level}>`);
-  //   }
-  // }, [content, editor, level]);
-
-  // const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-  //   if (!widgetRef.current) return;
-
-  //   const rect = widgetRef.current.getBoundingClientRect();
-
-  //   const position = {
-  //     widgetX: rect.left,
-  //     widgetY: rect.top,
-
-  //     centerX: rect.left + rect.width / 2,
-  //     centerY: rect.top + rect.height / 2,
-  //   };
-
-  //   updateSelectWidget({
-  //     slideIndex: 1,
-  //     id: id,
-  //     data: {
-  //       editor: editor,
-  //       number: "1",
-  //       position: position,
-  //     },
-  //     type: "editoral",
-  //   });
-  // };
-
   return (
     <div
-      className="w-full h-full"
+      className="w-full h-full backdrop-blur-xl"
       ref={widgetRef}
       data-widget
       style={{
-        zIndex: "20",
+        zIndex: "24",
       }}
       onClick={() => {
         handleClick({
           editor: editor,
-          widgetType: "text",
+        widgetType: "text",
         });
       }}
     >
@@ -127,7 +92,7 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
         <EditorContent
           editor={editor}
           className={cn(
-            "outline-none p-2 [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 text-primary"
+            "outline-none p-2 [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 text-primary text-xl"
           )}
         />
       </div>
@@ -135,4 +100,6 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   );
 };
 
-export default React.memo(HeadingWidget);
+const HeadingWidgetComponent = React.memo(HeadingWidget);
+
+export { HeadingWidgetComponent as HeadingWidget };

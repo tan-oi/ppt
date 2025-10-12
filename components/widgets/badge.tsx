@@ -27,6 +27,7 @@ export function BadgeWidget({
     isSelected && editBuffer?.widgetData
       ? editBuffer.widgetData
       : {
+          label,
           color,
           backgroundColor,
         };
@@ -42,6 +43,7 @@ export function BadgeWidget({
             data: {
               color: currentData.color,
               backgroundColor: currentData.backgroundColor,
+              label: currentData.label,
             },
           })
         }
@@ -53,7 +55,7 @@ export function BadgeWidget({
             color: currentData.color,
           }}
         >
-          <span className="">{label}</span>
+          <span className="">{currentData.label}</span>
         </div>
       </div>
     </>

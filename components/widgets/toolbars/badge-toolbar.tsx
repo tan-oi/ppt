@@ -1,4 +1,5 @@
 import { BaseColorInput } from "@/components/base/color-changer";
+import { Input } from "@/components/ui/input";
 import { useUIStore } from "@/lib/store/ui-store";
 import { PaintBucket, PaintbrushIcon } from "lucide-react";
 
@@ -27,7 +28,11 @@ export function BadgeToolbar() {
         onChange={(newValue) => handleUpdate("backgroundColor", newValue)}
       />
 
-      <div></div>
+      <Input
+        placeholder="Label on badge"
+        value={widgetData.label}
+        onChange={(e) => handleUpdate("label", e.target.value)}
+      />
     </>
   );
 }

@@ -128,6 +128,226 @@ const templates = [
       </div>
     ),
   },
+  {
+    id: "chart-with-title",
+    name: "Chart Showcase",
+    description: "Large chart with title for data visualization focus",
+    layoutType: "Chart",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 flex flex-col gap-1">
+        <div className="w-1/2 h-2 bg-zinc-600 rounded mx-auto" />
+        <div className="flex-1 bg-zinc-700 rounded flex items-end justify-around px-2 pb-1">
+          <div
+            className="w-1/6 bg-zinc-500 rounded-t"
+            style={{ height: "40%" }}
+          />
+          <div
+            className="w-1/6 bg-zinc-500 rounded-t"
+            style={{ height: "65%" }}
+          />
+          <div
+            className="w-1/6 bg-zinc-500 rounded-t"
+            style={{ height: "50%" }}
+          />
+          <div
+            className="w-1/6 bg-zinc-500 rounded-t"
+            style={{ height: "80%" }}
+          />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "chart-comparison",
+    name: "Side-by-Side Charts",
+    description: "Compare two charts or datasets directly",
+    layoutType: "Chart",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 flex gap-2">
+        <div className="flex-1 bg-zinc-700 rounded flex items-end justify-around px-1.5 pb-1">
+          <div
+            className="w-1/4 bg-zinc-500 rounded-t"
+            style={{ height: "45%" }}
+          />
+          <div
+            className="w-1/4 bg-zinc-500 rounded-t"
+            style={{ height: "70%" }}
+          />
+          <div
+            className="w-1/4 bg-zinc-500 rounded-t"
+            style={{ height: "55%" }}
+          />
+        </div>
+        <div className="flex-1 bg-zinc-700 rounded flex items-end justify-around px-1.5 pb-1">
+          <div
+            className="w-1/4 bg-zinc-500 rounded-t"
+            style={{ height: "60%" }}
+          />
+          <div
+            className="w-1/4 bg-zinc-500 rounded-t"
+            style={{ height: "40%" }}
+          />
+          <div
+            className="w-1/4 bg-zinc-500 rounded-t"
+            style={{ height: "75%" }}
+          />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "image-caption",
+    name: "Image with Caption",
+    description: "Large centered image with descriptive caption below",
+    layoutType: "Image",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 flex flex-col items-center gap-1">
+        <div className="w-3/4 flex-1 bg-zinc-600 rounded" />
+        <div className="w-2/3 h-1 bg-zinc-700 rounded" />
+        <div className="w-1/2 h-1 bg-zinc-700 rounded" />
+      </div>
+    ),
+  },
+  {
+    id: "image-text-split",
+    name: "Image & Text Split",
+    description: "Image on left, explanatory text on right",
+    layoutType: "Mixed",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 flex gap-2">
+        <div className="w-1/2 bg-zinc-600 rounded" />
+        <div className="w-1/2 flex flex-col justify-center space-y-1">
+          <div className="w-full h-1 bg-zinc-600 rounded" />
+          <div className="w-full h-1 bg-zinc-600 rounded" />
+          <div className="w-full h-1 bg-zinc-600 rounded" />
+          <div className="w-3/4 h-1 bg-zinc-600 rounded" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "four-quadrants",
+    name: "Four Quadrants",
+    description: "Four equal sections for balanced feature comparison",
+    layoutType: "Only Text",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 grid grid-cols-2 grid-rows-2 gap-1.5">
+        <div className="bg-zinc-700 rounded flex items-center justify-center">
+          <div className="w-3/4 h-1 bg-zinc-600 rounded" />
+        </div>
+        <div className="bg-zinc-700 rounded flex items-center justify-center">
+          <div className="w-3/4 h-1 bg-zinc-600 rounded" />
+        </div>
+        <div className="bg-zinc-700 rounded flex items-center justify-center">
+          <div className="w-3/4 h-1 bg-zinc-600 rounded" />
+        </div>
+        <div className="bg-zinc-700 rounded flex items-center justify-center">
+          <div className="w-3/4 h-1 bg-zinc-600 rounded" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "header-three-cards",
+    name: "Header + 3 Cards",
+    description: "Main heading followed by three feature cards",
+    layoutType: "Only Text",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 flex flex-col gap-1.5">
+        <div className="w-1/2 h-2 bg-zinc-600 rounded mx-auto" />
+        <div className="flex-1 flex gap-1.5">
+          <div className="flex-1 bg-zinc-700 rounded" />
+          <div className="flex-1 bg-zinc-700 rounded" />
+          <div className="flex-1 bg-zinc-700 rounded" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "big-number",
+    name: "Big Stat Display",
+    description: "Emphasize a key metric or statistic with context",
+    layoutType: "Only Text",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 flex flex-col items-center justify-center gap-1.5">
+        <div className="w-1/3 h-5 bg-zinc-600 rounded" />
+        <div className="w-2/3 h-1 bg-zinc-700 rounded" />
+        <div className="w-1/2 h-1 bg-zinc-700 rounded" />
+      </div>
+    ),
+  },
+  {
+    id: "text-over-image",
+    name: "Hero with Overlay",
+    description: "Text overlaid on background image for dramatic effect",
+    layoutType: "Mixed",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 relative">
+        <div className="absolute inset-2 bg-zinc-600 rounded" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 z-10">
+          <div className="w-1/2 h-2.5 bg-zinc-400 rounded" />
+          <div className="w-1/3 h-1 bg-zinc-500 rounded" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "split-content-chart",
+    name: "Content + Chart",
+    description: "Text explanation alongside supporting chart",
+    layoutType: "Mixed",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 flex flex-col gap-1">
+        <div className="w-1/3 h-1.5 bg-zinc-600 rounded" />
+        <div className="flex-1 flex gap-2">
+          <div className="w-1/2 space-y-1 flex flex-col justify-center">
+            <div className="w-full h-1 bg-zinc-600 rounded" />
+            <div className="w-full h-1 bg-zinc-600 rounded" />
+            <div className="w-3/4 h-1 bg-zinc-600 rounded" />
+          </div>
+          <div className="w-1/2 bg-zinc-700 rounded flex items-end justify-around px-2 pb-1">
+            <div
+              className="w-1/5 bg-zinc-500 rounded-t"
+              style={{ height: "50%" }}
+            />
+            <div
+              className="w-1/5 bg-zinc-500 rounded-t"
+              style={{ height: "70%" }}
+            />
+            <div
+              className="w-1/5 bg-zinc-500 rounded-t"
+              style={{ height: "60%" }}
+            />
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "vertical-timeline",
+    name: "Step-by-Step Timeline",
+    description: "Three sequential steps or timeline items",
+    layoutType: "Only Text",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 flex flex-col gap-1">
+        <div className="w-1/3 h-1.5 bg-zinc-600 rounded" />
+        <div className="flex-1 flex flex-col justify-around gap-1">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 bg-zinc-600 rounded-full flex-shrink-0" />
+            <div className="flex-1 h-1 bg-zinc-700 rounded" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 bg-zinc-600 rounded-full flex-shrink-0" />
+            <div className="flex-1 h-1 bg-zinc-700 rounded" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 bg-zinc-600 rounded-full flex-shrink-0" />
+            <div className="flex-1 h-1 bg-zinc-700 rounded" />
+          </div>
+        </div>
+      </div>
+    ),
+  },
 ];
 
 const slideOptions = [
@@ -151,7 +371,7 @@ const slideOptions = [
   },
   {
     //left only.
-    
+
     name: "Duplicate slide",
     slug: "duplicate-slide",
     icon: LucideCopy,
@@ -166,7 +386,7 @@ export function SlideManager() {
 
   const handleSelect = (slug: SlideSlug, event: Event) => {
     if (slug === "add-template-slide") {
-      event.preventDefault(); // Prevent dropdown from closing
+      event.preventDefault();
       setActiveView("template");
     } else {
       if (slug === "add-blank-slide") {
@@ -232,7 +452,7 @@ export function SlideManager() {
             <span className="text-sm text-zinc-200">Back</span>
           </Button>
 
-          <div className="grid grid-cols-2 gap-2 w-full">
+          <div className="grid grid-cols-2 gap-2 p-2 w-full max-h-[400px] overflow-y-scroll">
             {templates.map((item, i) => (
               <button
                 onClick={() => {

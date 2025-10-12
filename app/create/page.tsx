@@ -25,20 +25,29 @@ export default function CreatePresentation() {
         </div>
 
         <div className="flex items-center gap-4">
-          <Card className="bg-gradient-to-bl from-zinc-800 via-neutral-900 to-neutral-950 w-xs h-48 px-4 py-6 max-w-md border-none flex flex-col items-center justify-start gap-3 rounded-2xl shadow-lg rounded-xl">
-            <CardHeader className="flex flex-col items-center justify-center gap-2 p-0">
-              <Pen className="w-8 h-8 text-primary" />
-              <CardTitle className="text-lg font-semibold text-foreground whitespace-nowrap">
-                Write with Text
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0 text-center">
-              <p className="text-sm text-muted-foreground">
-                Paste your notes or draft new content, and we’ll shape it into
-                slides.
-              </p>
-            </CardContent>
-          </Card>
+          <Link
+            href={{
+              pathname: "/create/generate",
+              query: {
+                type: "text",
+              },
+            }}
+          >
+            <Card className="bg-gradient-to-bl from-zinc-800 via-neutral-900 to-neutral-950 w-xs h-48 px-4 py-6 max-w-md border-none flex flex-col items-center justify-start gap-3 rounded-2xl shadow-lg rounded-xl">
+              <CardHeader className="flex flex-col items-center justify-center gap-2 p-0">
+                <Pen className="w-8 h-8 text-primary" />
+                <CardTitle className="text-lg font-semibold text-foreground whitespace-nowrap">
+                  Write with Text
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Paste your notes or draft new content, and we’ll shape it into
+                  slides.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
 
           <Link
             href={{
@@ -62,20 +71,30 @@ export default function CreatePresentation() {
               </CardContent>
             </Card>
           </Link>
-          <Card className="bg-gradient-to-bl from-zinc-800 via-neutral-900 to-neutral-950 w-xs h-48 px-4 py-6 max-w-md border-none flex flex-col items-center justify-start gap-3 rounded-xl shadow-lg">
-            <CardHeader className="flex flex-col items-center justify-center gap-2 p-0">
-              <LinkIcon className="w-8 h-8 text-primary" />
-              <CardTitle className="text-lg font-semibold text-foreground whitespace-nowrap">
-                Start from Link
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0 text-center">
-              <p className="text-sm text-muted-foreground">
-                Drop in a URL and instantly transform a website into a
-                presentation.
-              </p>
-            </CardContent>
-          </Card>
+
+          <Link
+            href={{
+              pathname: "/create/generate",
+              query: {
+                type: "link",
+              },
+            }}
+          >
+            <Card className="bg-gradient-to-bl from-zinc-800 via-neutral-900 to-neutral-950 w-xs h-48 px-4 py-6 max-w-md border-none flex flex-col items-center justify-start gap-3 rounded-xl shadow-lg">
+              <CardHeader className="flex flex-col items-center justify-center gap-2 p-0">
+                <LinkIcon className="w-8 h-8 text-primary" />
+                <CardTitle className="text-lg font-semibold text-foreground whitespace-nowrap">
+                  Start from Link
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Drop in a URL and instantly transform a website into a
+                  presentation.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </>

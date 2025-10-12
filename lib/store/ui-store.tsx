@@ -22,10 +22,20 @@ interface WidgetData {
   data: any;
 }
 
+interface WidgetPositionChange {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface UIStore {
   toolbarOpen: boolean;
   drawerOpen: boolean;
   selectedWidget: WidgetData | null;
+
+  isProcessing: boolean;
+  setProcessing: (processing: boolean) => void;
 
   updateSelectWidget: ({ slideId, id, widgetType, data }: WidgetData) => void;
 
@@ -37,6 +47,7 @@ interface UIStore {
   deselectWidgetAndRemoveToolbar: () => void;
   deselectWidgetAndAddData: () => void;
   setDrawer: () => void;
+  updateWidgetPosition: (changes: Partial<WidgetPositionChange>) => void;
 }
 
 export const useUIStore = create<UIStore>((set, get) => ({
@@ -44,13 +55,21 @@ export const useUIStore = create<UIStore>((set, get) => ({
   drawerOpen: false,
   editBuffer: null,
   selectedWidget: null,
+  isProcessing: false,
+
+  setProcessing: (processing) =>
+    set({
+      isProcessing: processing,
+    }),
 
   setDrawer: () =>
     set((state) => ({
       drawerOpen: !state.drawerOpen,
     })),
 
-  updateSelectWidget: ({ slideId, id, widgetType, data }) =>
+  updateSelectWidget: ({ slideId, id, widgetType, data }: WidgetData) => {
+    const widget = usePresentationStore.getState().getWidget(slideId, id);
+
     set({
       selectedWidget: {
         slideId,
@@ -59,12 +78,26 @@ export const useUIStore = create<UIStore>((set, get) => ({
         data,
       },
       editBuffer: {
-        widgetData: { ...data },
+        widgetData: {
+          ...data,
+          x: widget?.position.x,
+          y: widget?.position.y,
+          width: widget?.position.width,
+          height: widget?.position.height,
+        },
       },
       toolbarOpen: true,
-    }),
+    });
+  },
 
   deselectWidgetAndRemoveToolbar: () => {
+    const { isProcessing } = get();
+
+    if (isProcessing) {
+      console.log("Processing");
+      return;
+    }
+
     set({
       selectedWidget: null,
       toolbarOpen: false,
@@ -74,7 +107,14 @@ export const useUIStore = create<UIStore>((set, get) => ({
   },
 
   deselectWidgetAndAddData: () => {
-    const { selectedWidget, editBuffer } = get();
+    const { selectedWidget, editBuffer, isProcessing } = get();
+
+    if (isProcessing) {
+      console.log(" Processing ");
+      return;
+    }
+
+    console.log("yeah");
 
     if (!selectedWidget || !editBuffer?.widgetData) {
       set({
@@ -88,11 +128,27 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
     const { slideId, id } = selectedWidget;
 
-    const { position, editor, ...dataToSave } = editBuffer.widgetData;
+    const { position, editor, x, y, width, height, ...dataToSave } =
+      editBuffer.widgetData;
 
+    console.log(editBuffer);
     usePresentationStore.getState().updateWidget(slideId, id, {
       data: dataToSave,
     });
+
+    if (
+      x !== undefined ||
+      y !== undefined ||
+      width !== undefined ||
+      height !== undefined
+    ) {
+      usePresentationStore.getState().updateWidgetPosition(slideId, id, {
+        x,
+        y,
+        width,
+        height,
+      });
+    }
 
     set({
       selectedWidget: null,
@@ -103,6 +159,20 @@ export const useUIStore = create<UIStore>((set, get) => ({
   },
 
   updateEditBuffer: (changes: Partial<any>) => {
+    set((state) => ({
+      editBuffer: {
+        widgetData: {
+          ...state.editBuffer?.widgetData,
+          ...changes,
+        },
+      },
+    }));
+  },
+
+  updateWidgetPosition: (changes: Partial<WidgetPositionChange>) => {
+    const { editBuffer } = get();
+    console.log(changes);
+    console.log(editBuffer);
     set((state) => ({
       editBuffer: {
         widgetData: {

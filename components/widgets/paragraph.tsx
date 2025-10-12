@@ -75,15 +75,6 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
         }}
         data-widget
         onClick={() => {
-          // updateSelectWidget({
-          //   slideIndex: 2,
-          //   id: id,
-          //   data: {
-          //     editor: editor,
-          //     number: "1",
-          //   },
-          //   type: "editoral",
-          // });
           handleClick({
             editor: editor,
             widgetType: "text",
