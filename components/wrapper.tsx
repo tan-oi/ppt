@@ -43,7 +43,7 @@ export function DraggableResizableWrapper({
         height: height ?? "auto",
       }}
       scale={scale}
-      className={selected ? "ring-1 ring-offset-1 ring-secondary rounded" : ""}
+      className={selected ? "ring-1  ring-secondary rounded" : ""}
       enableResizing={selected}
       disableDragging={!selected}
       bounds="parent"

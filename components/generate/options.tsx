@@ -9,11 +9,19 @@ import {
 } from "@/components/ui/select";
 import { Button } from "../ui/button";
 import { useGenerationStore } from "@/lib/store/generation-store";
-export function PresentationOptions({ type, handleClick }: { type: string, handleClick : () => void }) {
+export function PresentationOptions({
+  type,
+  handleClick,
+}: {
+  type: string;
+  handleClick: () => void;
+}) {
   const setSlidesCount = useGenerationStore((s) => s.setSlidesCount);
+
+  const setWriteStyle = useGenerationStore((s) => s.setWriteStyle);
   return (
     <>
-      <div className="flex items-center w-sm gap-2  mx-auto rounded-xl">
+      <div className="flex items-center gap-2 max-w-2xl mx-auto rounded-xl">
         <div>
           <Select onValueChange={(value) => setSlidesCount(Number(value))}>
             <SelectTrigger className="w-[130px] bg-neutral-900 border-none focus-within:border-none rounded-xl text-foreground">
@@ -34,18 +42,25 @@ export function PresentationOptions({ type, handleClick }: { type: string, handl
         {type === "text" && (
           <>
             <div>
-              <Select>
+              <Select
+                onValueChange={(value) =>
+                  setWriteStyle(value as "extend" | "base" | "preserve")
+                }
+              >
                 <SelectTrigger className="w-[130px] bg-neutral-900 border-none focus-within:border-none rounded-xl">
-                  <SelectValue className="text-white"  placeholder="Write style" />
+                  <SelectValue
+                    className="text-white"
+                    placeholder="Write style"
+                  />
                 </SelectTrigger>
                 <SelectContent className="border-none opacity-80 rounded-xl">
                   <SelectGroup>
                     <SelectLabel>Write style</SelectLabel>
-                    <SelectItem value="Preserve">Preserve</SelectItem>
+                    <SelectItem value="preserve">Preserve</SelectItem>
 
-                    <SelectItem value="Extend">Extend</SelectItem>
+                    <SelectItem value="extend">Extend</SelectItem>
 
-                    <SelectItem value="Base">Use as base</SelectItem>
+                    <SelectItem value="base">Use as base</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>

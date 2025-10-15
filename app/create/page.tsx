@@ -8,13 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PenIcon } from "@phosphor-icons/react/ssr";
+
+
 import { Link as LinkIcon, Pen, WandSparkles } from "lucide-react";
 import Link from "next/link";
 export default function CreatePresentation() {
   return (
     <>
-      <div className="bg-background min-h-screen text-foreground flex flex-col items-center pt-20 gap-16">
+      <div className="min-h-screen text-foreground flex flex-col items-center pt-20 gap-16">
         <div className="flex flex-col items-center gap-1">
           <h1 className="text-foreground text-3xl font-semibold">
             How would you like to get started?

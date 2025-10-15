@@ -68,10 +68,10 @@ export function AlignSelector() {
         </Tooltip>
 
         <DropdownMenuContent
-          className="my-2 p-1 w-36 max-w-[230px] min-w-[120px] border-none bg-muted/70 backdrop-filter-xl"
+        className="my-2 p-1 w-36 max-w-[230px] min-w-[120px] bg-popover/95 border-none backdrop-filter-xl"
           widget-element="true"
         >
-          <DropdownMenuGroup>
+          <DropdownMenuGroup className="">
             {alignmentOptions.map((option) => (
               <DropdownMenuItem
                 key={option.label}

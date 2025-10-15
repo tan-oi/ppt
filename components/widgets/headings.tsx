@@ -92,7 +92,7 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
         <EditorContent
           editor={editor}
           className={cn(
-            "outline-none p-2 [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 text-primary text-xl"
+            "outline-none p-2 [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 text-primary font-heading text-xl"
           )}
         />
       </div>

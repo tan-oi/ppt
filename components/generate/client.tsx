@@ -4,15 +4,22 @@ import { PresentationOptions } from "./options";
 import { PromptInput } from "./prompt";
 import { Text } from "./text";
 import { UrlInput } from "./url";
+import { OutlineViewer } from "./outline-viewer";
 import { useEffect, useState } from "react";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { outlineSchema } from "@/app/api/outline/route";
+import { z } from "zod";
+import { nanoid } from "nanoid";
 
 const COMPONENTS: Record<"text" | "prompt" | "link", React.FC<any>> = {
   text: Text,
   prompt: PromptInput,
   link: UrlInput,
 };
+
+const apiResponseSchema = z.object({
+  slidesOutline: z.array(outlineSchema),
+});
 
 export function GenerateClient({
   type,
@@ -22,23 +29,34 @@ export function GenerateClient({
   [key: string]: any;
 }) {
   const setGenerateType = useGenerationStore((s) => s.setGenerateType);
+  const setResult = useGenerationStore((s) => s.setResult);
+  const setId = useGenerationStore((s) => s.setId);
   const [screen, setScreen] = useState<"form" | "result">("form");
 
   useEffect(() => {
     setGenerateType(type);
   }, [type]);
 
-  const { messages, status, sendMessage } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/outline",
-    }),
-    onFinish : (options) => {
-      // useGenerationStore.getState().setResult(options.message)
-      const outlineText = options.message.parts
-      ?.find(part => part.type === 'text')?.text || '';
-    
-    useGenerationStore.getState().setResult(outlineText);
-    }
+  const { object, submit, isLoading } = useObject({
+    api: "/api/outline",
+    schema: apiResponseSchema,
+    onFinish: (event) => {
+      console.log(event.object);
+      if (event.object?.slidesOutline) {
+        setResult(event.object.slidesOutline);
+
+        //WIP -> make db call to like persist outline
+        const id = `ai-${nanoid()}`;
+
+        window.history.replaceState(
+          null,
+          "",
+          `/create/generate/${id}?type=${type}`
+        );
+
+        setId(id);
+      }
+    },
   });
 
   const Component = COMPONENTS[type];
@@ -46,6 +64,11 @@ export function GenerateClient({
   const handleClick = () => {
     const instructions = useGenerationStore.getState().userInstruction;
     const slidesCount = useGenerationStore.getState().slidesCount;
+    let style;
+
+    if (type === "text") {
+      style = useGenerationStore.getState().writeStyle;
+    }
 
     if (!instructions || !slidesCount) {
       alert("Please provide instructions and slides count");
@@ -54,79 +77,17 @@ export function GenerateClient({
 
     setScreen("result");
 
-    sendMessage(
-      {
-        role: "user",
-        parts: [
-          {
-            type: "text",
-            text: "Generate presentation outline",
-          },
-        ],
-      },
-      {
-        body: {
-          instructions,
-          slidesNo: slidesCount,
-          type,
-          messages: messages,
-        },
-      }
-    );
-
-    console.log(instructions);
-    console.log(slidesCount);
+    submit({
+      instructions,
+      slidesNo: slidesCount,
+      type,
+      style,
+      messages: [],
+    });
   };
 
   if (screen === "result") {
-    return (
-      <div className="flex flex-col gap-4 p-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">
-            Generating Presentation Outline...
-          </h2>
-          <button
-            onClick={() => setScreen("form")}
-            className="px-3 py-1 text-sm border rounded hover:bg-gray-50"
-          >
-            Back to Form
-          </button>
-        </div>
-
-        <div className="space-y-4 text-white">
-          {messages.map((message) => (
-            <div key={message.id} className="p-4 border rounded">
-              <div className="font-medium text-sm text-gray-600 mb-2">
-                {message.role === "user" ? "Request" : "Generated Outline"}
-              </div>
-              {message.parts.map((part, index) => {
-                if (part.type === "text") {
-                  return (
-                    <div key={index} className="prose max-w-none">
-                      {message.role === "user" ? (
-                        <pre className="text-sm bg-gray-50 p-2 rounded overflow-x-auto">
-                          {part.text}
-                        </pre>
-                      ) : (
-                        <div className="whitespace-pre-wrap">{part.text}</div>
-                      )}
-                    </div>
-                  );
-                }
-                return null;
-              })}
-            </div>
-          ))}
-
-          {status === "submitted" && (
-            <div className="flex items-center gap-2 text-blue-600">
-              <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
-              <span>Generating outline...</span>
-            </div>
-          )}
-        </div>
-      </div>
-    );
+    return <OutlineViewer />;
   }
 
   return (

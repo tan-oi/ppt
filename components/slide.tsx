@@ -4,6 +4,8 @@ import { useDroppable } from "@dnd-kit/core";
 import { SLIDE_CONFIG } from "@/lib/config/slide";
 import { usePresentationStore } from "@/lib/store/presentation-store";
 import { cn } from "@/lib/utils";
+import { useUIStore } from "@/lib/store/ui-store";
+import { useThemeFonts } from "@/lib/config/theme-loader";
 
 const SlidePresentation = React.memo(
   ({ data, slideScale }: { data: any; slideScale: number }) => {
@@ -55,6 +57,8 @@ function SlideBase({
     data: { type: "slide" },
   });
 
+  useThemeFonts(data.theme);
+
   return (
     <div
       id={id}
@@ -69,7 +73,7 @@ function SlideBase({
         overflow: "hidden",
       }}
       className={cn(
-        "grid grid-cols-24 bg-background",
+        "grid grid-cols-24 grid-rows-24 bg-background",
         data.theme && data.theme !== "starter" ? data.theme : ""
       )}
     >

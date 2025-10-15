@@ -414,7 +414,7 @@ export function SlideManager() {
       {activeView === "main" ? (
         <DropdownMenuContent
           sideOffset={16}
-          className="w-72 overflow-y-hidden p-4 border-none bg-zinc-900/95 backdrop-blur-md rounded-xl"
+          className="w-64 overflow-y-hidden p-2 border-none bg-zinc-900/95 backdrop-blur-md rounded-md"
         >
           <TooltipProvider delayDuration={200}>
             {slideOptions.map((option) => (
@@ -438,19 +438,20 @@ export function SlideManager() {
       ) : (
         <DropdownMenuContent
           sideOffset={16}
-          className="w-md overflow-y-hidden p-4 border-none bg-zinc-900/95 backdrop-blur-md rounded-xl"
+          className="w-md overflow-y-hidden p-2 border-none bg-zinc-900/95 backdrop-blur-md rounded-xl"
         >
-          <Button
-            variant={"ghost"}
+          <button
             onClick={(event) => {
               event.preventDefault();
               setActiveView("main");
             }}
-            className="flex justify-start items-center gap-2 cursor-pointer mb-2 border-b border-zinc-800 w-full border-none "
+            className="flex p-2 justify-start items-center gap-2 cursor-pointer mb-2 border-b border-zinc-800 border-none hover:underline"
           >
             <ArrowLeft size={16} className="text-zinc-400" />
             <span className="text-sm text-zinc-200">Back</span>
-          </Button>
+          </button>
+
+          <DropdownMenuSeparator className="w-full" />
 
           <div className="grid grid-cols-2 gap-2 p-2 w-full max-h-[400px] overflow-y-scroll">
             {templates.map((item, i) => (
@@ -459,9 +460,6 @@ export function SlideManager() {
                   const id = usePresentationStore
                     .getState()
                     .addSlideAfterCurrent(item.id);
-
-                  console.log(id);
-                  console.log("eventually works");
                 }}
                 key={item.id}
                 className="group hover:ring hover:ring-zinc-500 flex rounded flex-col bg-zinc-800 gap-2 p-2 cursor-pointer"

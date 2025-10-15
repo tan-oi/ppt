@@ -70,7 +70,7 @@ export function IconWidget({
 
   return (
     <div
-      className="w-full h-full backdrop-blur-3xl bg-gray-50/5 rounded border-white"
+      className="w-full h-full backdrop-blur-xl rounded border-white"
       data-widget
       ref={widgetRef}
       onClick={() => {

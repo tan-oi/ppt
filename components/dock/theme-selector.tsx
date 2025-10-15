@@ -1,5 +1,3 @@
-//, i also need to add the language change support, make it change when the themes of 2 slides are different, it is only taking of that of the first slide
-
 import React, { useState } from "react";
 import {
   DropdownMenu,

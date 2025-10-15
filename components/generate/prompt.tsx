@@ -16,7 +16,7 @@ export function PromptInput() {
   const [option, setOption] = useState("");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex flex-col gap-2 items-center">
         <h1 className="text-primary text-xl">
           Craft a prompt or write any topic

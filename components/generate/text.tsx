@@ -22,7 +22,7 @@ export function Text({ className }: { className: string }) {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex flex-col gap-1 items-center">
         <h1 className="text-primary text-xl">Paste/Write content</h1>
 

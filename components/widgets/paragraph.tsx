@@ -84,7 +84,7 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
         <div>
           <EditorContent
             editor={editor}
-            className="outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 p-1"
+            className="outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 p-1 font-body"
           />
         </div>
       </div>

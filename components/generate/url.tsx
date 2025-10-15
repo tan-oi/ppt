@@ -5,7 +5,7 @@ export function UrlInput() {
   const setUserInstruction = useGenerationStore((s) => s.setUserInstruction);
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-2xl mx-auto">
         <div className="flex flex-col gap-1 items-center">
           <h1 className="text-primary text-xl">Give us the link</h1>
 

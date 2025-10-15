@@ -105,7 +105,7 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
         }}
       >
         <EditorContent
-          className="outline-none font-semibold text-accent text-sm
+          className="outline-none font-heading text-accent text-sm
         [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0"
           editor={headingEditor}
         />
@@ -122,7 +122,7 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
         }}
       >
         <EditorContent
-          className="outline-none leading-5 text-md text-foreground [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.PrposeMirror]:p-0 [&_.ProseMirror]:m-0"
+          className="outline-none leading-5 text-md text-foreground [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.PrposeMirror]:p-0 [&_.ProseMirror]:m-0 font-body"
           editor={paragraphEditor}
         />
       </div>

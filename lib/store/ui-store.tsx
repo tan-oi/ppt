@@ -48,6 +48,12 @@ interface UIStore {
   deselectWidgetAndAddData: () => void;
   setDrawer: () => void;
   updateWidgetPosition: (changes: Partial<WidgetPositionChange>) => void;
+
+  presentationMode: boolean;
+  setPresentationMode: (mode: boolean) => void;
+
+  currentSlideIndex: number;
+  setCurrentSlideIndex: (index: number) => void;
 }
 
 export const useUIStore = create<UIStore>((set, get) => ({
@@ -56,7 +62,19 @@ export const useUIStore = create<UIStore>((set, get) => ({
   editBuffer: null,
   selectedWidget: null,
   isProcessing: false,
+  presentationMode: false,
 
+  setPresentationMode: (mode) =>
+    set({
+      presentationMode: mode,
+    }),
+
+  currentSlideIndex: 0,
+
+  setCurrentSlideIndex: (index) =>
+    set({
+      currentSlideIndex: index,
+    }),
   setProcessing: (processing) =>
     set({
       isProcessing: processing,
