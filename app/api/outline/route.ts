@@ -10,6 +10,14 @@ export const requestSchema = z.object({
   type: z.enum(["text", "link", "prompt"]),
   style: z.enum(["preserve", "extend", "base"]).optional(),
   messages: z.array(z.any()) as z.ZodType<UIMessage[]>,
+  tone: z.enum([
+    "professional",
+    "creative",
+    "casual",
+    "academic",
+    "inspirational",
+    "minimalist",
+  ]),
 });
 
 export const outlineSchema = z.object({
@@ -43,15 +51,18 @@ export async function POST(req: Request) {
       );
     }
 
-    const { instructions, slidesNo, type, style, messages } = parsedData.data;
+    const { instructions, slidesNo, type, style, tone, messages } =
+      parsedData.data;
 
     const systemPrompt = buildPresentationPrompt({
       instructions,
       slidesNo,
       type,
       style,
+      tone,
     });
 
+    console.log(systemPrompt)
     const { object, finishReason, usage } = await generateObject({
       model: groq("openai/gpt-oss-120b"),
       output: "array",

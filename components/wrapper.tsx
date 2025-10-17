@@ -16,7 +16,8 @@ export function DraggableResizableWrapper({
   selected,
   id,
   slideId,
-}: {
+}: // editable,
+{
   x: number;
   y: number;
   width: number;
@@ -27,6 +28,7 @@ export function DraggableResizableWrapper({
   onDragStop?: (x: number, y: number) => void;
   onResizeStop?: (w: number, h: number, x: number, y: number) => void;
   id: string;
+  // editable: boolean;
   slideId: string;
 }) {
   const updateWidgetPosition = usePresentationStore(
@@ -43,7 +45,7 @@ export function DraggableResizableWrapper({
         height: height ?? "auto",
       }}
       scale={scale}
-      className={selected ? "ring-1  ring-secondary rounded" : ""}
+      className={selected ? "ring-1 ring-secondary rounded" : ""}
       enableResizing={selected}
       disableDragging={!selected}
       bounds="parent"

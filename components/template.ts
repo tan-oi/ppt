@@ -3,6 +3,7 @@ import { FeatureCardWidget } from "./widgets/cards/features";
 import { ParagraphWidget } from "./widgets/paragraph";
 import { BaseChartRender } from "./widgets/charts/base";
 import { ImageWidget } from "./widgets/image";
+import { QuoteCard } from "./widgets/cards/quotes";
 
 export interface Slot {
   id: string;
@@ -318,7 +319,6 @@ export const HeaderWithThreeCards: Slot[] = [
   },
 ];
 
-
 export const BigNumberWithContext: Slot[] = [
   {
     id: "big-stat",
@@ -439,6 +439,29 @@ export const VerticalTimeline: Slot[] = [
   },
 ];
 
+export const CenteredCallout: Slot[] = [
+  {
+    id: "callout-text",
+    type: "text",
+    columnStart: 6,
+    columnEnd: 20,
+    rowStart: 10,
+    rowEnd: 16,
+    defaultComponent: HeadingWidget,
+  },
+];
+
+export const QuoteHighlight: Slot[] = [
+  {
+    id: "quote-card",
+    type: "text",
+    columnStart: 5,
+    columnEnd: 21,
+    rowStart: 8,
+    rowEnd: 17,
+    defaultComponent: QuoteCard,
+  },
+];
 // export const BulletPoints: Slot[] = [
 //   {
 //     id: "section-title",

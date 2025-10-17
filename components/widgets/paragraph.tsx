@@ -78,6 +78,9 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
           handleClick({
             editor: editor,
             widgetType: "text",
+            data: {
+              content: content,
+            },
           });
         }}
       >

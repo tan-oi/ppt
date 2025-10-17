@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "../ui/button";
 import { useGenerationStore } from "@/lib/store/generation-store";
+import { PresentationTone } from "@/lib/store/generation-store";
 export function PresentationOptions({
   type,
   handleClick,
@@ -19,6 +20,8 @@ export function PresentationOptions({
   const setSlidesCount = useGenerationStore((s) => s.setSlidesCount);
 
   const setWriteStyle = useGenerationStore((s) => s.setWriteStyle);
+
+  const setTone = useGenerationStore((s) => s.setTone);
   return (
     <>
       <div className="flex items-center gap-2 max-w-2xl mx-auto rounded-xl">
@@ -67,6 +70,27 @@ export function PresentationOptions({
             </div>
           </>
         )}
+
+        <div>
+          <Select onValueChange={(value) => setTone(value as PresentationTone)}>
+            <SelectTrigger className="w-[130px] bg-neutral-900 border-none focus-within:border-none rounded-xl">
+              <SelectValue className="text-white" placeholder="Tone" />
+            </SelectTrigger>
+            <SelectContent className="border-none opacity-80 rounded-xl">
+              <SelectGroup>
+                <SelectLabel>Presentation Tone</SelectLabel>
+                <SelectItem value="professional">Professional</SelectItem>
+
+                <SelectItem value="creative">Creative</SelectItem>
+
+                <SelectItem value="casual">Casual</SelectItem>
+                <SelectItem value="academic">Academic</SelectItem>
+                <SelectItem value="inspirational">Inspirational</SelectItem>
+                <SelectItem value="minimalist">Minimalist</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
 
         <Button
           type="submit"

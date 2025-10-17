@@ -83,7 +83,7 @@ export function OutlineViewer() {
 
   return (
     <div className="min-h-screen bg-transparent p-8">
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-3 mb-8 justify-between">
           <div className="flex gap-3 items-center">
             <Sparkles className="w-6 h-6 text-cyan-400" />
@@ -197,7 +197,12 @@ export function OutlineViewer() {
             >
               Create Presentation →
             </button>
-            <button className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors border border-zinc-700">
+            <button
+              onClick={() => {
+                console.log(useGenerationStore.getState().result);
+              }}
+              className="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors border border-zinc-700"
+            >
               Refine Outline
             </button>
           </div>

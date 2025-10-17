@@ -64,6 +64,7 @@ export function GenerateClient({
   const handleClick = () => {
     const instructions = useGenerationStore.getState().userInstruction;
     const slidesCount = useGenerationStore.getState().slidesCount;
+    const tone = useGenerationStore.getState().tone;
     let style;
 
     if (type === "text") {
@@ -82,6 +83,7 @@ export function GenerateClient({
       slidesNo: slidesCount,
       type,
       style,
+      tone,
       messages: [],
     });
   };

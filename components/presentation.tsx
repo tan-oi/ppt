@@ -13,13 +13,18 @@ import {
   populateStores,
   transformAndStorePresentation,
 } from "@/lib/helper";
-import { DraggableButton } from "./draggable-button";
+
 import { DockBase } from "./dock/base";
 import { WidgetRegistry } from "@/lib/registry/widget";
 import { DrawerEditing } from "./widgets/drawer";
 import { cn } from "@/lib/utils";
 import { useSlideUrlSync } from "@/lib/hooks/useSlideSyncUrl";
 import { useUIStore } from "@/lib/store/ui-store";
+import { WidgetWrapper } from "./widget-wrapper";
+import { SLIDE_CONFIG } from "@/lib/config/slide";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useQueryState } from "nuqs";
+import { ShareOption } from "./share-option";
 
 export function Presentation({
   llmToBeCalled,
@@ -29,7 +34,15 @@ export function Presentation({
   llmToBeCalled: boolean;
 }) {
   const slides = usePresentationStore((s) => s.slides);
+  const [, setCurrentSlideParam] = useQueryState("slide");
+
   const drawerOpen = useUIStore((s) => s.drawerOpen);
+  const presentationMode = useUIStore((s) => s.presentationMode);
+  const setPresentationMode = useUIStore((s) => s.setPresentationMode);
+  const currentSlideIndex = useUIStore((s) => s.currentSlideIndex);
+  const nextSlide = useUIStore((s) => s.nextSlide);
+  const prevSlide = useUIStore((s) => s.prevSlide);
+
   const pptTheme = usePresentationStore((s) => s.theme);
   const setType = usePresentationStore((s) => s.setType);
   const [activeElement, setActiveElement] = useState<any>(null);
@@ -66,9 +79,43 @@ export function Presentation({
     }
   }, [llmToBeCalled, presentationData]);
 
+  useEffect(() => {
+    if (!presentationMode) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        const targetSlide = slides[currentSlideIndex];
+        setPresentationMode(false);
+
+        if (targetSlide) {
+          setCurrentSlideParam(targetSlide.id);
+          usePresentationStore.getState().setCurrentSlide(targetSlide.id);
+        }
+      } else if (e.key === "ArrowRight" || e.key === " ") {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        prevSlide();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [presentationMode, nextSlide, prevSlide, setPresentationMode]);
+
   const slideScale = useSlideScale();
   const slideIds = useMemo(() => slides?.map((s: any) => s.id) || [], [slides]);
   useSlideUrlSync(slideIds);
+  useEffect(() => {
+    if (presentationMode && slides.length > 0) {
+      const currentSlide = slides[currentSlideIndex];
+      if (currentSlide) {
+        setCurrentSlideParam(currentSlide.id);
+      }
+    }
+  }, [presentationMode, currentSlideIndex, slides, setCurrentSlideParam]);
+
   useWidgetDeselect();
 
   const handleDragStart = useCallback((event: any) => {
@@ -140,6 +187,85 @@ export function Presentation({
   if (status === "submitted" || status === "streaming")
     return <p className="text-white text-center">LLm cooking</p>;
 
+  if (presentationMode) {
+    const currentSlide = slides[currentSlideIndex];
+    // const windowWidth =
+    //   typeof window !== "undefined" ? window.innerWidth : 1920;
+    // const windowHeight =
+    //   typeof window !== "undefined" ? window.innerHeight : 1080;
+    // const scaleX = windowWidth / SLIDE_CONFIG.width;
+    // const scaleY = windowHeight / SLIDE_CONFIG.height;
+
+    return (
+      <div
+        className={cn(
+          "fixed inset-0 z-[9999] bg-black flex items-center justify-center",
+          pptTheme && pptTheme !== "starter" ? pptTheme : "font-sans"
+        )}
+      >
+        <button
+          onClick={() => {
+            const targetSlide = slides[currentSlideIndex];
+            setPresentationMode(false);
+
+            if (targetSlide) {
+              setCurrentSlideParam(targetSlide.id);
+              usePresentationStore.getState().setCurrentSlide(targetSlide.id);
+            }
+          }}
+          className="absolute top-4 right-4 z-10 p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+        >
+          <X size={24} className="text-white" />
+        </button>
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-lg">
+          <span className="text-white text-sm">
+            {currentSlideIndex + 1} / {slides.length}
+          </span>
+        </div>
+        {currentSlideIndex > 0 && (
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+          >
+            <ChevronLeft size={32} className="text-white" />
+          </button>
+        )}
+        {currentSlideIndex < slides.length - 1 && (
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+          >
+            <ChevronRight size={32} className="text-white" />
+          </button>
+        )}
+        <div
+          style={{
+            width: SLIDE_CONFIG.width,
+            height: SLIDE_CONFIG.height,
+            transform: `scale(1)`,
+            transformOrigin: "center",
+          }}
+          className={cn(
+            "relative bg-background rounded-lg overflow-hidden grid grid-cols-24 grid-rows-24",
+            currentSlide.theme && currentSlide.theme !== "starter"
+              ? currentSlide.theme
+              : ""
+          )}
+        >
+          {currentSlide &&
+            Object.keys(currentSlide.widgets).map((widgetId) => (
+              <WidgetWrapper
+                key={widgetId}
+                widgetId={widgetId}
+                slideScale={1}
+                slideId={currentSlide.id}
+                isPresenting={true}
+              />
+            ))}
+        </div>
+      </div>
+    );
+  }
   return (
     <>
       <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -149,8 +275,12 @@ export function Presentation({
             pptTheme && pptTheme !== "starter" ? `${pptTheme}` : "font-sans"
           )}
         >
-          <div className="fixed top-4 right-4 z-10">
-            <DraggableButton />
+          <div className="fixed top-4 right-0 z-10">
+            <ShareOption
+              shareUrl="http://holy.so"
+              isShared={true}
+              onRevoke={() => console.log("hey")}
+            />
           </div>
 
           <div className="fixed background-blur-2xl bottom-6 z-100">

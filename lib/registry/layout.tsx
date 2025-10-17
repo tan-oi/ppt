@@ -15,6 +15,8 @@ import {
   TextOverImage,
   SplitContentChart,
   VerticalTimeline,
+  CenteredCallout,
+  QuoteHighlight,
 } from "@/components/template";
 
 interface Layout {
@@ -123,5 +125,20 @@ export const LayoutRegistry: Record<string, Layout> = {
     name: "Step-by-Step Timeline",
     description: "Three sequential steps or timeline items",
     layoutType: "Only Text",
+  },
+  "centered-callout": {
+    slots: CenteredCallout,
+    name: "Centered Statement",
+
+    description: "Single powerful statement centered on slide",
+    recommendedContent:
+      "Key takeaways, mission statements, memorable one-liners",
+    layoutType: "Only Text",
+  },
+  "quote-box": {
+    slots: QuoteHighlight,
+    name: "Quote box",
+    description: "A big quote",
+    layoutType: "only text",
   },
 };

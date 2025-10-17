@@ -391,7 +391,7 @@ export function SlideManager() {
     } else {
       if (slug === "add-blank-slide") {
         const id = usePresentationStore.getState().addSlideAfterCurrent();
-        console.log("we're here.");
+      
 
         console.log(id);
       } else if (slug === "delete-slide") {

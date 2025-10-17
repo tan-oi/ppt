@@ -12,6 +12,7 @@ interface FeatureCard {
   body: string;
   id: string;
   slideId: string;
+  editable: boolean;
 }
 
 export const FeatureCardWidget: React.FC<FeatureCard> = ({
@@ -19,6 +20,7 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
   body,
   id,
   slideId,
+  editable,
 }) => {
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const { widgetRef: headingRef, handleClick: handleHeadingClick } =
@@ -46,6 +48,7 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
       }),
     ],
     content: title,
+    editable: editable,
     onUpdate: ({ editor }) => {
       updateEditBuffer({
         title: editor.getJSON(),
@@ -81,6 +84,7 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
         ],
       }),
     ],
+    editable,
     onUpdate: ({ editor }) => {
       updateEditBuffer({
         title: editor.getJSON(),
@@ -101,6 +105,10 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
           handleHeadingClick({
             editor: headingEditor,
             widgetType: "feature",
+            data: {
+              title: title,
+              body: body,
+            },
           });
         }}
       >
@@ -118,6 +126,10 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
           handleParagraphClick({
             editor: paragraphEditor,
             widgetType: "feature",
+            data: {
+              body: body,
+              title: title,
+            },
           });
         }}
       >

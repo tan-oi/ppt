@@ -2,10 +2,11 @@ import React from "react";
 import { WidgetWrapper } from "./widget-wrapper";
 import { useDroppable } from "@dnd-kit/core";
 import { SLIDE_CONFIG } from "@/lib/config/slide";
-import { usePresentationStore } from "@/lib/store/presentation-store";
+
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/store/ui-store";
 import { useThemeFonts } from "@/lib/config/theme-loader";
+import * as motion from "motion/react-client";
 
 const SlidePresentation = React.memo(
   ({ data, slideScale }: { data: any; slideScale: number }) => {
@@ -23,7 +24,7 @@ const SlidePresentation = React.memo(
       >
         <button
           onClick={() => {
-            console.log(usePresentationStore.getState().slides);
+            console.log(useUIStore.getState().editBuffer);
           }}
         >
           holy shit
@@ -36,6 +37,7 @@ const SlidePresentation = React.memo(
               widgetId={widgetId}
               slideScale={slideScale}
               slideId={data.id}
+              isPresenting={false}
             />
           ))}
       </div>
@@ -60,16 +62,21 @@ function SlideBase({
   useThemeFonts(data.theme);
 
   return (
-    <div
+    <motion.div
+      initial={{
+        scale: 0.95,
+        opacity: 0,
+      }}
+      animate={{
+        scale: 1,
+        opacity: 1,
+      }}
       id={id}
       ref={setNodeRef}
       style={{
         width: SLIDE_CONFIG.width * slideScale,
         height: SLIDE_CONFIG.height * slideScale,
-        borderRadius: "10px",
-        // paddingInline: "14px",
-        // paddingBlock: "10px",
-        // background: "black",
+
         overflow: "hidden",
       }}
       className={cn(
@@ -86,7 +93,7 @@ function SlideBase({
       />
 
       <SlidePresentation data={data} slideScale={slideScale} />
-    </div>
+    </motion.div>
   );
 }
 

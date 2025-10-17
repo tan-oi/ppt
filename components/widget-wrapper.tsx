@@ -7,10 +7,12 @@ export function WidgetWrapper({
   widgetId,
   slideScale,
   slideId,
+  isPresenting,
 }: {
   widgetId: string;
   slideScale: number;
   slideId: string;
+  isPresenting: boolean;
 }) {
   const widget = usePresentationStore((s) => s.getWidget(slideId, widgetId));
 
@@ -41,6 +43,7 @@ export function WidgetWrapper({
       selected={selectedWidget}
       id={widgetId}
       slideId={slideId}
+      // editable={!isPresenting}
     >
       <WidgetComponent
         styles={{
@@ -50,6 +53,7 @@ export function WidgetWrapper({
           width: position.width,
           content: widgetData?.content,
         }}
+        editable={!isPresenting}
         id={widgetId}
         slideId={slideId}
         {...widgetData}

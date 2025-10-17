@@ -82,7 +82,10 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
       onClick={() => {
         handleClick({
           editor: editor,
-        widgetType: "text",
+          widgetType: "text",
+          data: {
+            content: content,
+          },
         });
       }}
     >

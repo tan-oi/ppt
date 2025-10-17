@@ -54,6 +54,8 @@ interface UIStore {
 
   currentSlideIndex: number;
   setCurrentSlideIndex: (index: number) => void;
+  nextSlide: () => void;
+  prevSlide: () => void;
 }
 
 export const useUIStore = create<UIStore>((set, get) => ({
@@ -75,6 +77,21 @@ export const useUIStore = create<UIStore>((set, get) => ({
     set({
       currentSlideIndex: index,
     }),
+
+  nextSlide: () =>
+    set((state) => {
+      const totalSlides = usePresentationStore.getState().slides.length;
+      return {
+        currentSlideIndex: Math.min(
+          state.currentSlideIndex + 1,
+          totalSlides - 1
+        ),
+      };
+    }),
+  prevSlide: () =>
+    set((state) => ({
+      currentSlideIndex: Math.max(state.currentSlideIndex - 1, 0),
+    })),
   setProcessing: (processing) =>
     set({
       isProcessing: processing,
@@ -149,7 +166,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
     const { position, editor, x, y, width, height, ...dataToSave } =
       editBuffer.widgetData;
 
-    console.log(editBuffer);
     usePresentationStore.getState().updateWidget(slideId, id, {
       data: dataToSave,
     });

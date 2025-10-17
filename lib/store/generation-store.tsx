@@ -1,6 +1,14 @@
 import { create } from "zustand";
 
 type GenType = "prompt" | "text" | "link";
+export type PresentationTone =
+  | "professional"
+  | "creative"
+  | "casual"
+  | "academic"
+  | "inspirational"
+  | "minimalist";
+
 interface GenerationInterface {
   userInstruction: string;
   setUserInstruction: (data: string) => void;
@@ -12,6 +20,9 @@ interface GenerationInterface {
   setResult: (data: string | null) => void;
   writeStyle: "base" | "extend" | "preserve";
   setWriteStyle: (style: "base" | "extend" | "preserve") => void;
+  tone: PresentationTone;
+
+  setTone: (tone: PresentationTone) => void;
   id: null | string;
   setId: (id: string) => void;
 }
@@ -41,6 +52,11 @@ export const useGenerationStore = create<GenerationInterface>((set) => ({
   setGenerateType: (type) =>
     set({
       generateType: type,
+    }),
+  tone: "professional",
+  setTone: (tone) =>
+    set({
+      tone,
     }),
   slidesCount: 1,
   setSlidesCount: (count) =>
