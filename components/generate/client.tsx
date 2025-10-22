@@ -7,7 +7,7 @@ import { UrlInput } from "./url";
 import { OutlineViewer } from "./outline-viewer";
 import { useEffect, useState } from "react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { outlineSchema } from "@/app/api/outline/route";
+import { outlineSchema } from "@/app/api/generate-outline/route";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 
@@ -38,23 +38,41 @@ export function GenerateClient({
   }, [type]);
 
   const { object, submit, isLoading } = useObject({
-    api: "/api/outline",
+    api: "/api/generate-outline",
     schema: apiResponseSchema,
-    onFinish: (event) => {
-      console.log(event.object);
-      if (event.object?.slidesOutline) {
-        setResult(event.object.slidesOutline);
+    onFinish: async (event) => {
+      if (!event.object?.slidesOutline) return;
 
-        //WIP -> make db call to like persist outline
-        const id = `ai-${nanoid()}`;
+      setResult(event.object.slidesOutline);
 
-        window.history.replaceState(
-          null,
-          "",
-          `/create/generate/${id}?type=${type}`
-        );
+      const getId = nanoid(10);
+      const id = `ai-${getId}`;
+      setId(id);
 
-        setId(id);
+      window.history.replaceState(
+        null,
+        "",
+        `/create/generate/${id}?type=${type}`
+      );
+
+      const payload = {
+        topic: useGenerationStore.getState().userInstruction,
+        content: event.object.slidesOutline,
+        id: getId,
+      };
+
+      try {
+        const res = await fetch("/api/outline", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          console.error("Failed to save outline:", await res.text());
+        }
+      } catch (err) {
+        console.error("Network error while saving outline:", err);
       }
     },
   });
@@ -62,16 +80,10 @@ export function GenerateClient({
   const Component = COMPONENTS[type];
 
   const handleClick = () => {
-    const instructions = useGenerationStore.getState().userInstruction;
-    const slidesCount = useGenerationStore.getState().slidesCount;
-    const tone = useGenerationStore.getState().tone;
-    let style;
+    const { userInstruction, slidesCount, tone, writeStyle } =
+      useGenerationStore.getState();
 
-    if (type === "text") {
-      style = useGenerationStore.getState().writeStyle;
-    }
-
-    if (!instructions || !slidesCount) {
+    if (!userInstruction || !slidesCount) {
       alert("Please provide instructions and slides count");
       return;
     }
@@ -79,18 +91,16 @@ export function GenerateClient({
     setScreen("result");
 
     submit({
-      instructions,
+      instructions: userInstruction,
       slidesNo: slidesCount,
       type,
-      style,
+      style: type === "text" ? writeStyle : undefined,
       tone,
       messages: [],
     });
   };
 
-  if (screen === "result") {
-    return <OutlineViewer />;
-  }
+  if (screen === "result") return <OutlineViewer />;
 
   return (
     <div className="flex flex-col gap-4 justify-center">

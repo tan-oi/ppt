@@ -30,10 +30,18 @@ export function AlignSelector() {
   const editBuffer = useUIStore((s) => s.editBuffer);
   const editor = editBuffer?.widgetData?.editor;
   const alignmentOptions = [
-    { label: "Left", icon: <TextAlignLeftIcon />, value: "left" },
-    { label: "Right", icon: <TextAlignRightIcon />, value: "right" },
-    { label: "Center", icon: <TextAlignCenterIcon />, value: "center" },
-    { label: "Justify", icon: <TextAlignJustifyIcon />, value: "justify" },
+    { label: "Left", icon: <TextAlignLeftIcon size={16} />, value: "left" },
+    { label: "Right", icon: <TextAlignRightIcon size={16} />, value: "right" },
+    {
+      label: "Center",
+      icon: <TextAlignCenterIcon size={16} />,
+      value: "center",
+    },
+    {
+      label: "Justify",
+      icon: <TextAlignJustifyIcon size={16} />,
+      value: "justify",
+    },
   ];
 
   const closeDropdown = () => setOpen(false);
@@ -42,16 +50,16 @@ export function AlignSelector() {
 
     editor.commands.setTextAlign(option.value);
   };
-  if(!editor) return null;
+  if (!editor) return null;
   return (
     <TooltipProvider>
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger className="shadow-none" asChild>
               <Button
                 variant="outline"
-                className="border-none bg-muted/50 flex justify-between"
+                className="border-none bg-transparent flex justify-between"
               >
                 {align}
                 <ChevronDownIcon
@@ -68,7 +76,8 @@ export function AlignSelector() {
         </Tooltip>
 
         <DropdownMenuContent
-        className="my-2 p-1 w-36 max-w-[230px] min-w-[120px] bg-popover/95 border-none backdrop-filter-xl"
+          sideOffset={10}
+          className="w-36 max-w-[230px] min-w-[120px] bg-popover border-none backdrop-filter-xl"
           widget-element="true"
         >
           <DropdownMenuGroup className="">
@@ -78,7 +87,13 @@ export function AlignSelector() {
                 onClick={() => {
                   handleAlignChange(option);
                 }}
-                className="cursor-pointer flex items-center gap-2"
+                className={`cursor-pointer flex items-center gap-2 ${
+                  editor.isActive({
+                    textAlign: option.value,
+                  })
+                    ? "bg-accent"
+                    : ""
+                }`}
               >
                 {option.icon}
                 <span>{option.label}</span>

@@ -70,10 +70,12 @@ export function ColorSelector() {
       <Popover open={open} onOpenChange={setOpen}>
         <Tooltip>
           <TooltipTrigger className="-mt-1" asChild>
-            <PopoverTrigger asChild>
+            <PopoverTrigger 
+            className="shadow-none"
+            asChild>
               <Button
                 variant="outline"
-                className="border-none bg-muted/50 flex justify-between"
+                className="border-none bg-transparent flex justify-between"
               >
                 {selected ? (
                   <>
@@ -98,7 +100,9 @@ export function ColorSelector() {
           </TooltipTrigger>
           <TooltipContent>Choose a color</TooltipContent>
         </Tooltip>
-        <PopoverContent className="p-2 my-2 border-none bg-muted/70 backdrop-filter-xl rounded">
+        <PopoverContent 
+        sideOffset={10}
+        className="p-2 border-none bg-muted/70 backdrop-filter-xl rounded">
           <div className="flex gap-2">
             {colors.map((c) => (
               <button

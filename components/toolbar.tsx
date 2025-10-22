@@ -35,9 +35,9 @@ export function Toolbar() {
 
   return createPortal(
     <div className="pointer-events-none" style={toolbarStyle}>
-      <div className="pointer-events-auto h-2/3 rounded" data-toolbar>
-        <div className="p-1 mb-2 bg-zinc-900 backdrop-blur-lg rounded-xl transition-all shadow-md duration-300">
-          <div className="flex items-center gap-2 text-foreground">
+      <div className="pointer-events-auto rounded" data-toolbar>
+        <div className="bg-zinc-900 backdrop-blur-lg rounded-xl transition-all shadow-md duration-300">
+          <div className="flex items-center gap-2 text-foreground p-1">
             {ToolbarComponent && <ToolbarComponent />}
             <WidgetOptions />
           </div>

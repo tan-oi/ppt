@@ -41,5 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 
-convex/_generated/
-.convex/
+/lib/generated/prisma

@@ -75,10 +75,10 @@ export function TextFormatting() {
       <DropdownMenu>
         <Tooltip>
           <TooltipTrigger className="-mt-1" asChild>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger className="shadow-none" asChild>
               <Button
                 variant="outline"
-                className="px-4 border-none bg-card/80 flex justify-between"
+                className="px-4 border-none bg-transparent flex justify-between"
               >
                 <MoreHorizontal
                   className="-me-1 opacity-60"
@@ -95,7 +95,8 @@ export function TextFormatting() {
 
         <DropdownMenuContent
           widget-element="true"
-          className="my-2 w-48 max-w-[230px] min-w-[120px] border-none bg-popover/95 backdrop-filter-xl"
+          sideOffset={10}
+          className="w-48 max-w-[230px] min-w-[120px] border-none bg-popover/95 backdrop-filter-xl"
         >
           <DropdownMenuGroup className="flex flex-col gap-1">
             {moreOptions.map((option) => (

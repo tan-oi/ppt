@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/store/ui-store";
 import { useThemeFonts } from "@/lib/config/theme-loader";
 import * as motion from "motion/react-client";
+import { usePresentationStore } from "@/lib/store/presentation-store";
 
 const SlidePresentation = React.memo(
   ({ data, slideScale }: { data: any; slideScale: number }) => {
@@ -24,7 +25,7 @@ const SlidePresentation = React.memo(
       >
         <button
           onClick={() => {
-            console.log(useUIStore.getState().editBuffer);
+            console.log(usePresentationStore.getState().slides);
           }}
         >
           holy shit

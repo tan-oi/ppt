@@ -3,51 +3,40 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function GET() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-
-  const outline = await request.json();
 
   if (!session) {
     return NextResponse.json(
       {
         success: false,
-        error: "Authentication Requried",
-        message: "Please login to continue",
+        error: "Authentication required",
+        message: "Please log in to continue",
       },
-      {
-        status: 401,
-      }
+      { status: 401 }
     );
   }
 
   try {
-    const id = await prisma.outline.create({
-      data: {
-        topic: outline.topic,
-        content: outline.content,
-        finalContent: outline.finalContent ?? "",
+    const getPresentations = await prisma.presentation.findMany({
+      where: {
         userId: session?.user?.id,
-        id: outline.id,
-      },
-      select: {
-        id: true,
       },
     });
 
     return NextResponse.json({
-      succcess: true,
-      data: id,
+      success: true,
+      data: getPresentations,
     });
   } catch (error) {
-    console.error("Error updating outline:", error);
+    console.error("Error fetching presentation:", error);
     return NextResponse.json(
       {
         success: false,
         error: "Database error",
-        message: "Failed to update. Please try again.",
+        message: "Failed to fetch presentation. Please try again.",
       },
       { status: 500 }
     );

@@ -104,7 +104,7 @@ export const LayoutRegistry: Record<string, Layout> = {
   },
   "big-number": {
     slots: BigNumberWithContext,
-    name: "Big Stat Display",
+    name: "Big Display",
     description: "Emphasize a key metric or statistic with context",
     layoutType: "Only Text",
   },

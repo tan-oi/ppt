@@ -3,43 +3,43 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function PUT(
+  request: Request,
+  {
+    params,
+  }: {
+    params: Promise<{ id: string }>;
+  }
+) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-
-  const outline = await request.json();
-
   if (!session) {
     return NextResponse.json(
       {
         success: false,
-        error: "Authentication Requried",
+        error: "Authentication Required",
         message: "Please login to continue",
       },
-      {
-        status: 401,
-      }
+      { status: 401 }
     );
   }
 
+  const { id } = await params;
+  const body = await request.json();
+
   try {
-    const id = await prisma.outline.create({
-      data: {
-        topic: outline.topic,
-        content: outline.content,
-        finalContent: outline.finalContent ?? "",
-        userId: session?.user?.id,
-        id: outline.id,
+    const res = await prisma.outline.update({
+      where: {
+        id,
       },
-      select: {
-        id: true,
+      data: {
+        finalContent: body.updatedOutline,
       },
     });
 
     return NextResponse.json({
-      succcess: true,
-      data: id,
+      success: true,
     });
   } catch (error) {
     console.error("Error updating outline:", error);
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       {
         success: false,
         error: "Database error",
-        message: "Failed to update. Please try again.",
+        message: "Failed to update outline",
       },
       { status: 500 }
     );

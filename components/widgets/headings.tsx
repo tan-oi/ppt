@@ -67,8 +67,8 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
       });
     },
     onCreate: ({ editor }) => {
-      editor.chain().selectAll().setFontSize("32px").run();
-    },
+      editor.chain().selectAll().setFontSize("32px").setBold().run();
+    }, 
   });
 
   return (
@@ -104,5 +104,6 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
 };
 
 const HeadingWidgetComponent = React.memo(HeadingWidget);
+HeadingWidgetComponent.displayName = "HeadingWidget";
 
 export { HeadingWidgetComponent as HeadingWidget };

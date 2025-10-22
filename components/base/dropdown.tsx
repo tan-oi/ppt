@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 
 interface DropdownOption {
   label: string;
-  value: string | number ;
+  value: string | number;
 }
 
 interface BaseDropdownProps {
@@ -73,10 +73,10 @@ export function BaseDropdown({
       <DropdownMenu>
         <Tooltip>
           <TooltipTrigger className="-mt-1" asChild>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger className="shadow-none" asChild>
               <Button
                 variant="outline"
-                className={`w-32 border-none bg-card/80 flex justify-between ${className}`}
+                className={`w-28 border-none bg-transparent flex justify-between ${className}`}
               >
                 <span>{displayName}</span>
                 <ChevronDownIcon
@@ -95,7 +95,7 @@ export function BaseDropdown({
         <DropdownMenuContent
           sideOffset={10}
           widget-element="true"
-          className="my-2 w-40 max-w-[230px] min-w-[120px] border-none bg-popover/95 backdrop-filter-xl"
+          className="w-40 max-w-[230px] min-w-[120px] border-none bg-popover/95 backdrop-filter-xl"
         >
           <DropdownMenuGroup>
             {options.map((option) => (

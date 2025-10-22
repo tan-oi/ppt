@@ -1,0 +1,138 @@
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+  Presentations Presentation[]
+  outlines Outline[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
+}
+
+model Outline {
+  id             String       @id @default(cuid())
+  topic          String
+  targetAudience String?
+  purpose        String?
+  content        Json  
+  finalContent   Json?    
+  userId         String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  presentation   Presentation? 
+  
+  @@index([userId])
+}
+
+
+model Presentation {
+  id         String   @id @default(cuid())
+  topic      String
+  isModified Boolean  @default(false)
+  isShared Boolean @default(false)
+  userId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  outlineId String? @unique
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slides     Slide[]
+  outline Outline? @relation(fields: [outlineId], references: [id])
+  
+  @@index([userId])
+}
+
+model Slide {
+  id             String       @id @default(cuid())
+  slideNumber    Int
+  heading        String
+  presentationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  presentation   Presentation @relation(fields: [presentationId], references: [id], onDelete: Cascade)
+  widgets        Widget[]
+  
+  @@unique([presentationId, slideNumber])
+  @@index([presentationId])
+}
+
+model Widget {
+  id         String   @id @default(cuid())
+  widgetType String
+  data       Json
+  position   Json
+  slideId    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  slide      Slide    @relation(fields: [slideId], references: [id], onDelete: Cascade)
+  
+  @@index([slideId])
+}
+

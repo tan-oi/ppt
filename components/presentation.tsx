@@ -5,7 +5,7 @@ import { useWidgetDeselect } from "@/lib/hooks/useWidgetDeselect";
 import { Slide } from "./slide";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePresentationStore } from "@/lib/store/presentation-store";
-import { useChat } from "@ai-sdk/react";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import {
@@ -25,7 +25,8 @@ import { SLIDE_CONFIG } from "@/lib/config/slide";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { ShareOption } from "./share-option";
-
+import { useGenerationStore } from "@/lib/store/generation-store";
+import { z } from "zod";
 export function Presentation({
   llmToBeCalled,
   presentationData,
@@ -47,29 +48,30 @@ export function Presentation({
   const setType = usePresentationStore((s) => s.setType);
   const [activeElement, setActiveElement] = useState<any>(null);
 
-  const { status, sendMessage } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/trail",
-    }),
+  const { submit, object, isLoading } = useObject({
+    api: "/api/generate-ppt",
+    schema: z.array(z.any()),
     onFinish: (options) => {
       console.log(options);
+      console.log(useGenerationStore.getState().processedOutline);
+      const payload = {
+        slides: options.object,
+      };
+      transformAndStorePresentation(payload);
     },
   });
 
   useEffect(() => {
     if (llmToBeCalled && !presentationData) {
       setType("llm");
-      sendMessage({
-        role: "user",
-        parts: [
-          {
-            type: "text",
-            text: "yo ssup mate",
-          },
-        ],
+      const processedOutline = useGenerationStore.getState().processedOutline;
+
+      submit({
+        processedOutline: JSON.stringify({ processedOutline }),
       });
     } else if (presentationData && !llmToBeCalled) {
       if (needsTransformation(presentationData)) {
+        console.log("hello");
         transformAndStorePresentation(presentationData);
       } else {
         presentationData.slides.forEach((slide: any) => {
@@ -184,8 +186,7 @@ export function Presentation({
   );
 
   if (!slides) return <p>Loading....</p>;
-  if (status === "submitted" || status === "streaming")
-    return <p className="text-white text-center">LLm cooking</p>;
+  if (isLoading) return <p className="text-white text-center">LLm cooking</p>;
 
   if (presentationMode) {
     const currentSlide = slides[currentSlideIndex];

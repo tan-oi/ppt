@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ChevronDown, Sparkles, Loader2 } from "lucide-react";
+import { ChevronDown, Sparkles, Loader2, ArrowBigRight } from "lucide-react";
 import { useGenerationStore } from "@/lib/store/generation-store";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,7 @@ const loadingMessages = [
 export function OutlineViewer() {
   const router = useRouter();
   const result = useGenerationStore((s) => s.result);
+  const prepareForLLM = useGenerationStore((s) => s.prepareForLLM);
   const [localSlides, setLocalSlides] = useState<Slide[]>([]);
   const [messageIndex, setMessageIndex] = useState(0);
 
@@ -188,14 +189,15 @@ export function OutlineViewer() {
         {localSlides.length > 0 && (
           <div className="flex gap-3 pt-4">
             <button
-              className="flex-1 bg-cyan-500 hover:bg-cyan-600 text-black font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-cyan-500/20"
+              className="flex flex-1 justify-center bg-cyan-500 hover:bg-cyan-600 text-black font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-cyan-500/20 cursor-pointer"
               onClick={() => {
                 const id = useGenerationStore.getState().id;
-
+                prepareForLLM();
                 router.push(`/docs/${id}`);
               }}
             >
-              Create Presentation →
+              Create Presentation
+              <ArrowBigRight width={50} />
             </button>
             <button
               onClick={() => {
