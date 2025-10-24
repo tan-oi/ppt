@@ -6,12 +6,11 @@ import { ListCard } from "@/components/widgets/cards/list";
 import { QuoteCard } from "@/components/widgets/cards/quotes";
 import { BaseChartRender } from "@/components/widgets/charts/base";
 import { DividerWidget } from "@/components/widgets/divider";
-import { HeadingWidget } from "@/components/widgets/headings";
 import { ImageWidget } from "@/components/widgets/image";
 import { ButtonLinkWidget } from "@/components/widgets/links/base";
 import { ParagraphWidget } from "@/components/widgets/paragraph";
 import { ProgressBarWidget } from "@/components/widgets/progress-bar";
-
+import { HeadingWidget } from "@/components/widgets/headings";
 interface WidgetConfig {
   slug: string;
   type: "text" | "chart" | "image" | "decoration";
@@ -37,7 +36,7 @@ export const WidgetRegistry: Record<string, WidgetConfig> = {
     },
     defaultPosition: { x: 80, y: 60, width: 200, height: 80 },
     description:
-      "Headings from level 1 to 3 to be written while emphasising on a topic",
+      "Headings frobm level 1 to 3 to be written while emphasising on a topic",
   },
   paragraph: {
     slug: "paragraph",

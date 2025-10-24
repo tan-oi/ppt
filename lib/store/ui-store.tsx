@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { usePresentationStore } from "./presentation-store";
 
 interface WidgetData {
   slideId: string;
@@ -80,6 +79,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
   nextSlide: () =>
     set((state) => {
+      const { usePresentationStore } = require("./presentation-store");
       const totalSlides = usePresentationStore.getState().slides.length;
       return {
         currentSlideIndex: Math.min(
@@ -88,10 +88,12 @@ export const useUIStore = create<UIStore>((set, get) => ({
         ),
       };
     }),
+
   prevSlide: () =>
     set((state) => ({
       currentSlideIndex: Math.max(state.currentSlideIndex - 1, 0),
     })),
+
   setProcessing: (processing) =>
     set({
       isProcessing: processing,
@@ -103,7 +105,9 @@ export const useUIStore = create<UIStore>((set, get) => ({
     })),
 
   updateSelectWidget: ({ slideId, id, widgetType, data }: WidgetData) => {
+    const { usePresentationStore } = require("./presentation-store");
     const widget = usePresentationStore.getState().getWidget(slideId, id);
+    console.log(widget);
 
     set({
       selectedWidget: {
@@ -166,6 +170,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
     const { position, editor, x, y, width, height, ...dataToSave } =
       editBuffer.widgetData;
 
+    const { usePresentationStore } = require("./presentation-store");
     usePresentationStore.getState().updateWidget(slideId, id, {
       data: dataToSave,
     });
