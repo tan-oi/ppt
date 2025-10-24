@@ -70,9 +70,13 @@ interface PresentationState {
   deleteWidget: (slideId: string, widgetId: string) => void;
   getWidget: (slideId: string, widgetId: string) => WidgetData | null;
   updateSlideTheme: (slideId: string, theme: string) => void;
+
+  clearPresentation: () => void;
+  resetStore: () => void;
 }
 
 export const usePresentationStore = create<PresentationState>((set, get) => ({
+  theme: "starter",
   type: "db",
   setType: (type) =>
     set({
@@ -260,4 +264,19 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       ),
     }));
   },
+
+  clearPresentation: () =>
+    set({
+      slides: [],
+      currentSlide: undefined,
+      topic: undefined,
+    }),
+  resetStore: () =>
+    set({
+      theme: undefined,
+      type: "db",
+      currentSlide: undefined,
+      topic: undefined,
+      slides: [],
+    }),
 }));

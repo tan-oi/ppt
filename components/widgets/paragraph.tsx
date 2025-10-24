@@ -53,9 +53,11 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
     content,
     editable,
     onUpdate: ({ editor }) => {
-      updateEditBuffer({
-        content: editor.getJSON(),
-      });
+      if (editable) {
+        updateEditBuffer({
+          content: editor.getJSON(),
+        });
+      }
     },
     onCreate: ({ editor }) => {
       editor.commands.setTextAlign("center");
@@ -63,6 +65,26 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
     },
   });
 
+  if (!editable) {
+    return (
+      <>
+        <div
+          className="backdrop-blur-xl text-foreground text-base w-full h-full"
+          style={{
+            zIndex: "22",
+            overflow: "hidden",
+          }}
+        >
+          <div>
+            <EditorContent
+              editor={editor}
+              className="outline-none [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 p-1 font-body"
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <div

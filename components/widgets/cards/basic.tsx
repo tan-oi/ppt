@@ -47,11 +47,38 @@ export const BasicCard = ({
     ],
     editable: true,
     onUpdate: ({ editor }) => {
-      updateEditBuffer({
-        body: editor.getJSON(),
-      });
+      if (editable) {
+        updateEditBuffer({
+          body: editor.getJSON(),
+        });
+      }
     },
   });
+
+  if (!editable) {
+    return (
+      <>
+        <div
+          className="rounded
+        backdrop-blur-xl 
+        bg-gray-50/5 text-foreground h-full w-full border border-sm border-secondary overflow-hidden shadow-sm"
+        >
+          <div
+            className={
+              (cn("tracking-wide transition-all duration-200 "), className)
+            }
+          >
+            <EditorContent
+              editor={editor}
+              className={cn(
+                "outline-none p-2 [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0"
+              )}
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

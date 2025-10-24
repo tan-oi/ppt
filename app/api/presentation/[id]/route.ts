@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { getPresentationById } from "@/lib/functions/getPresentation";
 
 export async function GET(
   request: Request,
@@ -25,22 +26,8 @@ export async function GET(
   const { id } = await params;
 
   try {
-    const presentation = await prisma.presentation.findUnique({
-      where: {
-        id,
-        userId: session.user.id,
-      },
-      include: {
-        slides: {
-          include: {
-            widgets: true,
-          },
-          orderBy: {
-            slideNumber: "asc",
-          },
-        },
-      },
-    });
+ 
+    const presentation = await getPresentationById(id, session?.user?.id);
 
     if (!presentation) {
       return NextResponse.json(
@@ -54,29 +41,9 @@ export async function GET(
       );
     }
 
-    const transformedData = {
-      id: presentation.id,
-      isModified: presentation.isModified,
-      topic: presentation.topic,
-      slides: presentation.slides.map((slide) => ({
-        id: slide.id,
-        slideNumber: slide.slideNumber,
-        heading: slide.heading,
-        widgets: slide.widgets.reduce((acc, widget) => {
-          acc[widget.id] = {
-            id: widget.id,
-            widgetType: widget.widgetType,
-            data: widget.data,
-            position: widget.position,
-          };
-          return acc;
-        }, {} as Record<string, any>),
-      })),
-    };
-
     return NextResponse.json({
       success: true,
-      data: transformedData,
+      data: presentation,
     });
   } catch (error) {
     console.error("Error fetching presentation:", error);
@@ -110,7 +77,9 @@ export async function PUT(
     );
   }
 
-  const { id } = await params;
+  let { id } = await params;
+  id = id.startsWith("ai-") ? id.slice(3) : id;
+
 
   try {
     const body = await request.json();
@@ -134,6 +103,25 @@ export async function PUT(
           data: {
             topic: body.topic,
             isModified: body.isModified,
+            theme: body.theme,
+            slides: {
+              create: body.slides.map((slide: any) => ({
+                id: slide.id,
+                theme: slide.theme,
+                slideNumber: slide.slideNumber,
+                heading: slide.heading,
+                widgets: {
+                  create: Object.entries(slide.widgets).map(
+                    ([key, widget]: any) => ({
+                      id: widget.id || key,
+                      widgetType: widget.widgetType,
+                      data: widget.data,
+                      position: widget.position,
+                    })
+                  ),
+                },
+              })),
+            },
           },
         });
       } else {
@@ -144,30 +132,28 @@ export async function PUT(
             isModified: body.isModified || false,
             userId: session.user.id,
             outlineId: body.outlineId,
+            theme: body.theme,
+            slides: {
+              create: body.slides.map((slide: any) => ({
+                id: slide.id,
+                theme: slide.theme,
+                slideNumber: slide.slideNumber,
+                heading: slide.heading,
+                widgets: {
+                  create: Object.entries(slide.widgets).map(
+                    ([key, widget]: any) => ({
+                      id: widget.id || key,
+                      widgetType: widget.widgetType,
+                      data: widget.data,
+                      position: widget.position,
+                    })
+                  ),
+                },
+              })),
+            },
           },
         });
       }
-
-      await tx.presentation.update({
-        where: { id },
-        data: {
-          slides: {
-            create: body.slides.map((slide: any) => ({
-              id: slide.id,
-              slideNumber: slide.slideNumber,
-              heading: slide.heading,
-              widgets: {
-                create: Object.values(slide.widgets).map((widget: any) => ({
-                  id: widget.id,
-                  widgetType: widget.widgetType,
-                  data: widget.data,
-                  position: widget.position,
-                })),
-              },
-            })),
-          },
-        },
-      });
     });
 
     return NextResponse.json({
@@ -198,6 +184,7 @@ export async function PUT(
     );
   }
 }
+
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

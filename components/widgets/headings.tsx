@@ -8,6 +8,7 @@ import { useUIStore } from "@/lib/store/ui-store";
 import { TextStyle, FontSize, Color } from "@tiptap/extension-text-style";
 import TextAlign from "@tiptap/extension-text-align";
 import { useWidgetSelection } from "@/lib/hooks/useWidgetSelection";
+
 interface HeadingWidgetProps {
   content?: string;
   level?: 1 | 2 | 3;
@@ -18,7 +19,7 @@ interface HeadingWidgetProps {
   slideId: string;
 }
 
-const HeadingWidget: React.FC<HeadingWidgetProps> = ({
+export const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   content = "Your heading text",
   level = 1,
   editable = true,
@@ -29,11 +30,9 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
 }) => {
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
-  // const widgetRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
     immediatelyRender: false,
-
     extensions: [
       StarterKit.configure({
         heading: false,
@@ -60,16 +59,40 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
       }),
     ],
     content: content,
-    editable,
+    editable: editable,
     onUpdate: ({ editor }) => {
-      updateEditBuffer({
-        content: editor.getJSON(),
-      });
+      if (editable) {
+        updateEditBuffer({
+          content: editor.getJSON(),
+        });
+      }
     },
     onCreate: ({ editor }) => {
-      editor.chain().selectAll().setFontSize("32px").setBold().run();
-    }, 
+      editor.chain().selectAll().setFontSize("24px").setBold().run();
+    },
   });
+
+  if (!editable) {
+    return (
+      <div
+        className="w-full h-full backdrop-blur-xl"
+        style={{
+          zIndex: "24",
+        }}
+      >
+        <div
+          className={cn("tracking-wide transition-all duration-200", className)}
+        >
+          <EditorContent
+            editor={editor}
+            className={cn(
+              "outline-none p-2 [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 text-primary font-heading text-xl [&_.ProseMirror]:cursor-default"
+            )}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -102,8 +125,3 @@ const HeadingWidget: React.FC<HeadingWidgetProps> = ({
     </div>
   );
 };
-
-const HeadingWidgetComponent = React.memo(HeadingWidget);
-HeadingWidgetComponent.displayName = "HeadingWidget";
-
-export { HeadingWidgetComponent as HeadingWidget };

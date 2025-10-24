@@ -73,11 +73,11 @@ export function PresentationOptions({
 
         <div>
           <Select onValueChange={(value) => setTone(value as PresentationTone)}>
-            <SelectTrigger className="w-[130px] bg-neutral-900 border-none focus-within:border-none rounded-xl">
+            <SelectTrigger className="w-[130px] text-white bg-neutral-900 border-none focus-within:border-none rounded-xl">
               <SelectValue className="text-white" placeholder="Tone" />
             </SelectTrigger>
             <SelectContent className="border-none opacity-80 rounded-xl">
-              <SelectGroup>
+              <SelectGroup className="text-gray-50">
                 <SelectLabel>Presentation Tone</SelectLabel>
                 <SelectItem value="professional">Professional</SelectItem>
 

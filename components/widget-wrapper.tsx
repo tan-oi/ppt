@@ -43,7 +43,7 @@ export function WidgetWrapper({
       selected={selectedWidget}
       id={widgetId}
       slideId={slideId}
-      // editable={!isPresenting}
+      editable={!isPresenting}
     >
       <WidgetComponent
         styles={{

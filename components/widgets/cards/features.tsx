@@ -50,10 +50,12 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
     content: title,
     editable: editable,
     onUpdate: ({ editor }) => {
-      updateEditBuffer({
-        title: editor.getJSON(),
-        body: paragraphEditor?.getJSON(),
-      });
+      if (editable) {
+        updateEditBuffer({
+          title: editor.getJSON(),
+          body: paragraphEditor?.getJSON(),
+        });
+      }
     },
   });
 
@@ -86,12 +88,41 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
     ],
     editable,
     onUpdate: ({ editor }) => {
-      updateEditBuffer({
-        title: editor.getJSON(),
-        body: paragraphEditor?.getJSON(),
-      });
+      if (editable) {
+        updateEditBuffer({
+          title: editor.getJSON(),
+          body: paragraphEditor?.getJSON(),
+        });
+      }
     },
   });
+
+  if (!editable) {
+    return (
+      <>
+        <div
+          data-widget
+          className="w-full h-full bg-gray-50/5 backdrop-blur-xl p-4 rounded flex flex-col gap-2 overflow-hidden z-20"
+          style={{}}
+        >
+          <div>
+            <EditorContent
+              className="outline-none font-heading text-accent text-sm
+        [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0"
+              editor={headingEditor}
+            />
+          </div>
+          <div>
+            <EditorContent
+              className="outline-none leading-5 text-md text-foreground [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.PrposeMirror]:p-0 [&_.ProseMirror]:m-0 font-body"
+              editor={paragraphEditor}
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <div
       data-widget

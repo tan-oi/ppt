@@ -136,7 +136,7 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
   });
 
   addSlide({
-    id: slideData.id,
+    id: nanoid(10),
     slideNumber: slideData.slideNumber,
     heading: slideData.heading,
     widgets,

@@ -99,6 +99,7 @@ model Presentation {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   outlineId String? @unique
+  theme String @default("starter")
 
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   slides     Slide[]
@@ -114,7 +115,8 @@ model Slide {
   presentationId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  
+  theme          String       @default("starter")
+
   presentation   Presentation @relation(fields: [presentationId], references: [id], onDelete: Cascade)
   widgets        Widget[]
   

@@ -4,13 +4,20 @@ import { useDroppable } from "@dnd-kit/core";
 import { SLIDE_CONFIG } from "@/lib/config/slide";
 
 import { cn } from "@/lib/utils";
-import { useUIStore } from "@/lib/store/ui-store";
 import { useThemeFonts } from "@/lib/config/theme-loader";
 import * as motion from "motion/react-client";
 import { usePresentationStore } from "@/lib/store/presentation-store";
 
 const SlidePresentation = React.memo(
-  ({ data, slideScale }: { data: any; slideScale: number }) => {
+  ({
+    data,
+    slideScale,
+    isPresenting,
+  }: {
+    data: any;
+    slideScale: number;
+    isPresenting?: boolean;
+  }) => {
     return (
       <div
         style={{
@@ -38,7 +45,7 @@ const SlidePresentation = React.memo(
               widgetId={widgetId}
               slideScale={slideScale}
               slideId={data.id}
-              isPresenting={false}
+              isPresenting={isPresenting ?? false}
             />
           ))}
       </div>
@@ -50,10 +57,12 @@ function SlideBase({
   data,
   id,
   slideScale,
+  isPresenting
 }: {
   data: any;
   id: string;
   slideScale: number;
+  isPresenting?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id,
@@ -93,7 +102,11 @@ function SlideBase({
         }}
       />
 
-      <SlidePresentation data={data} slideScale={slideScale} />
+      <SlidePresentation
+        data={data}
+        slideScale={slideScale}
+        isPresenting={isPresenting}
+      />
     </motion.div>
   );
 }

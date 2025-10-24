@@ -16,8 +16,8 @@ export function DraggableResizableWrapper({
   selected,
   id,
   slideId,
-}: // editable,
-{
+  editable,
+}: {
   x: number;
   y: number;
   width: number;
@@ -28,12 +28,31 @@ export function DraggableResizableWrapper({
   onDragStop?: (x: number, y: number) => void;
   onResizeStop?: (w: number, h: number, x: number, y: number) => void;
   id: string;
-  // editable: boolean;
+  editable: boolean;
   slideId: string;
 }) {
   const updateWidgetPosition = usePresentationStore(
     (s) => s.updateWidgetPosition
   );
+
+  if (!editable) {
+    return (
+      <>
+        <div
+          style={{
+            position: "absolute",
+            left: `${x}px`,
+            top: `${y}px`,
+            width: width ? `${width}px` : "auto",
+            height: height ? `${height}px` : "auto",
+            pointerEvents: "auto",
+          }}
+        >
+          {children}
+        </div>
+      </>
+    );
+  }
 
   return (
     <Rnd
