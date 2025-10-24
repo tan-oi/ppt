@@ -6,7 +6,6 @@ import { Slide } from "./slide";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePresentationStore } from "@/lib/store/presentation-store";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import {
   needsTransformation,
@@ -30,9 +29,11 @@ import { z } from "zod";
 export function Presentation({
   llmToBeCalled,
   presentationData,
+  id,
 }: {
   presentationData: any;
   llmToBeCalled: boolean;
+  id: string;
 }) {
   const slides = usePresentationStore((s) => s.slides);
   const [, setCurrentSlideParam] = useQueryState("slide");
@@ -51,13 +52,47 @@ export function Presentation({
   const { submit, object, isLoading } = useObject({
     api: "/api/generate-ppt",
     schema: z.array(z.any()),
-    onFinish: (options) => {
+    onFinish: async (options) => {
       console.log(options);
-      console.log(useGenerationStore.getState().processedOutline);
+
       const payload = {
         slides: options.object,
       };
       transformAndStorePresentation(payload);
+
+      const updatedSlideData = usePresentationStore.getState().slides;
+      const payloadToBeSent = {
+        topic: useGenerationStore.getState().userInstruction,
+        outlineId: id.startsWith("ai-") ? id.slice(3) : id,
+        theme: pptTheme,
+        slides: updatedSlideData,
+      };
+
+      try {
+        const res = await fetch(`/api/presentation/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payloadToBeSent),
+        });
+
+        if (!res.ok) {
+          console.error("Failed to save the presentation!");
+        }
+
+        window.history.replaceState(
+          null,
+          "",
+          `/docs/${id.startsWith("ai-") ? id.slice(3) : id}`
+        );
+      } catch (err) {
+        console.error("Some network/db error");
+      }
+
+      console.log(payloadToBeSent);
+      console.log(usePresentationStore.getState().slides);
+      console.log(pptTheme);
     },
   });
 
@@ -74,12 +109,13 @@ export function Presentation({
         console.log("hello");
         transformAndStorePresentation(presentationData);
       } else {
+        console.log("ahh yeahh");
         presentationData.slides.forEach((slide: any) => {
           populateStores(slide);
         });
       }
     }
-  }, [llmToBeCalled, presentationData]);
+  }, []);
 
   useEffect(() => {
     if (!presentationMode) return;
@@ -276,13 +312,13 @@ export function Presentation({
             pptTheme && pptTheme !== "starter" ? `${pptTheme}` : "font-sans"
           )}
         >
-          <div className="fixed top-4 right-0 z-10">
+          {/* <div className="fixed top-4 right-0 z-10">
             <ShareOption
               shareUrl="http://holy.so"
               isShared={true}
               onRevoke={() => console.log("hey")}
             />
-          </div>
+          </div> */}
 
           <div className="fixed background-blur-2xl bottom-6 z-100">
             <DockBase />
