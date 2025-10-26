@@ -44,7 +44,7 @@ export function Presentation({
   const currentSlideIndex = useUIStore((s) => s.currentSlideIndex);
   const nextSlide = useUIStore((s) => s.nextSlide);
   const prevSlide = useUIStore((s) => s.prevSlide);
-
+  const clearPresentation = usePresentationStore((s) => s.clearPresentation);
   const pptTheme = usePresentationStore((s) => s.theme);
   const setType = usePresentationStore((s) => s.setType);
   const [activeElement, setActiveElement] = useState<any>(null);
@@ -58,6 +58,7 @@ export function Presentation({
       const payload = {
         slides: options.object,
       };
+      clearPresentation();
       transformAndStorePresentation(payload);
 
       const updatedSlideData = usePresentationStore.getState().slides;
@@ -312,13 +313,13 @@ export function Presentation({
             pptTheme && pptTheme !== "starter" ? `${pptTheme}` : "font-sans"
           )}
         >
-          {/* <div className="fixed top-4 right-0 z-10">
-            <ShareOption
-              shareUrl="http://holy.so"
-              isShared={true}
-              onRevoke={() => console.log("hey")}
-            />
-          </div> */}
+            {/* <div className="fixed top-4 right-0 z-10">
+              <ShareOption
+                shareUrl="http://holy.so"
+                isShared={true}
+                onRevoke={() => console.log("hey")}
+              />
+            </div> */}
 
           <div className="fixed background-blur-2xl bottom-6 z-100">
             <DockBase />

@@ -6,7 +6,7 @@ export default async function GeneratePPT({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await searchParams;
-  const type = (params.type as "text" | "prompt" | "link") || "prompt"; 
+  const type = (params.type as "text" | "prompt") || "prompt";
 
   return (
     <>

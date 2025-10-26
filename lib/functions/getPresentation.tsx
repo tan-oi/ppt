@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { auth } from "../auth";
 
 export async function getPresentationById(
   presentationId: string,
@@ -115,4 +116,34 @@ export async function getSharedPresentation(
       })),
     },
   };
+}
+
+export async function getAllPresentations(userId: string) {
+  try {
+    const getPresentations = await prisma.presentation.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        _count: {
+          select: {
+            slides: true,
+          },
+        },
+      },
+    });
+
+    console.log(getPresentations);
+    return {
+      success: true,
+      data: getPresentations,
+    };
+  } catch (error) {
+    console.error("Error fetching presentation:", error);
+    return {
+      success: false,
+      error: "Database error",
+      message: "Failed to fetch presentation. Please try again.",
+    };
+  }
 }
