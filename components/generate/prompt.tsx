@@ -3,6 +3,8 @@ import { useGenerationStore } from "@/lib/store/generation-store";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useState } from "react";
+import { Separator } from "../ui/separator";
+import Link from "next/link";
 
 const options = [
   "How sleeping is important?",
@@ -16,17 +18,37 @@ export function PromptInput() {
   const [option, setOption] = useState("");
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      <div className="flex flex-col gap-2 items-center">
-        <h1 className="text-primary text-xl">
-          Craft a prompt or write any topic
-        </h1>
-        <p className="text-muted-foreground text-sm">
-          Create a deck by just stating a topic
-        </p>
+    <div className="space-y-2">
+     
+
+      <div className="relative w-full px-6 py-6 space-y-8">
+        <div className="flex items-start justify-between gap-8">
+          <div className="flex-1">
+            <div className="inline-block mb-4 px-3 py-1.5 rounded-full bg-neutral-900/40 border border-neutral-800/60">
+              <p className="text-xs font-medium text-neutral-500 tracking-widest">
+                Create
+              </p>
+            </div>
+            <h1 className="text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
+              Craft prompt
+            </h1>
+            <p className="text-neutral-500 text-sm max-w-md leading-relaxed">
+              Enter a prompt and get your presentation generated
+            </p>
+          </div>
+
+          <Link href={"/create"}>
+
+          <Button className="rounded-lg cursor-pointer">
+            Back
+          </Button>
+          </Link>
+        </div>
+
+        <Separator className="w-full text-zinc-600" />
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 max-w-3xl mx-auto">
         <div className="space-y-2">
           <p className="text-xs text-foreground/60">Topic</p>
           <Input

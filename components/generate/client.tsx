@@ -3,18 +3,22 @@ import { useGenerationStore } from "@/lib/store/generation-store";
 import { PresentationOptions } from "./options";
 import { PromptInput } from "./prompt";
 import { Text } from "./text";
-import { UrlInput } from "./url";
+
+// import { UrlInput } from "./url";
 import { OutlineViewer } from "./outline-viewer";
 import { useEffect, useState } from "react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { outlineSchema } from "@/app/api/generate-outline/route";
 import { z } from "zod";
 import { nanoid } from "nanoid";
+import { Button } from "../ui/button";
+import { createBlankPresentation } from "@/app/create/action";
+import { useRouter } from "next/navigation";
 
-const COMPONENTS: Record<"text" | "prompt" | "link", React.FC<any>> = {
+const COMPONENTS: Record<"text" | "prompt", React.FC<any>> = {
   text: Text,
   prompt: PromptInput,
-  link: UrlInput,
+  // link: UrlInput,
 };
 
 const apiResponseSchema = z.object({
@@ -25,9 +29,12 @@ export function GenerateClient({
   type,
   ...props
 }: {
-  type: "text" | "prompt" | "link";
+  type: "text" | "prompt";
   [key: string]: any;
 }) {
+  const [isCreatingScratch, setIsCreatingScratch] = useState(false);
+
+  const router = useRouter();
   const setGenerateType = useGenerationStore((s) => s.setGenerateType);
   const setResult = useGenerationStore((s) => s.setResult);
   const setId = useGenerationStore((s) => s.setId);
@@ -100,10 +107,22 @@ export function GenerateClient({
     });
   };
 
+  const handleStartFromScratch = async () => {
+    setIsCreatingScratch(true);
+    const result = await createBlankPresentation();
+
+    if (result.success) {
+      router.push(`/docs/${result.id}`);
+    } else {
+      alert(result.error || "Failed to create presentation");
+      setIsCreatingScratch(false);
+    }
+  };
+
   if (screen === "result") return <OutlineViewer />;
 
   return (
-    <div className="flex flex-col gap-4 justify-center">
+    <div className="flex flex-col max-w-7xl mx-auto min-h-screen space-y-6">
       <Component {...props} />
       <PresentationOptions type={type} handleClick={handleClick} />
     </div>

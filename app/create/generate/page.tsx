@@ -20,7 +20,7 @@ export default async function GeneratePPT({
             }}
           />
         </div>
-        <div className="flex flex-col w-full mx-auto pt-16 justify-center">
+        <div className="">
           <GenerateClient type={type} />
         </div>
       </div>

@@ -3,6 +3,9 @@ import { useGenerationStore } from "@/lib/store/generation-store";
 import { cn } from "@/lib/utils";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 
 export function Text({ className }: { className: string }) {
   const setUserInstruction = useGenerationStore((s) => s.setUserInstruction);
@@ -22,16 +25,33 @@ export function Text({ className }: { className: string }) {
   });
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
-      <div className="flex flex-col gap-1 items-center">
-        <h1 className="text-primary text-xl">Paste/Write content</h1>
+    <div className="space-y-2">
+      <div className="relative w-full px-6 py-6 space-y-8">
+        <div className="flex items-start justify-between gap-8">
+          <div className="flex-1">
+            <div className="inline-block mb-4 px-3 py-1.5 rounded-full bg-neutral-900/40 border border-neutral-800/60">
+              <p className="text-xs font-medium text-neutral-500 tracking-widest">
+                Create
+              </p>
+            </div>
+            <h1 className="text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
+              Paste/write content
+            </h1>
+            <p className="text-neutral-500 text-sm max-w-md leading-relaxed">
+              Create a deck by pasting notes, outline or drafting any text
+              content{" "}
+            </p>
+          </div>
 
-        <p className="text-muted-foreground text-sm">
-          Create a deck by pasting notes, outline or drafting any text content{" "}
-        </p>
+          <Link href={"/create"}>
+            <Button className="rounded-lg cursor-pointer">Back</Button>
+          </Link>
+        </div>
+
+        <Separator className="w-full text-zinc-600" />
       </div>
       <div>
-        <div className="bg-muted/40 rounded-xl text-primary h-96 w-2xl outline outline-neutral-600">
+        <div className="bg-muted/40 rounded-xl text-primary h-80 max-w-3xl mx-auto outline outline-neutral-600">
           <div
             className={cn("w-full h-full", className)}
             onClick={() => editor?.commands.focus()}
