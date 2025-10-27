@@ -17,12 +17,12 @@ export function ThemeSelector() {
   const theme = usePresentationStore((s) => s.theme);
   const setTheme = usePresentationStore((s) => s.setTheme);
   const currentSlide = usePresentationStore((s) => s.currentSlide);
+  const slides = usePresentationStore((s) => s.slides);
   const [scope, setScope] = useState<"current" | "all">("all");
-
-  const [currentSlideTheme, setCurrentSlideTheme] = useState<string | null>(
-    null
-  );
   const [isOpen, setIsOpen] = useState(false);
+
+  const currentSlideData = slides?.find((s: any) => s.id === currentSlide);
+  const currentSlideTheme = currentSlideData?.theme || theme;
 
   const handleThemeSelect = (selectedTheme: (typeof themes)[0]) => {
     if (scope === "all") {
@@ -31,7 +31,6 @@ export function ThemeSelector() {
       usePresentationStore
         .getState()
         .updateSlideTheme(currentSlide as string, selectedTheme.slug);
-      setCurrentSlideTheme(selectedTheme.slug);
     }
   };
 

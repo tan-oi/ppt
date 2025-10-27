@@ -30,14 +30,6 @@ const SlidePresentation = React.memo(
         }}
         className="relative"
       >
-        <button
-          onClick={() => {
-            console.log(usePresentationStore.getState().slides);
-          }}
-        >
-          holy shit
-        </button>
-
         {data &&
           Object.keys(data.widgets).map((widgetId) => (
             <WidgetWrapper
@@ -54,12 +46,11 @@ const SlidePresentation = React.memo(
 );
 
 function SlideBase({
-  data,
   id,
   slideScale,
-  isPresenting
+  isPresenting,
 }: {
-  data: any;
+  data?: any;
   id: string;
   slideScale: number;
   isPresenting?: boolean;
@@ -69,7 +60,13 @@ function SlideBase({
     data: { type: "slide" },
   });
 
-  useThemeFonts(data.theme);
+  const slideData = usePresentationStore((s) =>
+    s.slides.find((slide: any) => slide.id === id)
+  );
+
+  if (!slideData) return null;
+
+  useThemeFonts(slideData.theme);
 
   return (
     <motion.div
@@ -86,12 +83,11 @@ function SlideBase({
       style={{
         width: SLIDE_CONFIG.width * slideScale,
         height: SLIDE_CONFIG.height * slideScale,
-
         overflow: "hidden",
       }}
       className={cn(
-        "grid grid-cols-24 grid-rows-24 bg-background",
-        data.theme && data.theme !== "starter" ? data.theme : ""
+        "grid grid-cols-24 grid-rows-24 bg-background rounded-lg",
+        slideData.theme && slideData.theme !== "starter" ? slideData.theme : ""
       )}
     >
       <div
@@ -103,7 +99,7 @@ function SlideBase({
       />
 
       <SlidePresentation
-        data={data}
+        data={slideData}
         slideScale={slideScale}
         isPresenting={isPresenting}
       />
@@ -111,4 +107,4 @@ function SlideBase({
   );
 }
 
-export const Slide = React.memo(SlideBase);
+export const Slide = SlideBase;
