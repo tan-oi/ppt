@@ -39,12 +39,15 @@ export function ProgressToolbar() {
         disabled={!widgetData.showPercentage}
         value={widgetData.percentage}
         onChange={(e) => handleUpdate("percentage", e.target.value)}
+        className="min-w-[30px] max-w-[50px]"
         placeholder="60"
       />
 
       <Input
+        data-toolbar-input
         value={widgetData.label}
         onChange={(e) => handleUpdate("label", e.target.value)}
+        className="min-w-[150px] max-w-[300px]"
         placeholder="Label"
       />
 

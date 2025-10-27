@@ -15,6 +15,7 @@ import { BaseColorInput } from "@/components/base/color-changer";
 
 export function IconToolbar() {
   const editBuffer = useUIStore((s) => s.editBuffer);
+  console.log(editBuffer);
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const [iconSearch, setIconSearch] = React.useState("");
 
@@ -162,19 +163,19 @@ export function IconToolbar() {
 
       {widgetData.showLabel && (
         <Input
-          value={widgetData.label}
+          data-toolbar-input
+          value={widgetData.label ?? ""}
           type="text"
+          placeholder="Enter label text"
           onChange={(e) => handleUpdate("label", e.target.value)}
+          className="min-w-[150px] max-w-[300px]"
         />
       )}
 
       <Popover>
         <PopoverTrigger asChild>
-          <Button
-            variant={"ghost"}
-            className="bg-zinc-700/30 text-sm cursor-pointer rounded"
-          >
-            Icon
+          <Button variant={"ghost"} className="text-sm cursor-pointer rounded">
+            <LucideIcons.Shapes />
           </Button>
         </PopoverTrigger>
         <PopoverContent

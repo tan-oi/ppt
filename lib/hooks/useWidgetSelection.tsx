@@ -8,9 +8,14 @@ export function useWidgetSelection(widgetId: string, slideId: string) {
 
   const handleClick = (additionalData?: any) => {
     const { isProcessing } = useUIStore.getState();
-
+    const { selectedWidget } = useUIStore.getState();
     if (isProcessing) {
       console.log("⏳ Cannot switch widgets during processing");
+      return;
+    }
+
+    if (selectedWidget?.id === widgetId) {
+      console.log("Widget already selected, skipping position recalculation");
       return;
     }
 

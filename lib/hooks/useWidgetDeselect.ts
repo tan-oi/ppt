@@ -8,6 +8,7 @@ export function useWidgetDeselect() {
       const target = e.target as HTMLElement;
       const isToolbarOpen = useUIStore.getState().toolbarOpen;
 
+      
       if (
         target.closest("[data-widget]") ||
         target.closest("[data-toolbar]") ||
@@ -24,9 +25,13 @@ export function useWidgetDeselect() {
     const handleScroll = (e: Event) => {
       const target = e.target as HTMLElement;
       const isToolbarOpen = useUIStore.getState().toolbarOpen;
-      if (target instanceof Element && target.closest("[data-drawer]")) {
+      if (target instanceof Element && (
+        target.closest("[data-drawer]") ||
+        target.closest("[data-toolbar-input]") 
+      )) {
         return;
       }
+    
 
       if (isToolbarOpen) {
         useUIStore.getState().deselectWidgetAndRemoveToolbar();

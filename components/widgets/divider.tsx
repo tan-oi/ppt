@@ -7,7 +7,6 @@ interface DividerWidgetProps {
   style?: "solid" | "dashed" | "dotted";
   thickness?: number;
   color?: string;
-  width?: string;
   orientation?: "horizontal" | "vertical";
 }
 
@@ -17,26 +16,23 @@ export const DividerWidget: React.FC<DividerWidgetProps> = ({
   style = "dashed",
   thickness = 2,
   color = "#fff",
-  width = "100%",
   orientation = "vertical",
 }) => {
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
 
   const isSelected = useUIStore((s) => s.selectedWidget?.id === id);
-  // const isSelected = selectedWidget?.id === id;
   const editBuffer = useUIStore((s) => s.editBuffer);
 
   const currentData =
     isSelected && editBuffer?.widgetData
       ? editBuffer.widgetData
-      : { style, thickness, color, width, orientation };
+      : { style, thickness, color, orientation };
 
   const isHorizontal = currentData.orientation === "horizontal";
-  console.log(currentData);
 
   return (
     <div
-      className="h-full"
+      className="h-full w-full"
       ref={widgetRef}
       onClick={() => {
         handleClick({
@@ -45,7 +41,6 @@ export const DividerWidget: React.FC<DividerWidgetProps> = ({
             style: currentData.style,
             thickness: currentData.thickness,
             color: currentData.color,
-            width: currentData.width,
             orientation: currentData.orientation,
           },
         });
@@ -61,14 +56,10 @@ export const DividerWidget: React.FC<DividerWidgetProps> = ({
     >
       <hr
         style={{
-          width: isHorizontal
-            ? currentData.width
-            : `${currentData.thickness}px`,
-          height: isHorizontal
-            ? `${currentData.thickness}px`
-            : currentData.width,
-          border: "none",
+          width: isHorizontal ? "100%" : `${currentData.thickness}px`,
+          height: isHorizontal ? `${currentData.thickness}px` : "100%",
 
+          border: "none",
           borderTop: isHorizontal
             ? `${currentData.thickness}px ${currentData.style} ${currentData.color}`
             : "none",

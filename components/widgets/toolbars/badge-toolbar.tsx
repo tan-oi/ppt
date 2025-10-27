@@ -29,9 +29,11 @@ export function BadgeToolbar() {
       />
 
       <Input
+        data-toolbar-input
         placeholder="Label on badge"
         value={widgetData.label}
         onChange={(e) => handleUpdate("label", e.target.value)}
+        className="min-w-[60px] max-w-[150px]"
       />
     </>
   );
