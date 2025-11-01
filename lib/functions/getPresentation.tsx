@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "../auth";
+import { redis } from "../rate-limit";
 
 export async function getPresentationById(
   presentationId: string,
@@ -124,6 +125,9 @@ export async function getAllPresentations(userId: string) {
       where: {
         userId,
       },
+      orderBy: {
+        updatedAt: "desc",
+      },
       include: {
         _count: {
           select: {
@@ -135,7 +139,7 @@ export async function getAllPresentations(userId: string) {
 
     console.log(getPresentations);
     return {
-      success: true,
+      success: true as const,
       data: getPresentations,
     };
   } catch (error) {
@@ -144,6 +148,68 @@ export async function getAllPresentations(userId: string) {
       success: false,
       error: "Database error",
       message: "Failed to fetch presentation. Please try again.",
+    };
+  }
+}
+
+export async function getCredits(userId: string) {
+  const redisKey = `user:${userId}:credits`;
+
+  let cachedRedis = await redis.get<number>(redisKey);
+
+  if (cachedRedis !== null) {
+    return cachedRedis;
+  }
+
+  const userCredits = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      credits: true,
+    },
+  });
+
+  if (userCredits && userCredits.credits) {
+    redis.set(redisKey, userCredits.credits, {
+      ex: 24 * 60 * 60,
+    });
+
+    return userCredits.credits;
+  } else {
+    redis.set(redisKey, 0, {
+      ex: 24 * 60 * 60,
+    });
+    return 0;
+  }
+}
+
+export async function getLibraryData(userId: string) {
+  try {
+    const [presentationResult, credit] = await Promise.all([
+      getAllPresentations(userId),
+      getCredits(userId),
+    ]);
+
+    if (!presentationResult.success) {
+      return {
+        success: false as const,
+        error: presentationResult.error,
+        message: presentationResult.message,
+      };
+    }
+
+    return {
+      success: true as const,
+      presentations: presentationResult.data,
+      credits: credit,
+    };
+  } catch (error) {
+    console.error("Error fetching library data:", error);
+    return {
+      success: false,
+      error: "Database error",
+      message: "Failed to fetch library data. Please try again.",
     };
   }
 }

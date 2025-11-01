@@ -1,8 +1,13 @@
+import { auth } from "@/lib/auth";
 import { buildPresentationPrompt } from "@/lib/config/prompt";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/rate-limit";
 import { groq } from "@ai-sdk/groq";
-import { UIMessage, convertToModelMessages, generateObject } from "ai";
+import { UIMessage, generateObject } from "ai";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { nanoid } from "nanoid";
 
 export const requestSchema = z.object({
   instructions: z.string().min(5, "Please give some more instructions!"),
@@ -33,15 +38,30 @@ export const outlineSchema = z.object({
     "image-caption",
     "four-quadrants",
     "header-three-cards",
-    "big-number",
+    "stat-showcase",
+    "centered-callout",
+    "image-caption",
+    "image-text-split",
+    "two-media-paragraph",
   ]),
   pointers: z.array(z.string().min(1)).min(1, "At least 1 pointers required"),
 });
 
 export async function POST(req: Request) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return NextResponse.json({ error: "Not permitted" }, { status: 401 });
+  }
+
+  const requiredCredits = Number(process.env.REQUIRED_CREDITS);
+  const userId = session.user.id;
+  const redisKey = `user:${userId}:credits`;
+
   try {
     const obj = await req.json();
-    console.log(obj);
     const parsedData = requestSchema.safeParse(obj);
 
     if (!parsedData.success) {
@@ -51,31 +71,118 @@ export async function POST(req: Request) {
       );
     }
 
-    const { instructions, slidesNo, type, style, tone, messages } =
-      parsedData.data;
+    let credits = await redis.get<number>(redisKey);
 
-    const systemPrompt = buildPresentationPrompt({
-      instructions,
-      slidesNo,
-      type,
-      style,
-      tone,
+    if (credits === null) {
+      const userCredit = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { credits: true },
+      });
+
+      if (!userCredit) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      credits = userCredit.credits;
+      await redis.set(redisKey, credits, { ex: 24 * 60 * 60 });
+    }
+
+    if (credits < requiredCredits) {
+      return NextResponse.json(
+        { error: "Insufficient credits" },
+        { status: 403 }
+      );
+    }
+
+    await redis.decrby(redisKey, requiredCredits);
+
+    const { instructions, slidesNo, type, style, tone } = parsedData.data;
+
+    let slideObject: z.infer<typeof outlineSchema>[];
+    try {
+      const systemPrompt = buildPresentationPrompt({
+        instructions,
+        slidesNo,
+        type,
+        style,
+        tone,
+      });
+
+      const { object } = await generateObject({
+        model: groq("openai/gpt-oss-120b"),
+        output: "array",
+        schema: outlineSchema,
+        system: systemPrompt,
+        prompt: "Do as asked!",
+      });
+
+      slideObject = object;
+    } catch (aiError) {
+      console.error("AI generation failed:", aiError);
+      await redis.incrby(redisKey, requiredCredits);
+      throw aiError;
+    }
+
+    const transaction = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { id: userId },
+        select: { credits: true },
+      });
+
+      if (!user || user.credits < requiredCredits) {
+        await redis.incrby(redisKey, requiredCredits);
+        throw new Error("Insufficient credits in database");
+      }
+
+      await tx.user.update({
+        where: { id: userId },
+        data: { credits: { decrement: requiredCredits } },
+      });
+
+      const record = await tx.transactionHistory.create({
+        data: {
+          userId,
+          credits: requiredCredits,
+          type: "ppt",
+        },
+      });
+
+      const presentationId = nanoid(10);
+      const outline = await tx.outline.create({
+        data: {
+          id: presentationId,
+          userId,
+          topic: instructions,
+          content: slideObject as any,
+          finalContent: "",
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      return {
+        record,
+        outline,
+        newCredits: user.credits - requiredCredits,
+      };
     });
 
-    console.log(systemPrompt);
-    const { object, finishReason, usage } = await generateObject({
-      model: groq("openai/gpt-oss-120b"),
-      output: "array",
-      schema: outlineSchema,
+    const ttl = await redis.ttl(redisKey);
+    if (ttl > 0) {
+      await redis.set(redisKey, transaction.newCredits, { ex: ttl });
+    } else {
+      await redis.set(redisKey, transaction.newCredits, { ex: 24 * 60 * 60 });
+    }
 
-      system: systemPrompt,
-      prompt: "Do as asked!",
-    });
-
-    console.log(object);
-    console.log(finishReason);
-    console.log(usage, "usage");
-    return NextResponse.json({ slidesOutline: object }, { status: 200 });
+    return NextResponse.json(
+      {
+        slidesOutline: slideObject,
+        presentationId: transaction.outline.id,
+        transactionId: transaction.record.id,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error generating presentation:", error);
     return NextResponse.json(
