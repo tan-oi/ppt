@@ -12,6 +12,7 @@ import { Palette, Check } from "lucide-react";
 import { themes } from "@/lib/config/theme";
 import { usePresentationStore } from "@/lib/store/presentation-store";
 import { cn } from "@/lib/utils";
+import * as motion from "motion/react-client";
 
 export function ThemeSelector() {
   const theme = usePresentationStore((s) => s.theme);
@@ -38,10 +39,21 @@ export function ThemeSelector() {
     <div className="">
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors">
+          <motion.button
+            whileHover={{
+              scale: 1.02,
+            }}
+            whileTap={{
+              scale: [1, 0.98],
+            }}
+            transition={{
+              duration: 0.3,
+            }}
+            className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors"
+          >
             <Palette size={18} className="text-zinc-400" />
             <span className="text-sm text-zinc-300">Theme</span>
-          </button>
+          </motion.button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           sideOffset={16}

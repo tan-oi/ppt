@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/dialog";
 import { deletePresentation } from "@/app/library/action";
 import { Separator } from "../ui/separator";
+import { ShareOption } from "../share-option";
+import { toggleSharePresentation } from "@/app/docs/[id]/action";
+import { motion } from "motion/react";
 
 interface PresentationCardProps {
   item: {
@@ -40,7 +43,7 @@ export function PresentationCard({
   const router = useRouter();
   const [openDelete, setOpenDelete] = useState(false);
   const [isPending, startTransition] = useTransition();
-
+  const [openShare, setOpenShare] = useState(false);
   const handleCardClick = () => {
     router.push(`/docs/${item.id}`);
   };
@@ -70,8 +73,20 @@ export function PresentationCard({
   };
 
   return (
-    <div
-      className="relative rounded-lg border border-neutral-800/50 overflow-visible transition-all duration-300 hover:border-neutral-700/70 shadow-sm hover:shadow-md flex flex-col h-[420px] cursor-pointer group"
+    <motion.div
+      initial={{
+        scale: 0.98,
+        opacity: 0,
+      }}
+      whileInView={{
+        scale: 1,
+        opacity: 1,
+      }}
+      transition={{
+        duration: 0.3,
+        ease: "easeOut",
+      }}
+      className="relative rounded-xl border border-neutral-800/50 overflow-visible transition-all duration-300 hover:border-neutral-700/70 shadow-sm hover:shadow-md flex flex-col h-[420px] cursor-pointer group"
       onClick={handleCardClick}
     >
       {item.isShared && (
@@ -174,7 +189,7 @@ export function PresentationCard({
           <Link href={`/p/${item.id}`} className="flex-1">
             <Button
               size="sm"
-              className="w-full h-8 text-xs rounded-md transition-colors duration-200 font-medium bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+              className="w-full h-8 text-xs rounded-lg transition-colors duration-200 font-medium bg-blue-600 hover:bg-blue-700 text-white cursor-pointer hover:scale-[1.01]"
             >
               <Play className="w-3 h-3 mr-1.5" />
               Present
@@ -192,14 +207,17 @@ export function PresentationCard({
 
           <Separator orientation="vertical" />
 
-          <Button
-            size="icon"
-            variant={"link"}
-            className="h-8 w-8 rounded-md transition-colors duration-200 text-neutral-400 hover:text-blue-600 hover:scale-[1.02] cursor-pointer"
-            onClick={handleShare}
-          >
-            <Share2 className="w-3 h-3" />
-          </Button>
+          <ShareOption
+            isShared={item.isShared}
+            type="minimal"
+            shareUrl={`${process.env.NEXT_PUBLIC_APP_URL}/p/${item.id}`}
+            presentationId={`${item.id}`}
+            onToggleShare={toggleSharePresentation.bind(
+              null,
+              item.id,
+              item.isShared
+            )}
+          />
 
           <Separator orientation="vertical" />
 
@@ -267,6 +285,6 @@ export function PresentationCard({
           </Dialog>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

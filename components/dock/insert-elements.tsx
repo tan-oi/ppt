@@ -26,7 +26,8 @@ import {
   Image,
 } from "lucide-react";
 import { DraggableMenuItem } from "./draggableItems";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 
 const elements = [
   {
@@ -128,8 +129,10 @@ const elements = [
 ];
 
 export function InsertElements() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors">
           <Plus size={18} className="text-zinc-400" />
@@ -137,46 +140,56 @@ export function InsertElements() {
         </button>
       </DropdownMenuTrigger>
 
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <DropdownMenuContent
-          sideOffset={16}
-          className="h-96 w-72 p-2 border border-zinc-800 bg-zinc-900 backdrop-blur-md rounded-lg shadow-xl"
-        >
-          <DropdownMenuLabel className="text-sm text-zinc-300 flex flex-col space-y-0.5 px-2">
-            <span>Insert widget</span>
-            <span className="text-xs text-zinc-500">Drag to slide</span>
-          </DropdownMenuLabel>
-
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.03 } },
-            }}
+      <AnimatePresence mode="wait">
+        {isOpen && (
+          <DropdownMenuContent
+            asChild
+            forceMount
+            sideOffset={16}
+            className="h-96 w-72 p-2 border border-zinc-800 bg-zinc-900 backdrop-blur-md rounded-lg shadow-xl"
           >
-            <DropdownMenuSeparator className="my-2 bg-zinc-800" />
-            {elements.map((el) => (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: -8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -8 }}
+              transition={{ duration: 0.2, ease: "easeOut", delay: 0.1 }}
+            >
+              <DropdownMenuLabel className="text-sm text-zinc-300 flex flex-col space-y-0.5 px-2">
+                <span>Insert widget</span>
+                <span className="text-xs text-zinc-500">Drag to slide</span>
+              </DropdownMenuLabel>
+
               <motion.div
-                key={el.id}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
                 variants={{
-                  hidden: { y: 8, opacity: 0, scale: 0.95 },
-                  visible: { y: 0, opacity: 1, scale: 1 },
+                  hidden: {},
+                  visible: { transition: { staggerChildren: 0.15 } },
                 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               >
-                <DraggableMenuItem element={el} />
+                <DropdownMenuSeparator className="my-2 bg-zinc-800" />
+                {elements.map((el, index) => (
+                  <motion.div
+                    key={el.id}
+                    variants={{
+                      hidden: {
+                        y: 8,
+                        opacity: 0,
+                        scale: 0.95,
+                      },
+                      visible: { y: 0, opacity: 1, scale: 1 },
+                    }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <DraggableMenuItem element={el} />
+                  </motion.div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
-        </DropdownMenuContent>
-      </motion.div>
+            </motion.div>
+          </DropdownMenuContent>
+        )}
+      </AnimatePresence>
     </DropdownMenu>
   );
 }

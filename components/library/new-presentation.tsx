@@ -84,7 +84,7 @@ export function NewPresentation() {
                   visible: {
                     transition: {
                       staggerChildren: 0.2,
-                      delayChildren: 0.2,
+                      delayChildren: 0.05,
                       ease: "easeOut",
                     },
                   },
@@ -127,7 +127,7 @@ export function NewPresentation() {
                         visible: { opacity: 1, y: 0 },
                       }}
                       whileHover={{ scale: 1.02 }}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
                     >
                       <div className="p-2 rounded-lg bg-blue-500/20">
                         <Wand2 className="w-4 h-4 text-blue-400" />

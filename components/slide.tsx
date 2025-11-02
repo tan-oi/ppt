@@ -74,9 +74,17 @@ function SlideBase({
         scale: 0.95,
         opacity: 0,
       }}
-      animate={{
+      whileInView={{
         scale: 1,
         opacity: 1,
+      }}
+      transition={{
+        delay: 0.1,
+        duration: 0.5,
+        ease: "easeInOut",
+      }}
+      viewport={{
+        amount: 0.7,
       }}
       id={id}
       ref={setNodeRef}
@@ -84,20 +92,12 @@ function SlideBase({
         width: SLIDE_CONFIG.width * slideScale,
         height: SLIDE_CONFIG.height * slideScale,
         overflow: "hidden",
-      }}
+      }}  
       className={cn(
         "grid grid-cols-24 grid-rows-24 bg-background rounded-lg",
         slideData.theme && slideData.theme !== "starter" ? slideData.theme : ""
       )}
     >
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          border: isOver ? "2px dashed #4ade80" : "",
-          borderRadius: "10px",
-        }}
-      />
-
       <SlidePresentation
         data={slideData}
         slideScale={slideScale}
