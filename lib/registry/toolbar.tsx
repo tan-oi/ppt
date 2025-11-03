@@ -1,9 +1,11 @@
 import { BadgeToolbar } from "@/components/widgets/toolbars/badge-toolbar";
 import { BasicToolbar } from "@/components/widgets/toolbars/basic-toolbar";
+import { ChartToolbar } from "@/components/widgets/toolbars/chart-toolbar";
 import { DividerToolbar } from "@/components/widgets/toolbars/divider-toolbar";
 import { IconToolbar } from "@/components/widgets/toolbars/icon-toolbar";
 import { ImageToolbar } from "@/components/widgets/toolbars/image-toolbar";
 import { LinkToolbar } from "@/components/widgets/toolbars/link-toolbar";
+import { ListToolbar } from "@/components/widgets/toolbars/list-toolbar";
 import { ProgressToolbar } from "@/components/widgets/toolbars/progress-toolbar";
 
 export const ToolbarRegistry = {
@@ -29,13 +31,16 @@ export const ToolbarRegistry = {
     component: BasicToolbar,
   },
   list: {
-    component: BasicToolbar,
+    component: ListToolbar,
   },
   quote: {
     component: BasicToolbar,
   },
   stat: {
     component: BasicToolbar,
+  },
+  chart: {
+    component: ChartToolbar,
   },
   image: {
     component: ImageToolbar,

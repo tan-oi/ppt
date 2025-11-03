@@ -16,7 +16,7 @@ export function ChartToolbar() {
 
   return (
     <>
-      <BaseDropdown
+      {/* <BaseDropdown
         label="Chart Type"
         options={[
           { label: "Bar Chart", value: "bar" },
@@ -27,7 +27,7 @@ export function ChartToolbar() {
         value={widgetData.type}
         onChange={(newValue) => handleUpdate("type", newValue)}
         tooltip="Choose chart type"
-      />
+      /> */}
       
       <Button
         variant="outline"

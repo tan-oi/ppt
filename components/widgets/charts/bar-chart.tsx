@@ -24,7 +24,7 @@ export const BarChartBase: React.FC<BarChartProps> = ({
       <BarChart
         accessibilityLayer
         data={chartData}
-        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+        margin={{ top: 10, right: 10, bottom: 5, left: 5 }}
       >
         <defs>
           {dataKeys.map((key, idx) => (
@@ -64,7 +64,7 @@ export const BarChartBase: React.FC<BarChartProps> = ({
         <CartesianGrid
           strokeDasharray="3 3"
           stroke="currentColor"
-          className="opacity-20"
+          className="opacity-30"
           vertical={false}
         />
 

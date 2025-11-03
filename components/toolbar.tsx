@@ -39,6 +39,7 @@ export function Toolbar() {
         <div className="bg-zinc-900 backdrop-blur-lg rounded-xl transition-all shadow-md duration-300">
           <div className="flex items-center gap-2 text-foreground p-1">
             {ToolbarComponent && <ToolbarComponent />}
+            <div className="w-px h-8 bg-gradient-to-b from-transparent via-zinc-600 to-transparent" />
             <WidgetOptions />
           </div>
         </div>

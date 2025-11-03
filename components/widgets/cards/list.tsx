@@ -7,7 +7,7 @@ import { StarterKit } from "@tiptap/starter-kit";
 
 export function ListCard({
   type = "bullet",
-  content = "<ul><li>First item</li><li>Second item</li><li>Third item</li></ul>",
+  content = "<ul><li>First item</li></ul>",
   id,
   slideId,
 }: {
@@ -83,39 +83,11 @@ export function ListCard({
           widgetType: "list",
         });
       }}
-      className="w-full h-full bg-muted p-4 rounded overflow-hidden"
+      className="w-full h-full backdrop-blur-md bg-gray-50/10 border-white/10 p-6 rounded-lg overflow-hidden shadow-lg hover:bg-white/15  transition-colors"
     >
-      <div className="flex gap-2 mb-3 pb-2 border-b border-border/40">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            editor?.chain().focus().toggleBulletList().run();
-          }}
-          className={`px-3 py-1 text-sm rounded transition-colors ${
-            editor?.isActive("bulletList")
-              ? "bg-primary text-primary-foreground"
-              : "bg-background hover:bg-accent"
-          }`}
-        >
-          • Bullet
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            editor?.chain().focus().toggleOrderedList().run();
-          }}
-          className={`px-3 py-1 text-sm rounded transition-colors ${
-            editor?.isActive("orderedList")
-              ? "bg-primary text-primary-foreground"
-              : "bg-background hover:bg-accent"
-          }`}
-        >
-          1. Numbered
-        </button>
-      </div>
       <EditorContent
         editor={editor}
-        className="outline-none text-foreground [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:mb-2"
+        className="outline-none text-foreground [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:mb-2 [&_li]:leading-relaxed"
       />
     </div>
   );
