@@ -3,27 +3,56 @@ import { useGenerationStore } from "@/lib/store/generation-store";
 import { PresentationOptions } from "./options";
 import { PromptInput } from "./prompt";
 import { Text } from "./text";
-
-// import { UrlInput } from "./url";
 import { OutlineViewer } from "./outline-viewer";
 import { useEffect, useState } from "react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { outlineSchema } from "@/app/api/generate-outline/route";
 import { z } from "zod";
-import { nanoid } from "nanoid";
-import { Button } from "../ui/button";
 import { createBlankPresentation } from "@/app/create/action";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+const outlineSchema = z.object({
+  slideHeading: z.string(),
+  layoutType: z.enum([
+    "main-pointer",
+    "heading-paragraph",
+    "two-column",
+    "three-sections",
+    "title",
+    "chart-with-title",
+    "chart-comparison",
+    "image-caption",
+    "four-quadrants",
+    "header-three-cards",
+    "stat-showcase",
+    "centered-callout",
+    "image-caption",
+    "image-text-split",
+    "two-media-paragraph",
+  ]),
+  pointers: z.array(z.string().min(1)).min(1, "At least 1 pointers required"),
+});
 
 const COMPONENTS: Record<"text" | "prompt", React.FC<any>> = {
   text: Text,
   prompt: PromptInput,
-  // link: UrlInput,
 };
 
 const apiResponseSchema = z.object({
   slidesOutline: z.array(outlineSchema),
+  presentationId: z.string(),
+  transactionId: z.string().optional(),
 });
+
+const ERROR_MESSAGES: Record<string, string> = {
+  UNAUTHORIZED: "You need to be logged in to do this.",
+  VALIDATION_ERROR: "Please check your inputs and try again.",
+  INSUFFICIENT_CREDITS:
+    "You don't have enough credits to generate this presentation.",
+  AI_GENERATION_ERROR:
+    "The AI couldn't generate slides. Try different instructions.",
+  UNKNOWN_ERROR: "Something went wrong. Please try again.",
+};
 
 export function GenerateClient({
   type,
@@ -42,18 +71,35 @@ export function GenerateClient({
 
   useEffect(() => {
     setGenerateType(type);
-  }, [type]);
+  }, [type, setGenerateType]);
 
-  const { object, submit, isLoading } = useObject({
+  const { submit } = useObject({
     api: "/api/generate-outline",
     schema: apiResponseSchema,
+
+    fetch: async (url, options) => {
+      const response = await fetch(url, options);
+
+      if (!response.ok) {
+        const data = await response.json();
+        const error = new Error(data.message || "Request failed");
+        (error as any).code = data.error;
+        (error as any).status = response.status;
+        throw error;
+      }
+
+      return response;
+    },
+
     onFinish: async (event) => {
-      if (!event.object?.slidesOutline) return;
-
+      if (!event.object?.slidesOutline || !event.object?.presentationId) {
+        toast.error("No slides generated. Please try again.");
+        setScreen("form");
+        return;
+      }
       setResult(event.object.slidesOutline);
-
-      const getId = nanoid(10);
-      const id = `ai-${getId}`;
+      toast.success("Outline created successfully");
+      const id = `ai-${event.object.presentationId}`;
       setId(id);
 
       window.history.replaceState(
@@ -61,26 +107,24 @@ export function GenerateClient({
         "",
         `/create/generate/${id}?type=${type}`
       );
+    },
 
-      const payload = {
-        topic: useGenerationStore.getState().userInstruction,
-        content: event.object.slidesOutline,
-        id: getId,
-      };
+    onError: (error: any) => {
+      console.log(error.code);
+      const message =
+        ERROR_MESSAGES[error.code] ||
+        error.message ||
+        ERROR_MESSAGES.UNKNOWN_ERROR;
 
-      try {
-        const res = await fetch("/api/outline", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) {
-          console.error("Failed to save outline:", await res.text());
-        }
-      } catch (err) {
-        console.error("Network error while saving outline:", err);
+      if (error.code === "UNAUTHORIZED") {
+        toast.error("Not logged in, you'd be redirect in a couple of seconds");
+        setTimeout(() => {
+          router.replace("/check");
+        }, 1000);
+        return;
       }
+      toast.error(message);
+      setScreen("form");
     },
   });
 
@@ -91,7 +135,7 @@ export function GenerateClient({
       useGenerationStore.getState();
 
     if (!userInstruction || !slidesCount) {
-      alert("Please provide instructions and slides count");
+      toast.error("Please provide instructions and slides count");
       return;
     }
 
@@ -114,7 +158,7 @@ export function GenerateClient({
     if (result.success) {
       router.push(`/docs/${result.id}`);
     } else {
-      alert(result.error || "Failed to create presentation");
+      toast.error(result.error || "Failed to create presentation");
       setIsCreatingScratch(false);
     }
   };

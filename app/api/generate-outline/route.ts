@@ -53,7 +53,10 @@ export async function POST(req: Request) {
   });
 
   if (!session) {
-    return NextResponse.json({ error: "Not permitted" }, { status: 401 });
+    return NextResponse.json(
+      { error: "UNAUTHORIZED", message: "Please log in to continue" },
+      { status: 401 }
+    );
   }
 
   const requiredCredits = Number(process.env.REQUIRED_CREDITS);
@@ -66,7 +69,10 @@ export async function POST(req: Request) {
 
     if (!parsedData.success) {
       return NextResponse.json(
-        { error: parsedData.error.message },
+        {
+          error: "VALIDATION_ERROR",
+          message: parsedData.error.issues[0]?.message || "Invalid input",
+        },
         { status: 400 }
       );
     }
@@ -80,7 +86,10 @@ export async function POST(req: Request) {
       });
 
       if (!userCredit) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "UNAUTHORIZED", message: "User not found" },
+          { status: 404 }
+        );
       }
 
       credits = userCredit.credits;
@@ -89,7 +98,10 @@ export async function POST(req: Request) {
 
     if (credits < requiredCredits) {
       return NextResponse.json(
-        { error: "Insufficient credits" },
+        {
+          error: "INSUFFICIENT_CREDITS",
+          message: "You don't have enough credits",
+        },
         { status: 403 }
       );
     }
@@ -120,7 +132,15 @@ export async function POST(req: Request) {
     } catch (aiError) {
       console.error("AI generation failed:", aiError);
       await redis.incrby(redisKey, requiredCredits);
-      throw aiError;
+
+      return NextResponse.json(
+        {
+          error: "AI_GENERATION_ERROR",
+          message:
+            "Failed to generate slides. Please try different instructions.",
+        },
+        { status: 500 }
+      );
     }
 
     const transaction = await prisma.$transaction(async (tx) => {
@@ -186,7 +206,10 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Error generating presentation:", error);
     return NextResponse.json(
-      { error: "Failed to generate presentation" },
+      {
+        error: "UNKNOWN_ERROR",
+        message: "Something went wrong. Please try again.",
+      },
       { status: 500 }
     );
   }
