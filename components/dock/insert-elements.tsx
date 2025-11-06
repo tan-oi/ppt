@@ -79,7 +79,7 @@ const elements = [
     icon: LineSquiggle,
   },
   {
-    name: "link",
+    name: "Link",
     id: "link",
     slug: "buttonLink",
     icon: Link,
@@ -134,13 +134,18 @@ export function InsertElements() {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+          className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors"
+        >
           <Plus size={18} className="text-zinc-400" />
           <span className="text-sm text-zinc-300">Insert</span>
-        </button>
+        </motion.button>
       </DropdownMenuTrigger>
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {isOpen && (
           <DropdownMenuContent
             asChild
@@ -149,10 +154,21 @@ export function InsertElements() {
             className="h-96 w-72 p-2 border border-zinc-800 bg-zinc-900 backdrop-blur-md rounded-lg shadow-xl"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: -8 }}
+              initial={{ opacity: 0, scale: 0.92, y: 5 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -8 }}
-              transition={{ duration: 0.2, ease: "easeOut", delay: 0.1 }}
+              exit={{
+                opacity: 0,
+                scale: 0.95,
+                y: -8,
+                transition: {
+                  duration: 0.15,
+                },
+              }}
+              transition={{
+                duration: 0.25,
+                ease: [0.16, 1, 0.3, 1],
+                delay: 0.2,
+              }}
             >
               <DropdownMenuLabel className="text-sm text-zinc-300 flex flex-col space-y-0.5 px-2">
                 <span>Insert widget</span>
@@ -163,10 +179,12 @@ export function InsertElements() {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                variants={{
-                  hidden: {},
-                  visible: { transition: { staggerChildren: 0.15 } },
-                }}
+                variants={
+                  {
+                    // hidden: {},
+                    // visible: { transition: { staggerChildren: 0.15 } },
+                  }
+                }
               >
                 <DropdownMenuSeparator className="my-2 bg-zinc-800" />
                 {elements.map((el, index) => (
@@ -174,13 +192,24 @@ export function InsertElements() {
                     key={el.id}
                     variants={{
                       hidden: {
-                        y: 8,
+                        x: -8,
                         opacity: 0,
                         scale: 0.95,
+                        filter: "blur(10px)",
                       },
-                      visible: { y: 0, opacity: 1, scale: 1 },
+                      visible: {
+                        x: 0,
+                        opacity: 1,
+                        scale: 1,
+                        filter: "blur(0px)",
+                      },
                     }}
-                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{
+                      duration: 0.25,
+
+                      delay: index * 0.18,
+                      ease: [0.34, 1.56, 0.64, 1],
+                    }}
                   >
                     <DraggableMenuItem element={el} />
                   </motion.div>
