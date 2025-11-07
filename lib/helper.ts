@@ -125,7 +125,13 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
     widgets[nanoid(7)] = {
       id: nanoid(7),
       widgetType,
-      data: slotData,
+      data:
+        widgetType === "image"
+          ? {
+              imagePrompt: slotData?.imagePrompt || null,
+              imageUrl: slotData?.imageUrl || null,
+            }
+          : slotData,
       position: {
         x: positionedSlot.x,
         y: positionedSlot.y,
