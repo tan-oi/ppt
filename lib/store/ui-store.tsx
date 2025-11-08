@@ -153,8 +153,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
       return;
     }
 
-    console.log("yeah");
-
     if (!selectedWidget || !editBuffer?.widgetData) {
       set({
         selectedWidget: null,
@@ -171,9 +169,18 @@ export const useUIStore = create<UIStore>((set, get) => ({
       editBuffer.widgetData;
 
     const { usePresentationStore } = require("./presentation-store");
-    usePresentationStore.getState().updateWidget(slideId, id, {
-      data: dataToSave,
-    });
+    const currentWidget = usePresentationStore
+      .getState()
+      .getWidget(slideId, id);
+
+    const dataChanged =
+      JSON.stringify(currentWidget?.data) !== JSON.stringify(dataToSave);
+
+    if (dataChanged) {
+      usePresentationStore.getState().updateWidget(slideId, id, {
+        data: dataToSave,
+      });
+    }
 
     if (
       x !== undefined ||
@@ -181,12 +188,20 @@ export const useUIStore = create<UIStore>((set, get) => ({
       width !== undefined ||
       height !== undefined
     ) {
-      usePresentationStore.getState().updateWidgetPosition(slideId, id, {
-        x,
-        y,
-        width,
-        height,
-      });
+      const positionChanged =
+        x !== currentWidget?.position.x ||
+        y !== currentWidget?.position.y ||
+        width !== currentWidget?.position.width ||
+        height !== currentWidget?.position.height;
+
+      if (positionChanged) {
+        usePresentationStore.getState().updateWidgetPosition(slideId, id, {
+          x,
+          y,
+          width,
+          height,
+        });
+      }
     }
 
     set({

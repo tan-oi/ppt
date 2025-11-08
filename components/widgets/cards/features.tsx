@@ -102,7 +102,7 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
       <>
         <div
           data-widget
-          className="w-full h-full bg-gray-50/5 backdrop-blur-xl p-4 rounded flex flex-col gap-2 overflow-hidden z-20"
+          className="w-full h-full backdrop-blur-md p-4 rounded flex flex-col gap-2 overflow-hidden z-20"
           style={{}}
         >
           <div>

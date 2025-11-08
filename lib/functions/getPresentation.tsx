@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "../auth";
 import { redis } from "../rate-limit";
+import { headers } from "next/headers";
 
 export async function getPresentationById(
   presentationId: string,
@@ -62,6 +63,9 @@ type PresentationResult = {
 export async function getSharedPresentation(
   presentationId: string
 ): Promise<PresentationResult> {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   const presentation = await prisma.presentation.findFirst({
     where: {
       id: presentationId,
@@ -85,7 +89,7 @@ export async function getSharedPresentation(
     };
   }
 
-  if (!presentation.isShared) {
+  if (!presentation.isShared && !session?.user?.id) {
     return {
       success: false,
       message: "This presentation is not shared publicly",

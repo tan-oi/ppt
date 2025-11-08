@@ -37,7 +37,11 @@ export function WidgetWrapper({
     <DraggableResizableWrapper
       x={position.x}
       y={position.y}
-      height={widgetType === "image" ? position.height : null}
+      height={
+        widgetType === "image" || widgetType === "divider"
+          ? position.height
+          : null
+      }
       width={position.width}
       scale={slideScale}
       selected={selectedWidget}

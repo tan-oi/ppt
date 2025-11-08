@@ -88,7 +88,14 @@ export function ButtonLinkWidget({
 
   const handleLinkClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
+    if (!url) return;
+
+    const target =
+      url.startsWith("http://") || url.startsWith("https://")
+        ? url
+        : `https://${url}`;
+
+    window.open(target, "_blank", "noopener,noreferrer");
   };
 
   return (

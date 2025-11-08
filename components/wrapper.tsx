@@ -1,8 +1,7 @@
-import { usePresentationStore } from "@/lib/store/presentation-store";
 import { useUIStore } from "@/lib/store/ui-store";
 import { cn } from "@/lib/utils";
+import React, { useState } from "react";
 import { Rnd } from "react-rnd";
-usePresentationStore;
 
 export function DraggableResizableWrapper({
   x,
@@ -10,8 +9,6 @@ export function DraggableResizableWrapper({
   width,
   height,
   children,
-  onDragStop,
-  onResizeStop,
   scale,
   selected,
   id,
@@ -25,61 +22,72 @@ export function DraggableResizableWrapper({
   scale: number;
   selected: boolean;
   children: React.ReactNode;
-  onDragStop?: (x: number, y: number) => void;
-  onResizeStop?: (w: number, h: number, x: number, y: number) => void;
   id: string;
   editable: boolean;
   slideId: string;
 }) {
-  const updateWidgetPosition = usePresentationStore(
-    (s) => s.updateWidgetPosition
-  );
+  const updateWidgetPosition = useUIStore((s) => s.updateWidgetPosition);
+  const [position, setPosition] = useState({ x, y });
+  const [size, setSize] = useState({ width, height: height ?? "auto" });
+
+  React.useEffect(() => {
+    setPosition({ x, y });
+  }, [x, y]);
+
+  React.useEffect(() => {
+    setSize({ width, height: height ?? "auto" });
+  }, [width, height]);
 
   if (!editable) {
     return (
-      <>
-        <div
-          style={{
-            position: "absolute",
-            left: `${x}px`,
-            top: `${y}px`,
-            width: width ? `${width}px` : "auto",
-            height: height ? `${height}px` : "auto",
-            pointerEvents: "auto",
-          }}
-        >
-          {children}
-        </div>
-      </>
+      <div
+        style={{
+          position: "absolute",
+          left: `${x}px`,
+          top: `${y}px`,
+          width: width ? `${width}px` : "auto",
+          height: height ? `${height}px` : "auto",
+          pointerEvents: "auto",
+        }}
+      >
+        {children}
+      </div>
     );
   }
 
   return (
     <Rnd
       data-widget-interactive
-      default={{
-        x,
-        y,
-        width,
-        height: height ?? "auto",
-      }}
+      size={size}
+      position={position}
       scale={scale}
       className={selected ? "ring-1 ring-secondary rounded" : ""}
       enableResizing={selected}
       disableDragging={!selected}
       bounds="parent"
+      onDrag={(e, d) => {
+        setPosition({ x: d.x, y: d.y });
+      }}
       onDragStop={(e, d) => {
-        console.log(d.x, d.y);
-        updateWidgetPosition(slideId, id, { x: d.x, y: d.y });
+        updateWidgetPosition({
+          x: Math.round(d.x),
+          y: Math.round(d.y),
+        });
       }}
       enableUserSelectHack={false}
+      onResize={(e, direction, ref, delta, position) => {
+        setPosition({ x: position.x, y: position.y });
+        setSize({
+          width: ref.offsetWidth,
+          height: ref.offsetHeight,
+        });
+      }}
       onResizeStop={(e, direction, ref, delta, position) => {
-        console.log(position.x, position.y, ref.offsetHeight, ref.offsetWidth);
-        updateWidgetPosition(slideId, id, {
-          x: position.x,
-          y: position.y,
-          width: parseInt(ref.style.width),
-          height: parseInt(ref.style.height),
+        updateWidgetPosition({
+          x: Math.round(position.x),
+          y: Math.round(position.y),
+          width: Math.round(ref.offsetWidth),
+          height: Math.round(ref.offsetHeight),
         });
       }}
     >
