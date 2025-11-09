@@ -20,15 +20,17 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
-
+  credits       Int       @default(50)
   @@unique([email])
   @@map("user")
   Presentations Presentation[]
   outlines Outline[]
+    transactions  TransactionHistory[]
+
 }
 
 model Session {
-  id        String   @id
+  id        String   @id  
   expiresAt DateTime
   token     String
   createdAt DateTime @default(now())
@@ -87,6 +89,7 @@ model Outline {
   presentation   Presentation? 
   
   @@index([userId])
+  TransactionHistory TransactionHistory[]
 }
 
 
@@ -104,7 +107,7 @@ model Presentation {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   slides     Slide[]
   outline Outline? @relation(fields: [outlineId], references: [id])
-  
+  transaction TransactionHistory[]
   @@index([userId])
 }
 
@@ -138,3 +141,26 @@ model Widget {
   @@index([slideId])
 }
 
+
+model TransactionHistory {
+  id String @id @default(cuid())
+  credits Int @default(5)
+
+  type  TransactionType @default(ppt)
+  outlineId String?
+ outline Outline? @relation(fields: [outlineId], references: [id])
+
+    userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+
+  presentationId String?
+  presentation Presentation? @relation(fields : [presentationId], references: [id])
+ 
+
+}
+
+enum TransactionType {
+  ppt 
+  image
+}
