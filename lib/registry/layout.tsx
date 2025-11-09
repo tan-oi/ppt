@@ -17,6 +17,8 @@ import {
   VerticalTimeline,
   CenteredCallout,
   QuoteHighlight,
+  StatShowcase,
+  TwoMediaParagraph,
 } from "@/components/template";
 
 interface Layout {
@@ -141,4 +143,34 @@ export const LayoutRegistry: Record<string, Layout> = {
     description: "A big quote",
     layoutType: "only text",
   },
+  "stat-showcase": {
+    slots: StatShowcase,
+    name: "Stat Story",
+    description: "Title + impactful statistic + context explanation",
+    recommendedContent:
+      "KPIs with backstory, growth metrics, achievement highlights",
+    layoutType: "Only Text",
+  },
+  "two-media-paragraph": {
+    slots: TwoMediaParagraph,
+    name: "Two Media and paragraphs",
+    description: "idl",
+    recommendedContent: "",
+    layoutType: "Text + Image",
+  },
+  "quote-highlight": {
+    slots: QuoteHighlight,
+    layoutType: "Text",
+    name: "Quote testimonial",
+    description: " ",
+    recommendedContent: "",
+  },
 };
+
+/**
+ * 
+ *   **"big-number"** → Shocking stats, key metrics, impact moments
+     *Use for:* Data highlights, attention-grabbing statistics, proof points
+     *Format:* Massive number/stat + context paragraph explaining significance
+  
+ */
