@@ -26,7 +26,6 @@ export async function GET(
   const { id } = await params;
 
   try {
- 
     const presentation = await getPresentationById(id, session?.user?.id);
 
     if (!presentation) {
@@ -80,81 +79,101 @@ export async function PUT(
   let { id } = await params;
   id = id.startsWith("ai-") ? id.slice(3) : id;
 
-
   try {
     const body = await request.json();
 
-    await prisma.$transaction(async (tx) => {
-      const existing = await tx.presentation.findUnique({
-        where: { id },
-      });
-
-      if (existing) {
-        if (existing.userId !== session.user.id) {
-          throw new Error("Unauthorized");
-        }
-
-        await tx.slide.deleteMany({
-          where: { presentationId: id },
-        });
-
-        await tx.presentation.update({
+    await prisma.$transaction(
+      async (tx) => {
+        const existing = await tx.presentation.findUnique({
           where: { id },
-          data: {
-            topic: body.topic,
-            isModified: body.isModified,
-            theme: body.theme,
-            slides: {
-              create: body.slides.map((slide: any) => ({
-                id: slide.id,
-                theme: slide.theme,
-                slideNumber: slide.slideNumber,
-                heading: slide.heading,
-                widgets: {
-                  create: Object.entries(slide.widgets).map(
-                    ([key, widget]: any) => ({
-                      id: widget.id || key,
-                      widgetType: widget.widgetType,
-                      data: widget.data,
-                      position: widget.position,
-                    })
-                  ),
-                },
-              })),
-            },
-          },
+          select: { userId: true },
         });
-      } else {
-        await tx.presentation.create({
-          data: {
-            id,
-            topic: body.topic,
-            isModified: body.isModified || false,
-            userId: session.user.id,
-            outlineId: body.outlineId,
-            theme: body.theme,
-            slides: {
-              create: body.slides.map((slide: any) => ({
-                id: slide.id,
-                theme: slide.theme,
-                slideNumber: slide.slideNumber,
-                heading: slide.heading,
-                widgets: {
-                  create: Object.entries(slide.widgets).map(
-                    ([key, widget]: any) => ({
-                      id: widget.id || key,
-                      widgetType: widget.widgetType,
-                      data: widget.data,
-                      position: widget.position,
-                    })
-                  ),
-                },
-              })),
+
+        if (existing) {
+          if (existing.userId !== session.user.id) {
+            throw new Error("Unauthorized");
+          }
+
+          await tx.widget.deleteMany({
+            where: {
+              slide: { presentationId: id },
             },
-          },
-        });
+          });
+
+          await tx.slide.deleteMany({
+            where: { presentationId: id },
+          });
+
+          await tx.presentation.update({
+            where: { id },
+            data: {
+              topic: body.topic,
+              isModified: body.isModified,
+              theme: body.theme,
+            },
+          });
+
+          const slidesData = body.slides.map((slide: any) => ({
+            id: slide.id,
+            theme: slide.theme,
+            slideNumber: slide.slideNumber,
+            heading: slide.heading,
+            presentationId: id,
+          }));
+
+          await tx.slide.createMany({ data: slidesData });
+
+          const widgetsData = body.slides.flatMap((slide: any) =>
+            Object.entries(slide.widgets).map(([key, widget]: any) => ({
+              id: widget.id || key,
+              widgetType: widget.widgetType,
+              data: widget.data,
+              position: widget.position,
+              slideId: slide.id,
+            }))
+          );
+
+          await tx.widget.createMany({ data: widgetsData });
+        } else {
+          await tx.presentation.create({
+            data: {
+              id,
+              topic: body.topic,
+              isModified: body.isModified || false,
+              userId: session.user.id,
+              outlineId: body.outlineId,
+              theme: body.theme,
+            },
+          });
+
+          const slidesData = body.slides.map((slide: any) => ({
+            id: slide.id,
+            theme: slide.theme,
+            slideNumber: slide.slideNumber,
+            heading: slide.heading,
+            presentationId: id,
+          }));
+
+          await tx.slide.createMany({ data: slidesData });
+
+          const widgetsData = body.slides.flatMap((slide: any) =>
+            Object.entries(slide.widgets).map(([key, widget]: any) => ({
+              id: widget.id || key,
+              widgetType: widget.widgetType,
+              data: widget.data,
+              position: widget.position,
+              slideId: slide.id,
+            }))
+          );
+
+          await tx.widget.createMany({ data: widgetsData });
+        }
+      },
+      {
+        maxWait: 10000,
+        timeout: 15000,
       }
-    });
+    );
 
     return NextResponse.json({
       success: true,
