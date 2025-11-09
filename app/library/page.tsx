@@ -2,9 +2,10 @@ import { NewPresentation } from "@/components/library/new-presentation";
 import { PresentationList } from "@/components/library/presentation-list";
 import { Separator } from "@/components/ui/separator";
 import { auth } from "@/lib/auth";
-import { getAllPresentations } from "@/lib/functions/getPresentation";
+import { getLibraryData } from "@/lib/functions/getPresentation";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { CreditViewer } from "@/components/library/credit-viewer";
 
 export default async function Library() {
   const session = await auth.api.getSession({
@@ -14,20 +15,20 @@ export default async function Library() {
   if (!session || !session?.user) return redirect("/check");
 
   const userId = session?.user?.id;
-  const getLibrary = await getAllPresentations(userId);
+  const getLibrary = await getLibraryData(userId);
 
   if (!getLibrary?.success) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">Failed to load presentations</p>
+        <p className="text-red-500">Failed to load presentations and credits</p>
       </div>
     );
   }
-
-  const totalPresentations = getLibrary.data || [];
+  console.log(getLibrary);
+  const { presentations, credits } = getLibrary;
 
   return (
-    <div className="min-h-screen flex flex-col space-y-6 max-w-7xl mx-auto">
+    <div className="min-h-screen flex flex-col space-y-6 max-w-7xl mx-auto backdrop-blur-xl">
       <div className="relative w-full px-6 py-6 space-y-8">
         <div className="flex items-start justify-between gap-8">
           <div className="flex-1">
@@ -43,13 +44,16 @@ export default async function Library() {
               Create, manage, and present your ideas with precision.
             </p>
           </div>
-          <NewPresentation />
+          <div className="flex gap-2 items-center">
+            <CreditViewer credits={credits as number} />
+            <NewPresentation />
+          </div>
         </div>
 
         <Separator className="w-full text-zinc-600" />
       </div>
 
-      <PresentationList initialPresentations={totalPresentations} />
+      <PresentationList initialPresentations={presentations || []} />
     </div>
   );
 }
