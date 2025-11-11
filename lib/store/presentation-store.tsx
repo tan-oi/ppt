@@ -3,7 +3,9 @@ import { create } from "zustand";
 import { SLIDE_CONFIG } from "../config/slide";
 import { LayoutRegistry } from "../registry/layout";
 import { createWidgetsFromSlots } from "@/components/slideUtils";
-import { WidgetRegistry } from "../registry/widget";
+// import { WidgetRegistry } from "../registry/widget";
+
+import { WidgetMetadata } from "@/lib/core/widget-metadata";
 
 interface WidgetData {
   id: string;
@@ -47,8 +49,8 @@ interface PresentationState {
   addWidget: (
     slideId: string,
     widgetType: string,
-    defaultData?: any,
-    position?: Partial<WidgetData["position"]>
+    position?: Partial<WidgetData["position"]>,
+    defaultData?: any
   ) => string;
 
   updateWidget: (
@@ -103,7 +105,7 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
 
     const newSlide: Slide = {
       id: nanoid(10),
-      slideNumber: 0,
+      slideNumber: currentIndex + 1,
       heading: "",
       widgets: {},
       theme: theme || "starter",
@@ -130,25 +132,36 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
         SLIDE_CONFIG.rows
       );
 
+     
       positions.forEach((pos) => {
         const slot = layout.slots.find((s) => s.id === pos.id);
         if (!slot) return;
 
         let widgetType = "paragraph";
 
-        for (const [slug, widget] of Object.entries(WidgetRegistry)) {
-          if (widget.component === slot.defaultComponent) {
+        //new added change
+        for (const [slug, widget] of Object.entries(WidgetMetadata)) {
+          if (widget.path === slot.defaultComponentPath) {
             widgetType = slug;
             break;
           }
         }
 
-        const defaultData = WidgetRegistry[widgetType]?.defaultData || null;
+        //change
+        type WidgetKey = keyof typeof WidgetMetadata;
+        const meta = WidgetMetadata[widgetType as WidgetKey]?.defaultData;
+        const defaultData =
+          WidgetMetadata[widgetType as WidgetKey]?.defaultData || null;
 
         get().addWidget(
           newSlide.id,
           widgetType,
-          { x: pos.x, y: pos.y, width: pos.width, height: pos.height },
+          {
+            x: pos.x,
+            y: pos.y,
+            width: pos.width,
+            height: pos.height,
+          },
           defaultData
         );
       });
@@ -162,9 +175,43 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       slides: state.slides.filter((slide) => slide.id !== slideId),
     })),
 
+  // addWidget: (slideId, widgetType, position, defaultData) => {
+  //   const widgetId = nanoid(7);
+  //   const widgetConfig = WidgetRegistry[widgetType];
+  //   const defaultPosition = widgetConfig?.defaultPosition || {
+  //     x: 0,
+  //     y: 0,
+  //     width: 200,
+  //     height: 200,
+  //   };
+
+  //   console.log(widgetType);
+  //   const widget: WidgetData = {
+  //     id: widgetId,
+  //     widgetType,
+  //     data: defaultData ?? widgetConfig?.defaultData ?? null,
+  //     position: {
+  //       ...defaultPosition,
+  //       ...position,
+  //     },
+  //   };
+
+  //   set((state) => ({
+  //     slides: state.slides.map((slide) =>
+  //       slide.id === slideId
+  //         ? { ...slide, widgets: { ...slide.widgets, [widgetId]: widget } }
+  //         : slide
+  //     ),
+  //   }));
+
+  //   return widgetId;
+  // },
+
   addWidget: (slideId, widgetType, position, defaultData) => {
     const widgetId = nanoid(7);
-    const widgetConfig = WidgetRegistry[widgetType];
+    type WidgetKey = keyof typeof WidgetMetadata;
+
+    const widgetConfig = WidgetMetadata[widgetType as WidgetKey];
     const defaultPosition = widgetConfig?.defaultPosition || {
       x: 0,
       y: 0,
@@ -172,15 +219,11 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       height: 200,
     };
 
-    console.log(widgetType);
     const widget: WidgetData = {
       id: widgetId,
       widgetType,
       data: defaultData ?? widgetConfig?.defaultData ?? null,
-      position: {
-        ...defaultPosition,
-        ...position,
-      },
+      position: { ...defaultPosition, ...position },
     };
 
     set((state) => ({
@@ -209,11 +252,16 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       ),
     })),
 
-  updateWidgetPosition: (slideId, widgetId, position) =>
+  updateWidgetPosition: (slideId, widgetId, position) => {
+    console.log(slideId);
+    console.log(widgetId);
+    console.log(position);
+
     set((state) => ({
       slides: state.slides.map((slide) => {
         if (slide.id !== slideId) return slide;
 
+        console.log("im here!");
         return {
           ...slide,
           widgets: {
@@ -228,7 +276,10 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
           },
         };
       }),
-    })),
+    }));
+
+    console.log(get().slides);
+  },
 
   deleteWidget: (slideId, widgetId) =>
     set((state) => ({

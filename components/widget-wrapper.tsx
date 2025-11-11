@@ -1,7 +1,10 @@
+import { useEffect, useState } from "react";
 import { usePresentationStore } from "@/lib/store/presentation-store";
 import { DraggableResizableWrapper } from "./wrapper";
-import { WidgetRegistry } from "@/lib/registry/widget";
 import { useUIStore } from "@/lib/store/ui-store";
+
+import { WidgetMetadata } from "@/lib/core/widget-metadata";
+import { loadWidgetComponent } from "@/lib/core/widget-loader";
 
 export function WidgetWrapper({
   widgetId,
@@ -15,8 +18,19 @@ export function WidgetWrapper({
   isPresenting: boolean;
 }) {
   const widget = usePresentationStore((s) => s.getWidget(slideId, widgetId));
-
   const selectedWidget = useUIStore((s) => s.selectedWidget?.id === widgetId);
+
+  const [WidgetComponent, setWidgetComponent] = useState<any>(null);
+
+  useEffect(() => {
+    if (widget?.widgetType) {
+      loadWidgetComponent(widget.widgetType)
+        .then((comp) => setWidgetComponent(() => comp))
+        .catch((err) =>
+          console.error(`Failed to load widget ${widget.widgetType}`, err)
+        );
+    }
+  }, [widget?.widgetType]);
 
   if (!widget) {
     console.warn(`Widget ${widgetId} not found in store`);
@@ -24,14 +38,14 @@ export function WidgetWrapper({
   }
 
   const { widgetType, data: widgetData, position } = widget;
+  const widgetInfo = WidgetMetadata[widgetType as keyof typeof WidgetMetadata];
 
-  const widgetInfo = WidgetRegistry[widgetType];
   if (!widgetInfo) {
-    console.warn(`Widget type ${widgetType} not found in registry`);
+    console.warn(`Widget type ${widgetType} not found in metadata`);
     return null;
   }
 
-  const WidgetComponent = widgetInfo.component;
+  if (!WidgetComponent) return null;
 
   return (
     <DraggableResizableWrapper

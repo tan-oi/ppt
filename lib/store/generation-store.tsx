@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { LayoutRegistry } from "../registry/layout";
+import { COMPONENT_PATH_CONVERSION } from "../core/widget-metadata";
 
 export const COMPONENT_TO_TYPE: Record<string, string> = {
   HeadingWidget: "heading",
@@ -11,6 +12,12 @@ export const COMPONENT_TO_TYPE: Record<string, string> = {
   BaseChartRender: "chart",
   ImageWidget: "image",
 };
+
+interface Slide {
+  slideHeading: string;
+  layoutType: string;
+  pointers: string[];
+}
 
 export const TYPE_TO_WIDGET: Record<string, string> = {
   heading: "heading",
@@ -36,8 +43,8 @@ interface GenerationInterface {
   setGenerateType: (type: GenType) => void;
   slidesCount: number;
   setSlidesCount: (count: number) => void;
-  result: string | null;
-  setResult: (data: string | null) => void;
+  result: Slide[] | null;
+  setResult: (data: Slide[] | null) => void;
   writeStyle: "base" | "extend" | "preserve";
   setWriteStyle: (style: "base" | "extend" | "preserve") => void;
   tone: PresentationTone;
@@ -46,7 +53,11 @@ interface GenerationInterface {
   id: null | string;
   setId: (id: string) => void;
 
-  processedOutline: string | null;
+  processedOutline?:
+    | (Slide & {
+        slots: Record<string, { type: string }>;
+      })[]
+    | null;
   prepareForLLM: () => void;
 }
 
@@ -93,7 +104,7 @@ export const useGenerationStore = create<GenerationInterface>((set, get) => ({
 
     const processed = outlines?.map(
       (outline: {
-        layoutType: string | number;
+        layoutType: string;
         slideHeading: string;
         pointers: any;
       }) => {
@@ -101,11 +112,12 @@ export const useGenerationStore = create<GenerationInterface>((set, get) => ({
         if (!layout) throw new Error(`Layout ${outline.layoutType} not found`);
 
         const slots: Record<string, { type: string }> = {};
-        layout.slots.forEach((slot: any) => {
+        layout.slots.forEach((slot) => {
           const componentName =
-            slot.defaultComponent?.name || "ParagraphWidget";
+            slot.defaultComponentPath || "@/components/widgets/paragraph";
           slots[slot.id] = {
-            type: COMPONENT_TO_TYPE[componentName] || "paragraph",
+            type:
+              COMPONENT_PATH_CONVERSION[componentName].typeSet || "paragraph",
           };
         });
 

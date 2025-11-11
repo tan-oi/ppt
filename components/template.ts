@@ -1,10 +1,3 @@
-import { HeadingWidget } from "./widgets/headings";
-import { FeatureCardWidget } from "./widgets/cards/features";
-import { ParagraphWidget } from "./widgets/paragraph";
-import { BaseChartRender } from "./widgets/charts/base";
-import { ImageWidget } from "./widgets/image";
-import { QuoteCard } from "./widgets/cards/quotes";
-
 export interface Slot {
   id: string;
   type: "text" | "image" | "chart";
@@ -12,7 +5,8 @@ export interface Slot {
   columnEnd: number;
   rowStart: number;
   rowEnd: number;
-  defaultComponent: any;
+  //changed name
+  defaultComponentPath: string;
 }
 
 export const textImageTemplate: Slot[] = [
@@ -23,7 +17,7 @@ export const textImageTemplate: Slot[] = [
     columnEnd: 23,
     rowStart: 2,
     rowEnd: 4,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
   },
   {
     id: "text",
@@ -32,7 +26,7 @@ export const textImageTemplate: Slot[] = [
     columnEnd: 22,
     rowStart: 5,
     rowEnd: 7,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
   {
     id: "image",
@@ -41,7 +35,7 @@ export const textImageTemplate: Slot[] = [
     columnEnd: 19,
     rowStart: 9,
     rowEnd: 14,
-    defaultComponent: "none",
+    defaultComponentPath: "none",
   },
 ];
 
@@ -53,7 +47,7 @@ export const OneParagraph: Slot[] = [
     columnEnd: 19,
     rowStart: 8,
     rowEnd: 18,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
 ];
 
@@ -65,16 +59,16 @@ export const HeadingAndParagraph: Slot[] = [
     columnEnd: 16,
     rowStart: 6,
     rowEnd: 8,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
   },
   {
     id: "paragraph-1",
     type: "text",
     columnStart: 8,
-    columnEnd: 16,
+    columnEnd: 18,
     rowStart: 10,
-    rowEnd: 20,
-    defaultComponent: ParagraphWidget,
+    rowEnd: 16,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
 ];
 
@@ -86,7 +80,7 @@ export const TwoColumn: Slot[] = [
     columnEnd: 12,
     rowStart: 7,
     rowEnd: 20,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
   {
     id: "right-column",
@@ -95,7 +89,7 @@ export const TwoColumn: Slot[] = [
     columnEnd: 22,
     rowStart: 7,
     rowEnd: 20,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
 ];
 
@@ -107,7 +101,7 @@ export const TitleSlide: Slot[] = [
     columnEnd: 16,
     rowStart: 8,
     rowEnd: 10,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
   },
   {
     id: "subtitle",
@@ -116,19 +110,11 @@ export const TitleSlide: Slot[] = [
     columnEnd: 18,
     rowStart: 10,
     rowEnd: 13,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
 ];
 
 export const ThreeSections: Slot[] = [
-  // {
-  //   id: "main-heading",
-  //   type: "text",
-  //   columnStart: 3,
-  //   columnEnd: 23,
-  //   rowStart: 2,
-  //   rowEnd: 4,
-  // },
   {
     id: "section-1",
     type: "text",
@@ -136,7 +122,7 @@ export const ThreeSections: Slot[] = [
     columnEnd: 9,
     rowStart: 9,
     rowEnd: 17,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
   {
     id: "section-2",
@@ -145,7 +131,7 @@ export const ThreeSections: Slot[] = [
     columnEnd: 16,
     rowStart: 9,
     rowEnd: 17,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
   {
     id: "section-3",
@@ -154,9 +140,10 @@ export const ThreeSections: Slot[] = [
     columnEnd: 23,
     rowStart: 9,
     rowEnd: 17,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
 ];
+
 export const ChartWithTitle: Slot[] = [
   {
     id: "chart-title",
@@ -165,7 +152,7 @@ export const ChartWithTitle: Slot[] = [
     columnEnd: 23,
     rowStart: 2,
     rowEnd: 5,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
   },
   {
     id: "main-chart",
@@ -174,7 +161,7 @@ export const ChartWithTitle: Slot[] = [
     columnEnd: 22,
     rowStart: 6,
     rowEnd: 20,
-    defaultComponent: BaseChartRender,
+    defaultComponentPath: "@/components/widgets/charts/base",
   },
 ];
 
@@ -186,7 +173,7 @@ export const ChartComparison: Slot[] = [
     columnEnd: 12,
     rowStart: 4,
     rowEnd: 22,
-    defaultComponent: BaseChartRender,
+    defaultComponentPath: "@/components/widgets/charts/base",
   },
   {
     id: "right-chart",
@@ -195,7 +182,7 @@ export const ChartComparison: Slot[] = [
     columnEnd: 23,
     rowStart: 4,
     rowEnd: 22,
-    defaultComponent: BaseChartRender,
+    defaultComponentPath: "@/components/widgets/charts/base",
   },
 ];
 
@@ -203,11 +190,11 @@ export const ImageWithCaption: Slot[] = [
   {
     id: "main-image",
     type: "image",
-    columnStart: 5,
-    columnEnd: 21,
+    columnStart: 8,
+    columnEnd: 17,
     rowStart: 3,
     rowEnd: 18,
-    defaultComponent: ImageWidget,
+    defaultComponentPath: "@/components/widgets/image",
   },
   {
     id: "caption",
@@ -216,7 +203,7 @@ export const ImageWithCaption: Slot[] = [
     columnEnd: 19,
     rowStart: 19,
     rowEnd: 22,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
 ];
 
@@ -228,7 +215,7 @@ export const SideBySideImageText: Slot[] = [
     columnEnd: 12,
     rowStart: 3,
     rowEnd: 22,
-    defaultComponent: ImageWidget,
+    defaultComponentPath: "@/components/widgets/image",
   },
   {
     id: "right-content",
@@ -237,7 +224,7 @@ export const SideBySideImageText: Slot[] = [
     columnEnd: 23,
     rowStart: 6,
     rowEnd: 19,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
 ];
 
@@ -249,7 +236,7 @@ export const FourQuadrants: Slot[] = [
     columnEnd: 12,
     rowStart: 3,
     rowEnd: 12,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
   {
     id: "top-right",
@@ -258,7 +245,7 @@ export const FourQuadrants: Slot[] = [
     columnEnd: 23,
     rowStart: 3,
     rowEnd: 12,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
   {
     id: "bottom-left",
@@ -267,7 +254,7 @@ export const FourQuadrants: Slot[] = [
     columnEnd: 12,
     rowStart: 14,
     rowEnd: 23,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
   {
     id: "bottom-right",
@@ -276,7 +263,7 @@ export const FourQuadrants: Slot[] = [
     columnEnd: 23,
     rowStart: 14,
     rowEnd: 23,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
 ];
 
@@ -284,11 +271,11 @@ export const HeaderWithThreeCards: Slot[] = [
   {
     id: "main-header",
     type: "text",
-    columnStart: 3,
-    columnEnd: 23,
+    columnStart: 10,
+    columnEnd: 16,
     rowStart: 2,
     rowEnd: 5,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
   },
   {
     id: "card-1",
@@ -297,7 +284,7 @@ export const HeaderWithThreeCards: Slot[] = [
     columnEnd: 9,
     rowStart: 7,
     rowEnd: 22,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
   {
     id: "card-2",
@@ -306,7 +293,7 @@ export const HeaderWithThreeCards: Slot[] = [
     columnEnd: 16,
     rowStart: 7,
     rowEnd: 22,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
   {
     id: "card-3",
@@ -315,7 +302,7 @@ export const HeaderWithThreeCards: Slot[] = [
     columnEnd: 23,
     rowStart: 7,
     rowEnd: 22,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
 ];
 
@@ -327,7 +314,7 @@ export const BigNumberWithContext: Slot[] = [
     columnEnd: 19,
     rowStart: 6,
     rowEnd: 12,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
   },
   {
     id: "stat-description",
@@ -336,7 +323,7 @@ export const BigNumberWithContext: Slot[] = [
     columnEnd: 20,
     rowStart: 13,
     rowEnd: 19,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
 ];
 
@@ -348,7 +335,7 @@ export const TextOverImage: Slot[] = [
     columnEnd: 24,
     rowStart: 2,
     rowEnd: 24,
-    defaultComponent: ImageWidget,
+    defaultComponentPath: "@/components/widgets/image",
   },
   {
     id: "overlay-heading",
@@ -357,7 +344,7 @@ export const TextOverImage: Slot[] = [
     columnEnd: 21,
     rowStart: 9,
     rowEnd: 12,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
   },
   {
     id: "overlay-text",
@@ -366,7 +353,7 @@ export const TextOverImage: Slot[] = [
     columnEnd: 19,
     rowStart: 13,
     rowEnd: 17,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
 ];
 
@@ -378,7 +365,7 @@ export const SplitContentChart: Slot[] = [
     columnEnd: 23,
     rowStart: 2,
     rowEnd: 5,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
   },
   {
     id: "left-text",
@@ -387,7 +374,7 @@ export const SplitContentChart: Slot[] = [
     columnEnd: 11,
     rowStart: 7,
     rowEnd: 22,
-    defaultComponent: ParagraphWidget,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
   {
     id: "right-chart",
@@ -396,7 +383,7 @@ export const SplitContentChart: Slot[] = [
     columnEnd: 23,
     rowStart: 7,
     rowEnd: 22,
-    defaultComponent: BaseChartRender,
+    defaultComponentPath: "@/components/widgets/charts/base",
   },
 ];
 
@@ -408,7 +395,7 @@ export const VerticalTimeline: Slot[] = [
     columnEnd: 23,
     rowStart: 2,
     rowEnd: 5,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
   },
   {
     id: "step-1",
@@ -417,7 +404,7 @@ export const VerticalTimeline: Slot[] = [
     columnEnd: 21,
     rowStart: 7,
     rowEnd: 11,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
   {
     id: "step-2",
@@ -426,7 +413,7 @@ export const VerticalTimeline: Slot[] = [
     columnEnd: 21,
     rowStart: 13,
     rowEnd: 17,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
   {
     id: "step-3",
@@ -435,7 +422,7 @@ export const VerticalTimeline: Slot[] = [
     columnEnd: 21,
     rowStart: 19,
     rowEnd: 23,
-    defaultComponent: FeatureCardWidget,
+    defaultComponentPath: "@/components/widgets/cards/features",
   },
 ];
 
@@ -447,7 +434,37 @@ export const CenteredCallout: Slot[] = [
     columnEnd: 20,
     rowStart: 10,
     rowEnd: 16,
-    defaultComponent: HeadingWidget,
+    defaultComponentPath: "@/components/widgets/headings",
+  },
+];
+
+export const StatShowcase: Slot[] = [
+  {
+    id: "stat-title",
+    type: "text",
+    columnStart: 7,
+    columnEnd: 19,
+    rowStart: 3,
+    rowEnd: 6,
+    defaultComponentPath: "@/components/widgets/headings",
+  },
+  {
+    id: "main-stat",
+    type: "text",
+    columnStart: 7,
+    columnEnd: 19,
+    rowStart: 7,
+    rowEnd: 16,
+    defaultComponentPath: "@/components/widgets/stat-widget",
+  },
+  {
+    id: "stat-explanation",
+    type: "text",
+    columnStart: 8,
+    columnEnd: 18,
+    rowStart: 17,
+    rowEnd: 21,
+    defaultComponentPath: "@/components/widgets/paragraph",
   },
 ];
 
@@ -459,43 +476,45 @@ export const QuoteHighlight: Slot[] = [
     columnEnd: 21,
     rowStart: 8,
     rowEnd: 17,
-    defaultComponent: QuoteCard,
+    defaultComponentPath: "@/components/widgets/cards/quotes",
   },
 ];
-// export const BulletPoints: Slot[] = [
-//   {
-//     id: "section-title",
-//     type: "text",
-//     columnStart: 3,
-//     columnEnd: 21,
-//     rowStart: 2,
-//     rowEnd: 4,
-//   },
-//   {
-//     id: "bullet-content",
-//     type: "text",
-//     columnStart: 5,
-//     columnEnd: 22,
-//     rowStart: 6,
-//     rowEnd: 14,
-//   },
-// ];
 
-// export const QuoteLayout: Slot[] = [
-//   {
-//     id: "quote-text",
-//     type: "text",
-//     columnStart: 4,
-//     columnEnd: 22,
-//     rowStart: 6,
-//     rowEnd: 11,
-//   },
-//   {
-//     id: "attribution",
-//     type: "text",
-//     columnStart: 14,
-//     columnEnd: 22,
-//     rowStart: 13,
-//     rowEnd: 14,
-//   },
-// ];
+export const TwoMediaParagraph: Slot[] = [
+  {
+    id: "media-1",
+    type: "image",
+    columnStart: 4,
+    columnEnd: 12,
+    rowStart: 3,
+    rowEnd: 18,
+    defaultComponentPath: "@/components/widgets/image",
+  },
+  {
+    id: "text-1",
+    type: "text",
+    columnStart: 5,
+    columnEnd: 11,
+    rowStart: 19,
+    rowEnd: 21,
+    defaultComponentPath: "@/components/widgets/paragraph",
+  },
+  {
+    id: "media-2",
+    type: "image",
+    columnStart: 14,
+    columnEnd: 22,
+    rowStart: 3,
+    rowEnd: 18,
+    defaultComponentPath: "@/components/widgets/image",
+  },
+  {
+    id: "paragraph-2",
+    type: "text",
+    columnStart: 15,
+    columnEnd: 21,
+    rowStart: 19,
+    rowEnd: 21,
+    defaultComponentPath: "@/components/widgets/paragraph",
+  },
+];

@@ -4,6 +4,10 @@ import { LayoutRegistry } from "./registry/layout";
 import { usePresentationStore } from "./store/presentation-store";
 import { nanoid } from "nanoid";
 import { COMPONENT_TO_TYPE, TYPE_TO_WIDGET } from "./store/generation-store";
+import {
+  COMPONENT_PATH_CONVERSION,
+  COMPONENT_PATH_TO_WIDGET,
+} from "./core/widget-metadata";
 
 export function needsTransformation(presentationData: any) {
   if (!presentationData?.slides || presentationData.slides.length === 0)
@@ -27,56 +31,6 @@ export function transformAndStorePresentation(presentationData: any) {
   });
 }
 
-// function transformSlideAndStore(slideData: any, addSlide: any) {
-//   const layout = LayoutRegistry[slideData.layoutId];
-//   if (!layout) {
-//     console.error(`Layout ${slideData.layoutId} not found`);
-//     return;
-//   }
-
-//   const positionedSlots = createWidgetsFromSlots(
-//     layout.slots,
-//     SLIDE_CONFIG.width,
-//     SLIDE_CONFIG.height,
-//     SLIDE_CONFIG.columns,
-//     SLIDE_CONFIG.rows
-//   );
-
-//   const widgets: { [widgetId: string]: any } = {};
-//   const contentKeys = Object.keys(slideData.content);
-
-//   contentKeys.forEach((contentKey, index) => {
-//     const originalContent = slideData.content[contentKey];
-//     const widgetId = nanoid(7);
-
-//     const matchingSlot = positionedSlots.find((slot) => slot.id === contentKey);
-
-//     const position = matchingSlot
-//       ? {
-//           x: matchingSlot.x,
-//           y: matchingSlot.y,
-//           width: matchingSlot.width,
-//           height: matchingSlot.height,
-//         }
-//       : originalContent.position || { x: 100, y: 100, width: 200, height: 100 };
-
-//     widgets[widgetId] = {
-//       id: widgetId,
-//       widgetType: originalContent.widgetType,
-//       data: originalContent,
-//       position,
-//     };
-//   });
-
-//   addSlide({
-//     id: slideData.id,
-//     slideNumber: slideData.slideNumber,
-//     heading: slideData.heading,
-//     widgets,
-//     theme : "starter"
-//   });
-// }
-
 export function transformSlideAndStore(slideData: any, addSlide: any) {
   const layout = LayoutRegistry[slideData.layoutId];
   if (!layout) {
@@ -92,46 +46,47 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
     SLIDE_CONFIG.rows
   );
 
-  const widgets: { [widgetId: string]: any } = {};
+  const widgets: Record<string, any> = {};
 
-  Object.keys(slideData.content).forEach((slotId) => {
-    const slotData = slideData.content[slotId];
-
-    const positionedSlot = positionedSlots.find((s: any) => s.id === slotId);
+  console.log(positionedSlots);
+  Object.entries(slideData.content).forEach(([slotId, slotData]) => {
+    const positionedSlot = positionedSlots.find((s) => s.id === slotId);
     if (!positionedSlot) return;
 
-    const layoutSlot = layout.slots.find((s: any) => s.id === slotId);
+    const layoutSlot = layout.slots.find((s) => s.id === slotId);
     if (!layoutSlot) return;
 
     console.log(layoutSlot);
+    let widgetType = "paragraph";
 
-    const componentName =
-      layoutSlot.defaultComponent?.name ||
-      layoutSlot.defaultComponent?.displayName ||
-      "ParagraphWidget";
-    const genericType = COMPONENT_TO_TYPE[componentName] || "paragraph";
-    let widgetType = TYPE_TO_WIDGET[genericType] || "paragraph";
+    const componentPath =
+      layoutSlot.defaultComponentPath || "@/components/widgets/paragraph";
+    // const componentName =
+    //   componentPath.split("/").pop()?.replace(".tsx", "") || "";
 
-    if (genericType === "chart" && slotData?.type) {
-      const chartMap: Record<string, string> = {
-        bar: "barChart",
-        line: "lineChart",
-        area: "areaChart",
-        pie: "pieChart",
-      };
-      widgetType = chartMap[slotData.type] || "barChart";
-    }
+    // console.log(componentName);
+    // const genericType = COMPONENT_TO_TYPE[componentName] || "paragraph";
+    // console.log(genericType);
+    // widgetType = TYPE_TO_WIDGET[genericType] || "paragraph";
 
+    widgetType = COMPONENT_PATH_CONVERSION[componentPath].widgetType;
+
+    console.log(widgetType);
+    // if (genericType === "chart" && slotData?.type) {
+    //   const chartMap: Record<string, string> = {
+    //     bar: "barChart",
+    //     line: "lineChart",
+    //     area: "areaChart",
+    //     pie: "pieChart",
+    //   };
+    //   widgetType = chartMap[slotData.type] || "barChart";
+    // }
+
+    console.log(slotData);
     widgets[nanoid(7)] = {
       id: nanoid(7),
       widgetType,
-      data:
-        widgetType === "image"
-          ? {
-              imagePrompt: slotData?.imagePrompt || null,
-              imageUrl: slotData?.imageUrl || null,
-            }
-          : slotData,
+      data: slotData,
       position: {
         x: positionedSlot.x,
         y: positionedSlot.y,
@@ -149,7 +104,6 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
     theme: "starter",
   });
 }
-
 export function populateStores(slide: any) {
   const addSlide = usePresentationStore.getState().addSlide;
 

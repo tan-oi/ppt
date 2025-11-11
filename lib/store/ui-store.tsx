@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getPresentationStore } from "./store-bridge";
 
 interface WidgetData {
   slideId: string;
@@ -79,8 +80,10 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
   nextSlide: () =>
     set((state) => {
-      const { usePresentationStore } = require("./presentation-store");
-      const totalSlides = usePresentationStore.getState().slides.length;
+      // const usePresentationStore = require("./presentation-store").default;
+      // const { getPresentationStore } = require("./store-bridge");
+
+      const totalSlides = getPresentationStore().slides.length;
       return {
         currentSlideIndex: Math.min(
           state.currentSlideIndex + 1,
@@ -105,8 +108,10 @@ export const useUIStore = create<UIStore>((set, get) => ({
     })),
 
   updateSelectWidget: ({ slideId, id, widgetType, data }: WidgetData) => {
-    const { usePresentationStore } = require("./presentation-store");
-    const widget = usePresentationStore.getState().getWidget(slideId, id);
+    // const usePresentationStore = require("./presentation-store").default;
+    // const { getPresentationStore } = require("./store-bridge");
+
+    const widget = getPresentationStore().getWidget(slideId, id);
     console.log(widget);
 
     set({
@@ -168,16 +173,16 @@ export const useUIStore = create<UIStore>((set, get) => ({
     const { position, editor, x, y, width, height, ...dataToSave } =
       editBuffer.widgetData;
 
-    const { usePresentationStore } = require("./presentation-store");
-    const currentWidget = usePresentationStore
-      .getState()
-      .getWidget(slideId, id);
+    // const usePresentationStore = require("./presentation-store").default;
+    // const { getPresentationStore } = require("./store-bridge");
+
+    const currentWidget = getPresentationStore().getWidget(slideId, id);
 
     const dataChanged =
       JSON.stringify(currentWidget?.data) !== JSON.stringify(dataToSave);
 
     if (dataChanged) {
-      usePresentationStore.getState().updateWidget(slideId, id, {
+      getPresentationStore().updateWidget(slideId, id, {
         data: dataToSave,
       });
     }
@@ -195,7 +200,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
         height !== currentWidget?.position.height;
 
       if (positionChanged) {
-        usePresentationStore.getState().updateWidgetPosition(slideId, id, {
+        getPresentationStore().updateWidgetPosition(slideId, id, {
           x,
           y,
           width,
