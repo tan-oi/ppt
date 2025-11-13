@@ -7,7 +7,7 @@ interface BadgeWidgetProps {
   backgroundColor: string;
   id: string;
   slideId: string;
-  isEditing?: boolean;
+  editable?: boolean;
   className?: string;
 }
 
@@ -17,7 +17,7 @@ export function BadgeWidget({
   backgroundColor = "#000",
   id,
   slideId,
-  isEditing = false,
+  editable = false,
   className,
 }: BadgeWidgetProps) {
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
@@ -31,6 +31,24 @@ export function BadgeWidget({
           color,
           backgroundColor,
         };
+
+  if (editable) {
+    return (
+      <>
+        <div className="w-full flex items-center justify-center">
+          <div
+            className="text-center w-full h-full rounded-full"
+            style={{
+              background: currentData.backgroundColor,
+              color: currentData.color,
+            }}
+          >
+            <span className="">{currentData.label}</span>
+          </div>
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <div

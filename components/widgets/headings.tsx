@@ -28,6 +28,7 @@ export const HeadingWidget: React.FC<HeadingWidgetProps> = ({
   id,
   slideId,
 }) => {
+  console.log(content);
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
 
@@ -67,9 +68,6 @@ export const HeadingWidget: React.FC<HeadingWidgetProps> = ({
         });
       }
     },
-    onCreate: ({ editor }) => {
-      editor.chain().selectAll().setFontSize("24px").setBold().run();
-    },
   });
 
   if (!editable) {
@@ -107,7 +105,8 @@ export const HeadingWidget: React.FC<HeadingWidgetProps> = ({
           editor: editor,
           widgetType: "text",
           data: {
-            content: content,
+            content: editor?.getJSON(),
+            level: 1,
           },
         });
       }}

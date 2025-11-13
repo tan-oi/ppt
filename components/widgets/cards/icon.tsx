@@ -13,14 +13,14 @@ interface IconWidgetProps {
   showLabel?: boolean;
   labelPosition?: "bottom" | "right" | "top" | "left";
 
-  isEditable?: boolean;
+  editable: boolean;
   className?: string;
 }
 
 export function IconWidget({
   id,
   slideId,
-  isEditable,
+  editable,
   className,
   iconName,
   label,
@@ -67,6 +67,41 @@ export function IconWidget({
     currentData.labelPosition === "bottom";
   const alignItems = isVertical ? "items-center" : "items-center";
   const gap = isVertical ? "gap-2" : "gap-3";
+
+  if (!editable) {
+    return (
+      <>
+        <div className="w-full h-full backdrop-blur-xl rounded border-white">
+          <div
+            className={`w-full h-full flex ${getFlexDirection()} ${alignItems} ${gap} justify-center ${className}`}
+          >
+            {IconComponent ? (
+              <IconComponent
+                size={currentData.iconSize}
+                color={currentData.iconColor}
+                strokeWidth={2}
+              />
+            ) : (
+              <LucideIcons.HelpCircle
+                size={currentData.iconSize}
+                color="#9CA3AF"
+                strokeWidth={2}
+              />
+            )}
+
+            {currentData.showLabel && currentData.label && (
+              <span
+                className="text-sm font-medium text-gray-700"
+                style={{ color: currentData.iconColor }}
+              >
+                {currentData.label}
+              </span>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div

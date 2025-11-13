@@ -4,6 +4,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { Quote } from "lucide-react";
 import TextAlign from "@tiptap/extension-text-align";
+import { useUIStore } from "@/lib/store/ui-store";
 
 interface QuoteCard {
   body?: string;
@@ -11,14 +12,17 @@ interface QuoteCard {
   company?: string;
   id: string;
   slideId: string;
+  editable: boolean;
 }
 export const QuoteCard = ({
   id,
   body = "Good job building this",
   person = "Sam Altman, CEO",
   company = "OpenAI",
+  editable = true,
   slideId,
 }: QuoteCard) => {
+  const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const { widgetRef: mainRef, handleClick: mainClick } = useWidgetSelection(
     id,
     slideId
@@ -51,15 +55,25 @@ export const QuoteCard = ({
     ],
 
     content: body || "hello",
+    editable,
+
     onCreate: ({ editor }) => {
       editor.commands.setTextAlign("center");
       editor.commands.setFontSize("32px");
+    },
+    onUpdate: ({ editor }) => {
+      if (editable) {
+        updateEditBuffer({
+          body: editor.getJSON(),
+        });
+      }
     },
   });
 
   const secondaryEditor = useEditor({
     immediatelyRender: false,
     extensions: [StarterKit],
+    editable: editable,
     content: {
       type: "doc",
       content: [
@@ -71,7 +85,36 @@ export const QuoteCard = ({
     },
   });
 
-  
+  if (!editable) {
+    return (
+      <>
+        <div className="w-full h-full flex flex-col bg-accent/40 justify-between p-4 rounded-xl relative z-100 backdrop-blur-xl">
+          <Quote
+            size={28}
+            className="absolute -top-3 -left-2 text-gray-300 rotate-180"
+          />
+          <Quote
+            size={28}
+            className="absolute -bottom-2 -right-2 text-gray-300"
+          />
+
+          <div>
+            <EditorContent
+              editor={mainEditor}
+              className="outline-none font-bold text-2xl text-primary [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 "
+            />
+          </div>
+          <div>
+            <EditorContent
+              editor={secondaryEditor}
+              className="outline-none text-foreground font-thin [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0"
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <div className="w-full h-full flex flex-col bg-accent/40 justify-between p-4 rounded-xl relative z-100 backdrop-blur-xl">
@@ -91,6 +134,9 @@ export const QuoteCard = ({
             mainClick({
               editor: mainEditor,
               widgetType: "quote",
+              data: {
+                body: mainEditor?.getText(),
+              },
             })
           }
           className=""
@@ -107,6 +153,7 @@ export const QuoteCard = ({
             secondaryClick({
               editor: secondaryEditor,
               widgetType: "quote",
+              data: {},
             })
           }
         >

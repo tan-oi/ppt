@@ -10,7 +10,7 @@ interface ProgressBarWidgetProps {
   backgroundColor?: string;
   showPercentage?: boolean;
   height?: number;
-  isEditable?: boolean;
+  editable?: boolean;
   className?: string;
 }
 
@@ -23,7 +23,7 @@ export function ProgressBarWidget({
   backgroundColor = "#E5E7EB",
   showPercentage = true,
   height = 24,
-  isEditable,
+  editable,
   className,
 }: ProgressBarWidgetProps) {
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
@@ -45,6 +45,40 @@ export function ProgressBarWidget({
 
   const clampedPercentage = Math.min(Math.max(currentData.percentage, 0), 100);
 
+  if (!editable) {
+    return (
+      <div className="w-full h-full flex items-center justify-center p-4 cursor-pointer">
+        <div className="w-full space-y-2">
+          {(currentData.label || currentData.showPercentage) && (
+            <div className="flex justify-between items-center text-sm font-medium text-gray-700">
+              {currentData.label && <span>{currentData.label}</span>}
+              {currentData.showPercentage && (
+                <span style={{ color: currentData.color }}>
+                  {clampedPercentage}%
+                </span>
+              )}
+            </div>
+          )}
+
+          <div
+            className="w-full rounded-full overflow-hidden"
+            style={{
+              backgroundColor: currentData.backgroundColor,
+              height: `${height}px`,
+            }}
+          >
+            <div
+              className="h-full rounded-full transition-all duration-300 ease-out"
+              style={{
+                width: `${clampedPercentage}%`,
+                backgroundColor: currentData.color,
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className="w-full h-full flex items-center justify-center p-4 cursor-pointer"

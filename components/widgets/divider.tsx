@@ -7,6 +7,7 @@ interface DividerWidgetProps {
   style?: "solid" | "dashed" | "dotted";
   thickness?: number;
   color?: string;
+  editable: boolean;
   orientation?: "horizontal" | "vertical";
 }
 
@@ -17,6 +18,7 @@ export const DividerWidget: React.FC<DividerWidgetProps> = ({
   thickness = 2,
   color = "#fff",
   orientation = "vertical",
+  editable,
 }) => {
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
 
@@ -30,6 +32,27 @@ export const DividerWidget: React.FC<DividerWidgetProps> = ({
 
   const isHorizontal = currentData.orientation === "horizontal";
 
+  if (!editable) {
+    return (
+      <div className="h-full w-full">
+        <hr
+          style={{
+            width: isHorizontal ? "100%" : `${currentData.thickness}px`,
+            height: isHorizontal ? `${currentData.thickness}px` : "100%",
+
+            border: "none",
+            borderTop: isHorizontal
+              ? `${currentData.thickness}px ${currentData.style} ${currentData.color}`
+              : "none",
+            borderLeft: !isHorizontal
+              ? `${currentData.thickness}px ${currentData.style} ${currentData.color}`
+              : "none",
+            margin: 0,
+          }}
+        />
+      </div>
+    );
+  }
   return (
     <div
       className="h-full w-full"

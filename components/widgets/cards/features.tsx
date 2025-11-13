@@ -137,8 +137,8 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
             editor: headingEditor,
             widgetType: "feature",
             data: {
-              title: title,
-              body: body,
+              title: headingEditor?.getJSON(),
+              body: paragraphEditor?.getJSON(),
             },
           });
         }}
@@ -158,8 +158,8 @@ export const FeatureCardWidget: React.FC<FeatureCard> = ({
             editor: paragraphEditor,
             widgetType: "feature",
             data: {
-              body: body,
-              title: title,
+              title: headingEditor?.getJSON(),
+              body: paragraphEditor?.getJSON(),
             },
           });
         }}

@@ -59,10 +59,6 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
         });
       }
     },
-    onCreate: ({ editor }) => {
-      editor.commands.setTextAlign("center");
-      editor.commands.setFontSize("20px");
-    },
   });
 
   if (!editable) {
@@ -101,7 +97,7 @@ export const ParagraphWidget: React.FC<ParagraphWidgetProps> = ({
             editor: editor,
             widgetType: "text",
             data: {
-              content: content,
+              content: editor?.getJSON(),
             },
           });
         }}

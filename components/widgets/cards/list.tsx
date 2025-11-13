@@ -10,9 +10,11 @@ export function ListCard({
   content = "<ul><li>First item</li></ul>",
   id,
   slideId,
+  editable,
 }: {
   type?: "bullet" | "ordered";
   content?: string;
+  editable: boolean;
   id: string;
   slideId: string;
 }) {
@@ -39,48 +41,42 @@ export function ListCard({
         types: ["paragraph", "bulletList", "orderedList"],
       }),
     ],
-    editorProps: {
-      handleKeyDown: (view, event) => {
-        if (event.key === "Enter") {
-          setTimeout(() => {
-            if (
-              !editor?.isActive("bulletList") &&
-              !editor?.isActive("orderedList")
-            ) {
-              if (type === "ordered") {
-                editor?.commands.toggleOrderedList();
-              } else {
-                editor?.commands.toggleBulletList();
-              }
-            }
-          }, 0);
-        }
-        return false;
-      },
-    },
+    editable,
+
     content: content,
-    onCreate: ({ editor }) => {
-      if (type === "ordered" && !content.includes("<ol>")) {
-        editor.commands.toggleOrderedList();
-      } else if (type === "bullet" && !content.includes("<ul>")) {
-        editor.commands.toggleBulletList();
-      }
-    },
+    
     onUpdate: ({ editor }) => {
-      updateEditBuffer({
-        content: editor.getJSON(),
-      });
+      if (editable) {
+        console.log("dude");
+        updateEditBuffer({
+          content: editor.getJSON(),
+        });
+      }
     },
   });
 
+  if (!editable) {
+    return (
+      <div className="w-full h-full backdrop-blur-md bg-gray-50/10 border-white/10 p-6 rounded-lg overflow-hidden shadow-lg hover:bg-white/15  transition-colors">
+        <EditorContent
+          editor={editor}
+          className="outline-none text-foreground [&_.ProseMirror]:outline-none [&_.ProseMirror]:border-none [&_.ProseMirror]:p-0 [&_.ProseMirror]:m-0 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:mb-2 [&_li]:leading-relaxed"
+        />
+      </div>
+    );
+  }
   return (
     <div
       data-widget
       ref={widgetRef}
       onClick={() => {
         handleClick({
-          editor,
+          editor: editor,
           widgetType: "list",
+          data: {
+            type: type,
+            content: editor?.getJSON(),
+          },
         });
       }}
       className="w-full h-full backdrop-blur-md bg-gray-50/10 border-white/10 p-6 rounded-lg overflow-hidden shadow-lg hover:bg-white/15  transition-colors"

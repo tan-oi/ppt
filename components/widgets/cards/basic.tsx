@@ -15,7 +15,7 @@ export const BasicCard = ({
 }: {
   content: string;
   className?: string;
-  editable?: boolean;
+  editable: boolean;
   id: string;
   slideId: string;
 }) => {
@@ -45,11 +45,11 @@ export const BasicCard = ({
         ],
       }),
     ],
-    editable: true,
+    editable,
     onUpdate: ({ editor }) => {
       if (editable) {
         updateEditBuffer({
-          body: editor.getJSON(),
+          content: editor.getJSON(),
         });
       }
     },
@@ -88,7 +88,10 @@ export const BasicCard = ({
         onClick={() => {
           handleClick({
             editor,
-            widgetType: "text",
+            widgetType: "basic",
+            data: {
+              content: editor?.getJSON(),
+            },
           });
         }}
         className="rounded
