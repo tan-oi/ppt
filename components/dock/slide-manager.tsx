@@ -20,8 +20,8 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { useState } from "react";
-import { Button } from "../ui/button";
 import { usePresentationStore } from "@/lib/store/presentation-store";
+import { motion, AnimatePresence } from "motion/react";
 
 const templates = [
   {
@@ -209,6 +209,30 @@ const templates = [
     ),
   },
   {
+    id: "two-media-paragraph",
+    name: "2 Media + Paragraph",
+    description: "Two media blocks with supporting paragraphs",
+    layoutType: "Image",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 flex gap-2">
+        <div className="flex-1 flex flex-col gap-1">
+          <div className="flex-1 bg-zinc-600 rounded" />
+          <div className="space-y-1">
+            <div className="h-2 bg-zinc-700 rounded" />
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col gap-1">
+          <div className="flex-1 bg-zinc-600 rounded" />
+          <div className="space-y-1">
+            <div className="h-2 bg-zinc-700 rounded" />
+          </div>
+        </div>
+      </div>
+    ),
+  },
+
+  {
     id: "image-text-split",
     name: "Image & Text Split",
     description: "Image on left, explanatory text on right",
@@ -348,6 +372,20 @@ const templates = [
       </div>
     ),
   },
+  {
+    id: "quote-highlight",
+    name: "Quote Highlight",
+    description: "Large centered quote with attribution",
+    layoutType: "Text Focus",
+    preview: (
+      <div className="w-full h-20 bg-zinc-800 rounded border border-zinc-700 p-2 relative flex flex-col justify-center items-center text-center">
+        <div className="absolute -top-1 left-2 w-3 h-3 rotate-180 border-t border-l border-zinc-600 rounded-sm" />
+        <div className="w-3/4 h-2 bg-zinc-600 rounded mb-1" />
+        <div className="w-1/3 h-1 bg-zinc-700 rounded" />
+        <div className="absolute -bottom-1 right-2 w-3 h-3 border-b border-r border-zinc-600 rounded-sm" />
+      </div>
+    ),
+  },
 ];
 
 const slideOptions = [
@@ -369,14 +407,14 @@ const slideOptions = [
     icon: Trash,
     about: "Delete the current slide",
   },
-  {
-    //left only.
+  // {
+  //   //left only.
 
-    name: "Duplicate slide",
-    slug: "duplicate-slide",
-    icon: LucideCopy,
-    about: "Duplicate the current slide",
-  },
+  //   name: "Duplicate slide",
+  //   slug: "duplicate-slide",
+  //   icon: LucideCopy,
+  //   about: "Duplicate the current slide",
+  // },
 ] as const;
 
 type SlideSlug = (typeof slideOptions)[number]["slug"];
@@ -391,7 +429,6 @@ export function SlideManager() {
     } else {
       if (slug === "add-blank-slide") {
         const id = usePresentationStore.getState().addSlideAfterCurrent();
-      
 
         console.log(id);
       } else if (slug === "delete-slide") {
@@ -405,10 +442,22 @@ export function SlideManager() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors">
+        <motion.button
+          className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors"
+          whileHover={{
+            scale: 1.02,
+          }}
+          whileTap={{
+            scale: 0.98,
+          }}
+          transition={{
+            duration: 0.15,
+            ease: [0.4, 0, 0.2, 1],
+          }}
+        >
           <Layers size={18} className="text-zinc-400" />
           <span className="text-sm text-zinc-300">Slides</span>
-        </button>
+        </motion.button>
       </DropdownMenuTrigger>
 
       {activeView === "main" ? (
@@ -417,16 +466,42 @@ export function SlideManager() {
           className="w-64 overflow-y-hidden p-2 border-none bg-zinc-900/95 backdrop-blur-md rounded-md"
         >
           <TooltipProvider delayDuration={200}>
-            {slideOptions.map((option) => (
+            {slideOptions.map((option, index) => (
               <Tooltip key={option.slug}>
                 <TooltipTrigger asChild>
-                  <DropdownMenuItem
-                    onSelect={(event) => handleSelect(option.slug, event)}
-                    className="flex items-center gap-2 cursor-pointer"
+                  <motion.div
+                    variants={{
+                      hidden: {
+                        x: -8,
+                        opacity: 0,
+                        scale: 0.95,
+                        filter: "blur(4px)",
+                      },
+                      visible: {
+                        x: 0,
+                        opacity: 1,
+                        scale: 1,
+                        filter: "blur(0px)",
+                      },
+                    }}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{
+                      duration: 0.25,
+                      delay: index * 0.05,
+                      ease: [0.34, 1.56, 0.64, 1],
+                    }}
                   >
-                    <option.icon size={16} className="text-zinc-400" />
-                    <span className="text-sm text-zinc-200">{option.name}</span>
-                  </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={(event) => handleSelect(option.slug, event)}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <option.icon size={16} className="text-zinc-400" />
+                      <span className="text-sm text-zinc-200">
+                        {option.name}
+                      </span>
+                    </DropdownMenuItem>
+                  </motion.div>
                 </TooltipTrigger>
                 <TooltipContent side="top" className="text-xs max-w-[200px]">
                   {option.about}
@@ -454,8 +529,8 @@ export function SlideManager() {
           <DropdownMenuSeparator className="w-full" />
 
           <div className="grid grid-cols-2 gap-2 p-2 w-full max-h-[400px] overflow-y-scroll">
-            {templates.map((item, i) => (
-              <button
+            {templates.map((item, index) => (
+              <motion.button
                 onClick={() => {
                   const id = usePresentationStore
                     .getState()
@@ -463,12 +538,33 @@ export function SlideManager() {
                 }}
                 key={item.id}
                 className="group hover:ring hover:ring-zinc-500 flex rounded flex-col bg-zinc-800 gap-2 p-2 cursor-pointer"
+                variants={{
+                  hidden: {
+                    x: -8,
+                    opacity: 0,
+                    scale: 0.95,
+                    filter: "blur(10px)",
+                  },
+                  visible: {
+                    x: 0,
+                    opacity: 1,
+                    scale: 1,
+                    filter: "blur(0px)",
+                  },
+                }}
+                initial="hidden"
+                animate="visible"
+                transition={{
+                  duration: 0.25,
+                  delay: index * 0.05,
+                  ease: [0.34, 1.56, 0.64, 1],
+                }}
               >
                 {item.preview}
                 <p className="text-xs text-zinc-300 font-light font-sans group-hover:font-semibold">
                   {item.name}
                 </p>
-              </button>
+              </motion.button>
             ))}
           </div>
         </DropdownMenuContent>

@@ -35,23 +35,33 @@ export function ThemeSelector() {
     }
   };
 
+  const iconVariant = {
+    idle: { rotate: 0 },
+    hover: {
+      rotate: 180,
+      scale: 1.1,
+      transition: { duration: 0.15 },
+    },
+  };
+
   return (
     <div className="">
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <motion.button
-            whileHover={{
-              scale: 1.02,
+            variants={{
+              idle: {},
+              hover: { scale: 1.02 },
             }}
-            whileTap={{
-              scale: [1, 0.98],
-            }}
-            transition={{
-              duration: 0.3,
-            }}
-            className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors"
+            initial="idle"
+            whileHover="hover"
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors hover:font-semibold"
           >
-            <Palette size={18} className="text-zinc-400" />
+            <motion.div variants={iconVariant}>
+              <Palette size={18} className="text-zinc-400" />
+            </motion.div>
             <span className="text-sm text-zinc-300">Theme</span>
           </motion.button>
         </DropdownMenuTrigger>
@@ -99,57 +109,79 @@ export function ThemeSelector() {
 
           <DropdownMenuSeparator className="mb-2" />
           <div className="space-y-2">
-            {themes.map((themeOption) => {
+            {themes.map((themeOption, index) => {
               const isSelected =
                 scope === "all"
                   ? theme === themeOption.slug
                   : currentSlideTheme === themeOption.slug;
 
               return (
-                <DropdownMenuItem
+                <motion.div
                   key={themeOption.slug}
-                  onSelect={() => handleThemeSelect(themeOption)}
+                  variants={{
+                    hidden: {
+                      x: -8,
+                      opacity: 0,
+                      scale: 0.95,
+                    },
+                    visible: {
+                      x: 0,
+                      opacity: 1,
+                      scale: 1,
+                    },
+                  }}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{
+                    duration: 0.25,
+                    delay: index * 0.05,
+                    ease: [0.34, 1.56, 0.64, 1],
+                  }}
                 >
-                  <Button
-                    variant={"outline"}
-                    size={"lg"}
-                    className={cn(
-                      "border-none group hover:bg-zinc-500/20 hover:shadow-sm bg-transparent px-0 shadow-none h-full w-full relative",
-                      {
-                        "bg-zinc-500/20": isSelected,
-                      }
-                    )}
+                  <DropdownMenuItem
+                    onSelect={() => handleThemeSelect(themeOption)}
                   >
-                    <div className="w-full flex items-center justify-start h-full gap-4 p-1.5">
-                      <div
-                        className="w-4 h-10 flex items-center flex-1 justify-center"
-                        style={{
-                          background: themeOption.backgroundColor,
-                        }}
-                      >
-                        <p
-                          className="center text-xs"
+                    <Button
+                      variant={"outline"}
+                      size={"lg"}
+                      className={cn(
+                        "border-none group hover:bg-zinc-500/20 hover:shadow-sm bg-transparent px-0 shadow-none h-full w-full relative",
+                        {
+                          "bg-zinc-500/20": isSelected,
+                        }
+                      )}
+                    >
+                      <div className="w-full flex items-center justify-start h-full gap-4 p-1.5">
+                        <div
+                          className="w-4 h-10 flex items-center flex-1 justify-center"
                           style={{
-                            color: themeOption.accentColor,
+                            background: themeOption.backgroundColor,
                           }}
                         >
-                          hola!
+                          <p
+                            className="center text-xs"
+                            style={{
+                              color: themeOption.accentColor,
+                            }}
+                          >
+                            hola!
+                          </p>
+                        </div>
+
+                        <p className="flex-2 text-start text-sm font-mono text-zinc-300 group-hover:text-gray-50">
+                          {themeOption.name}
                         </p>
+
+                        {isSelected && (
+                          <Check
+                            size={16}
+                            className="text-green-400 ml-auto absolute right-2"
+                          />
+                        )}
                       </div>
-
-                      <p className="flex-2 text-start text-sm font-mono text-zinc-300 group-hover:text-gray-50">
-                        {themeOption.name}
-                      </p>
-
-                      {isSelected && (
-                        <Check
-                          size={16}
-                          className="text-green-400 ml-auto absolute right-2"
-                        />
-                      )}
-                    </div>
-                  </Button>
-                </DropdownMenuItem>
+                    </Button>
+                  </DropdownMenuItem>
+                </motion.div>
               );
             })}
           </div>

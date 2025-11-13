@@ -131,16 +131,37 @@ const elements = [
 export function InsertElements() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const iconVariant = {
+    idle: {
+      rotate: 0,
+    },
+    hover: {
+      rotate: 90,
+      scale: 1.1,
+      transition: {
+        duration: 0.15,
+      },
+    },
+  };
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <motion.button
-          whileHover={{ scale: 1.02 }}
+          variants={{
+            idle: {},
+            hover: {
+              scale: 1.02,
+            },
+          }}
+          initial="idle"
+          whileHover="hover"
           whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
-          className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors"
+          transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+          className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors hover:font-semibold"
         >
-          <Plus size={18} className="text-zinc-400" />
+          <motion.div variants={iconVariant}>
+            <Plus size={18} className="h  over:text-zinc-300 text-zinc-400" />
+          </motion.div>
           <span className="text-sm text-zinc-300">Insert</span>
         </motion.button>
       </DropdownMenuTrigger>
@@ -154,12 +175,12 @@ export function InsertElements() {
             className="h-96 w-72 p-2 border border-zinc-800 bg-zinc-900 backdrop-blur-md rounded-lg shadow-xl"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 5 }}
+              initial={{ opacity: 0, scale: 0.92, y: -5 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{
                 opacity: 0,
                 scale: 0.95,
-                y: -8,
+                y: -5,
                 transition: {
                   duration: 0.15,
                 },
@@ -195,19 +216,17 @@ export function InsertElements() {
                         x: -8,
                         opacity: 0,
                         scale: 0.95,
-                        filter: "blur(10px)",
                       },
                       visible: {
                         x: 0,
                         opacity: 1,
                         scale: 1,
-                        filter: "blur(0px)",
                       },
                     }}
                     transition={{
                       duration: 0.25,
 
-                      delay: index * 0.18,
+                      delay: index * 0.1,
                       ease: [0.34, 1.56, 0.64, 1],
                     }}
                   >
