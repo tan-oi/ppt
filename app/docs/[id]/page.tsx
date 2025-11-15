@@ -5,6 +5,8 @@ import { getPresentationById } from "@/lib/functions/getPresentation";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { toggleSharePresentation } from "./action";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function PresentationDoc({
   params,
@@ -24,7 +26,6 @@ export default async function PresentationDoc({
 
   if (!toBeGen) {
     presentationData = await getPresentationById(id, session.user.id);
-
     if (!presentationData) {
       return <p className="text-white">Presentation not found</p>;
     }
@@ -37,22 +38,29 @@ export default async function PresentationDoc({
         presentationData={presentationData}
         id={id}
       />
-
-      {toBeGen ||
-        (presentationData && (
-          <div className="fixed top-4 right-4 z-50">
-            <ShareOption
-              shareUrl={`${process.env.NEXT_PUBLIC_APP_URL}/p/${id}`}
-              isShared={presentationData.isShared}
-              presentationId={id}
-              onToggleShare={toggleSharePresentation.bind(
-                null,
+      {!toBeGen && presentationData && (
+        <div className="fixed top-4 right-4 z-50 bg-gray-50/10 backdrop-blur-xl px-4 py-2 rounded-xl flex items-center gap-2">
+          <ShareOption
+            type="normal"
+            shareUrl={`${process.env.NEXT_PUBLIC_APP_URL}/p/${id}`}
+            isShared={presentationData.isShared}
+            presentationId={id}
+            onToggleShare={async () => {
+              "use server";
+              return await toggleSharePresentation(
                 id,
-                presentationData.isShared
-              )}
-            />
-          </div>
-        ))}
+                presentationData!.isShared
+              );
+            }}
+          />
+
+          <Link href="/library">
+            <Button variant="ghost" size="sm">
+              Back
+            </Button>
+          </Link>
+        </div>
+      )}
     </>
   );
 }

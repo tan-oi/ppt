@@ -9,35 +9,26 @@ import { lightLimit } from "@/lib/rate-limit";
 export async function toggleSharePresentation(
   presentationId: string,
   currentState: boolean
-) {
+): Promise<{ success: boolean; isShared: boolean; error?: string }> {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  if (!session) return;
+  if (!session?.user) {
+    return { success: false, isShared: currentState, error: "Unauthorized" };
+  }
 
-  const id = session?.user?.id;
-  const { success, limit, reset, remaining, pending } = await lightLimit.limit(
-    `share:{user}`
+  const { success, limit, reset, remaining } = await lightLimit.limit(
+    `share:${session.user.id}`
   );
 
   if (!success) {
-    const resetDate = new Date(reset);
     const waitSeconds = Math.ceil((reset - Date.now()) / 1000);
-
     return {
       success: false,
+      isShared: currentState,
       error: `Too many requests. Try again in ${waitSeconds} seconds.`,
-      rateLimit: {
-        limit,
-        remaining: 0,
-        reset: resetDate.toISOString(),
-        retryAfter: waitSeconds,
-      },
     };
-  }
-  if (!session?.user) {
-    throw new Error("Unauthorized");
   }
 
   try {
@@ -56,6 +47,10 @@ export async function toggleSharePresentation(
     return { success: true, isShared: !currentState };
   } catch (error) {
     console.error("Error toggling share:", error);
-    throw new Error("Failed to update share status");
+    return { 
+      success: false, 
+      isShared: currentState, 
+      error: "Failed to update share status" 
+    };
   }
 }
