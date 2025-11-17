@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { strictLimit } from "@/lib/rate-limit";
+import { canCreatePresentation } from "@/lib/functions/plan-enforcement";
 
 export async function createBlankPresentation() {
   const session = await auth.api.getSession({
@@ -35,6 +36,14 @@ export async function createBlankPresentation() {
       },
     };
   }
+
+  const planCheck = await canCreatePresentation(userId);
+  if (!planCheck.allowed)
+    return {
+      success: false,
+      error: planCheck.message,
+      upgrade: true,
+    };
 
   const id = nanoid(10);
   const slideId = nanoid(10);

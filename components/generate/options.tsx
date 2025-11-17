@@ -4,19 +4,25 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "../ui/button";
 import { useGenerationStore } from "@/lib/store/generation-store";
 import { PresentationTone } from "@/lib/store/generation-store";
+import { PLAN_CONFIG } from "@/lib/config/plan";
+import { Lock } from "lucide-react";
 export function PresentationOptions({
   type,
   handleClick,
+  plan,
 }: {
   type: string;
   handleClick: () => void;
+  plan: "free" | "pro" | "basic";
 }) {
+  const maxSlides = PLAN_CONFIG[plan].maxSlidesPerPresentation;
   const setSlidesCount = useGenerationStore((s) => s.setSlidesCount);
 
   const setWriteStyle = useGenerationStore((s) => s.setWriteStyle);
@@ -32,11 +38,20 @@ export function PresentationOptions({
             </SelectTrigger>
             <SelectContent className="border-none opacity-80 rounded-xl">
               <SelectGroup>
-                {Array.from({ length: 10 }).map((_, index) => (
+                {Array.from({ length: maxSlides }).map((_, index) => (
                   <SelectItem key={index} value={(index + 1).toString()}>
                     {index + 1}
                   </SelectItem>
                 ))}
+                {plan !== "pro" && (
+                  <>
+                    <SelectSeparator />
+                    <div className="px-2 py-1.5 text-xs text-muted-foreground flex items-center gap-2">
+                      <Lock className="w-3 h-3" />
+                      <span>Upgrade for more slides</span>
+                    </div>
+                  </>
+                )}
               </SelectGroup>
             </SelectContent>
           </Select>

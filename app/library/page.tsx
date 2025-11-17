@@ -17,15 +17,15 @@ export default async function Library() {
   const userId = session?.user?.id;
   const getLibrary = await getLibraryData(userId);
 
-  if (!getLibrary?.success) {
+  if (!getLibrary?.success || !getLibrary.planDetails) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-red-500">Failed to load presentations and credits</p>
       </div>
     );
   }
-  console.log(getLibrary);
-  const { presentations, credits } = getLibrary;
+  // console.log(getLibrary);
+  const { presentations, planDetails } = getLibrary;
 
   return (
     <div className="min-h-screen flex flex-col space-y-6 max-w-7xl mx-auto backdrop-blur-xl">
@@ -45,7 +45,10 @@ export default async function Library() {
             </p>
           </div>
           <div className="flex gap-2 items-center">
-            <CreditViewer credits={credits as number} />
+            <CreditViewer
+              credits={planDetails.credit as number}
+              currentPlan={planDetails.currentPlan as string}
+            />
             <NewPresentation />
           </div>
         </div>

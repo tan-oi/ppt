@@ -52,6 +52,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   AI_GENERATION_ERROR:
     "The AI couldn't generate slides. Try different instructions.",
   UNKNOWN_ERROR: "Something went wrong. Please try again.",
+  INSUFFICIENT_ALLOWANCE: "You've exhausted your limit",
 };
 
 export function GenerateClient({
@@ -61,6 +62,7 @@ export function GenerateClient({
   type: "text" | "prompt";
   [key: string]: any;
 }) {
+  const plan = props.plan;
   const [isCreatingScratch, setIsCreatingScratch] = useState(false);
 
   const router = useRouter();
@@ -82,6 +84,7 @@ export function GenerateClient({
 
       if (!response.ok) {
         const data = await response.json();
+        console.log(data);
         const error = new Error(data.message || "Request failed");
         (error as any).code = data.error;
         (error as any).status = response.status;
@@ -123,6 +126,17 @@ export function GenerateClient({
         }, 1000);
         return;
       }
+
+      if (error.code && error.code.includes("INSUFFICIENT")) {
+        toast.error(error.message);
+        setScreen("form");
+
+        setTimeout(() => {
+          alert("upgrade1");
+        }, 3000);
+        return;
+      }
+
       toast.error(message);
       setScreen("form");
     },
@@ -168,7 +182,7 @@ export function GenerateClient({
   return (
     <div className="flex flex-col max-w-7xl mx-auto min-h-screen space-y-6">
       <Component {...props} />
-      <PresentationOptions type={type} handleClick={handleClick} />
+      <PresentationOptions plan={plan} type={type} handleClick={handleClick} />
     </div>
   );
 }

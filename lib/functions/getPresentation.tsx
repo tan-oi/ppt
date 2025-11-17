@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "../auth";
 import { redis } from "../rate-limit";
 import { headers } from "next/headers";
+import { getRedisKey } from "../config/plan";
 
 export async function getPresentationById(
   presentationId: string,
@@ -141,7 +142,6 @@ export async function getAllPresentations(userId: string) {
       },
     });
 
-    console.log(getPresentations);
     return {
       success: true as const,
       data: getPresentations,
@@ -157,44 +157,52 @@ export async function getAllPresentations(userId: string) {
 }
 
 export async function getCredits(userId: string) {
-  const redisKey = `user:${userId}:credits`;
+  const key = getRedisKey(userId);
 
-  let cachedRedis = await redis.get<number>(redisKey);
+  const rawPlanData = await redis.hmget(key, "credits", "plan");
 
-  if (cachedRedis !== null) {
-    return cachedRedis;
+  if (
+    rawPlanData &&
+    rawPlanData.credits !== null &&
+    rawPlanData.plan !== null
+  ) {
+    return {
+      credits: Number(rawPlanData.credits),
+      currentPlan: rawPlanData.plan || null,
+    };
   }
 
-  const userCredits = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
     select: {
       credits: true,
+      current_plan: true,
     },
   });
 
-  if (userCredits && userCredits.credits) {
-    redis.set(redisKey, userCredits.credits, {
-      ex: 24 * 60 * 60,
-    });
+  const credits = user?.credits ?? 0;
+  const plan = user?.current_plan ?? "free";
 
-    return userCredits.credits;
-  } else {
-    redis.set(redisKey, 0, {
-      ex: 24 * 60 * 60,
-    });
-    return 0;
-  }
+  await redis.hset(key, {
+    credits: credits,
+    plan: plan ?? "free",
+  });
+
+  await redis.expire(key, 86400);
+
+  return {
+    credits,
+    currentPlan: plan,
+  };
 }
 
 export async function getLibraryData(userId: string) {
   try {
-    const [presentationResult, credit] = await Promise.all([
+    const [presentationResult, plan] = await Promise.all([
       getAllPresentations(userId),
       getCredits(userId),
     ]);
-
+    console.log(plan);
     if (!presentationResult.success) {
       return {
         success: false as const,
@@ -204,9 +212,12 @@ export async function getLibraryData(userId: string) {
     }
 
     return {
-      success: true as const,
+      success: true,
       presentations: presentationResult.data,
-      credits: credit,
+      planDetails: {
+        credit: plan.credits,
+        currentPlan: plan.currentPlan,
+      },
     };
   } catch (error) {
     console.error("Error fetching library data:", error);
@@ -217,3 +228,4 @@ export async function getLibraryData(userId: string) {
     };
   }
 }
+

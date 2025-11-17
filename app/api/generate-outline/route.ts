@@ -1,17 +1,18 @@
 import { auth } from "@/lib/auth";
 import { buildPresentationPrompt } from "@/lib/config/prompt";
 import { prisma } from "@/lib/prisma";
-import { redis } from "@/lib/rate-limit";
 import { groq } from "@ai-sdk/groq";
 import { UIMessage, generateObject } from "ai";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { nanoid } from "nanoid";
+import { deductCredits, refundCredits } from "@/lib/functions/credits";
+import { requestValidation } from "@/lib/functions/plan-enforcement";
 
 export const requestSchema = z.object({
-  instructions: z.string().min(5, "Please give some more instructions!"),
-  slidesNo: z.number().min(1).max(10, "Exceeds the number of slides allowed!"),
+  instructions: z.string().min(5),
+  slidesNo: z.number().min(1).max(15),
   type: z.enum(["text", "link", "prompt"]),
   style: z.enum(["preserve", "extend", "base"]).optional(),
   messages: z.array(z.any()) as z.ZodType<UIMessage[]>,
@@ -25,92 +26,102 @@ export const requestSchema = z.object({
   ]),
 });
 
-export const outlineSchema = z.object({
-  slideHeading: z.string(),
-  layoutType: z.enum([
-    "main-pointer",
-    "heading-paragraph",
-    "two-column",
-    "three-sections",
-    "title",
-    "chart-with-title",
-    "chart-comparison",
-    "image-caption",
-    "four-quadrants",
-    "header-three-cards",
-    "stat-showcase",
-    "centered-callout",
-    "image-caption",
-    "image-text-split",
-    "two-media-paragraph",
-  ]),
-  pointers: z.array(z.string().min(1)).min(1, "At least 1 pointers required"),
-});
+const TEXT_LAYOUTS = [
+  "main-pointer",
+  "heading-paragraph",
+  "two-column",
+  "three-sections",
+  "title",
+  "chart-with-title",
+  "chart-comparison",
+  "four-quadrants",
+  "header-three-cards",
+  "stat-showcase",
+  "centered-callout",
+] as const;
+
+const IMAGE_LAYOUTS = [
+  "image-caption",
+  "image-text-split",
+  "two-media-paragraph",
+] as const;
+
+const ALL_LAYOUTS = [...TEXT_LAYOUTS, ...IMAGE_LAYOUTS] as const;
+
+const createOutlineSchema = (allowImages: boolean) => {
+  return z.object({
+    slideHeading: z.string(),
+    layoutType: z.enum(allowImages ? ALL_LAYOUTS : TEXT_LAYOUTS),
+    pointers: z.array(z.string().min(1)).min(1),
+  });
+};
 
 export async function POST(req: Request) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
+  const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
     return NextResponse.json(
-      { error: "UNAUTHORIZED", message: "Please log in to continue" },
+      { error: "UNAUTHORIZED", message: "Login required" },
       { status: 401 }
     );
   }
 
-  const requiredCredits = Number(process.env.REQUIRED_CREDITS);
   const userId = session.user.id;
-  const redisKey = `user:${userId}:credits`;
 
   try {
-    const obj = await req.json();
-    const parsedData = requestSchema.safeParse(obj);
+    const body = await req.json();
+    const parsed = requestSchema.safeParse(body);
 
-    if (!parsedData.success) {
+    if (!parsed.success) {
       return NextResponse.json(
         {
           error: "VALIDATION_ERROR",
-          message: parsedData.error.issues[0]?.message || "Invalid input",
+          message: parsed.error.issues[0]?.message,
         },
         { status: 400 }
       );
     }
+    console.log("i did");
+    const { slidesNo } = parsed.data;
 
-    let credits = await redis.get<number>(redisKey);
+    const planCheck = await requestValidation(userId, slidesNo);
 
-    if (credits === null) {
-      const userCredit = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { credits: true },
-      });
-
-      if (!userCredit) {
-        return NextResponse.json(
-          { error: "UNAUTHORIZED", message: "User not found" },
-          { status: 404 }
-        );
-      }
-
-      credits = userCredit.credits;
-      await redis.set(redisKey, credits, { ex: 24 * 60 * 60 });
-    }
-
-    if (credits < requiredCredits) {
+    if (!planCheck.allowed) {
       return NextResponse.json(
         {
-          error: "INSUFFICIENT_CREDITS",
-          message: "You don't have enough credits",
+          error: planCheck.error,
+          message: planCheck.message,
+          upgrade: true,
         },
-        { status: 403 }
+        {
+          status: 402,
+        }
       );
     }
 
-    await redis.decrby(redisKey, requiredCredits);
+    const maxImagesAllowed = planCheck.maxImagesAllowed ?? 0;
+    const { instructions, type, style, tone } = parsed.data;
 
-    const { instructions, slidesNo, type, style, tone } = parsedData.data;
+    const requiredCredits = Number(process.env.PPT_REQUIRED_CREDITS);
+    console.log(requiredCredits);
+    const isDeducted = await deductCredits({
+      type: "ppt",
+      amount: requiredCredits,
+    });
 
-    let slideObject: z.infer<typeof outlineSchema>[];
+    if (!isDeducted.ok) {
+      return NextResponse.json(
+        {
+          error: isDeducted.error,
+          message: "You've exhausted your credits to make presentations",
+          upgrade: true,
+        },
+        {
+          status: 402,
+        }
+      );
+    }
+    let slideObject;
+
     try {
       const systemPrompt = buildPresentationPrompt({
         instructions,
@@ -118,8 +129,10 @@ export async function POST(req: Request) {
         type,
         style,
         tone,
+        maxImagesAllowed,
       });
 
+      const outlineSchema = createOutlineSchema(maxImagesAllowed > 0);
       const { object } = await generateObject({
         model: groq("openai/gpt-oss-120b"),
         output: "array",
@@ -129,86 +142,35 @@ export async function POST(req: Request) {
       });
 
       slideObject = object;
-    } catch (aiError) {
-      console.error("AI generation failed:", aiError);
-      await redis.incrby(redisKey, requiredCredits);
-
-      return NextResponse.json(
-        {
-          error: "AI_GENERATION_ERROR",
-          message:
-            "Failed to generate slides. Please try different instructions.",
-        },
-        { status: 500 }
-      );
+    } catch (err) {
+      await refundCredits({ userId, amount: requiredCredits });
+      throw err;
     }
 
-    const transaction = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: { id: userId },
-        select: { credits: true },
-      });
+    const presentationId = nanoid(10);
 
-      if (!user || user.credits < requiredCredits) {
-        await redis.incrby(redisKey, requiredCredits);
-        throw new Error("Insufficient credits in database");
-      }
-
-      await tx.user.update({
-        where: { id: userId },
-        data: { credits: { decrement: requiredCredits } },
-      });
-
-      const record = await tx.transactionHistory.create({
-        data: {
-          userId,
-          credits: requiredCredits,
-          type: "ppt",
-        },
-      });
-
-      const presentationId = nanoid(10);
-      const outline = await tx.outline.create({
-        data: {
-          id: presentationId,
-          userId,
-          topic: instructions,
-          content: slideObject as any,
-          finalContent: "",
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      return {
-        record,
-        outline,
-        newCredits: user.credits - requiredCredits,
-      };
+    await prisma.outline.create({
+      data: {
+        id: presentationId,
+        userId,
+        topic: instructions,
+        content: slideObject as any,
+        finalContent: "",
+      },
     });
-
-    const ttl = await redis.ttl(redisKey);
-    if (ttl > 0) {
-      await redis.set(redisKey, transaction.newCredits, { ex: ttl });
-    } else {
-      await redis.set(redisKey, transaction.newCredits, { ex: 24 * 60 * 60 });
-    }
 
     return NextResponse.json(
       {
         slidesOutline: slideObject,
-        presentationId: transaction.outline.id,
-        transactionId: transaction.record.id,
+        presentationId,
       },
       { status: 200 }
     );
-  } catch (error) {
-    console.error("Error generating presentation:", error);
+  } catch (err) {
     return NextResponse.json(
       {
         error: "UNKNOWN_ERROR",
-        message: "Something went wrong. Please try again.",
+        message: "Something went wrong",
       },
       { status: 500 }
     );
