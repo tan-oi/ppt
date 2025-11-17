@@ -20,13 +20,40 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
-  credits       Int       @default(50)
+  credits       Int       @default(25)
+  current_plan CurrentPlan @default(free)
+  current_plan_start DateTime?
+  subscription_id String?   @unique
+
+
   @@unique([email])
   @@map("user")
   Presentations Presentation[]
   outlines Outline[]
     transactions  TransactionHistory[]
+      payments           Payment[]    
 
+
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  paymentId       String   @unique 
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  productId       String?   
+  subscription_id String?
+  plan            CurrentPlan 
+  creditsAdded    Int    
+  amount          Int    
+  currency        String   @default("USD")
+  status          String   
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([userId])
+  @@index([paymentId])
 }
 
 model Session {
@@ -163,4 +190,11 @@ model TransactionHistory {
 enum TransactionType {
   ppt 
   image
+}
+
+
+enum CurrentPlan {
+  free
+  basic 
+  pro
 }
