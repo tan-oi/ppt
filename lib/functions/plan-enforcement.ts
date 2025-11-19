@@ -1,98 +1,44 @@
 import { getPlanConfig, getRedisKey } from "../config/plan";
-import { prisma } from "../prisma";
-import { redis } from "../rate-limit";
+
+import { preloadUserCache } from "./userCache";
 
 export async function canCreatePresentation(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      current_plan: true,
-      _count: {
-        select: {
-          Presentations: true,
-        },
-      },
-    },
-  });
+  const cache = await preloadUserCache(userId, ["plan", "pptCount"]);
 
-  if (!user) {
+  const plan = (cache?.plan as "free" | "basic" | "pro") ?? "free";
+
+  const pptCount = Number(cache?.pptCount ?? 0);
+
+  const limit = getPlanConfig(plan).maxPresentations;
+
+  if (pptCount >= limit) {
     return {
       allowed: false,
-      reason: "User not found",
+      message: `You've reached your ${plan} limit of ${limit} decks`,
     };
   }
 
-  const plan = user.current_plan;
-
-  const getPresentationLimit = getPlanConfig(plan).maxPresentations;
-
-  const canCreate = user._count.Presentations < getPresentationLimit;
-
-  if (!canCreate) {
-    return {
-      allowed: false,
-      message: `You've reached your ${plan} limit of ${getPresentationLimit} decks`,
-    };
-  }
-
-  return {
-    allowed: true,
-  };
+  return { allowed: true };
 }
 
 export async function userPlan(userId: string) {
-  const redisKey = getRedisKey(userId);
-
-  const userPlan = await redis.hget<string>(redisKey, "plan");
-
-  if (!userPlan) {
-    const userPlanFromDb = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        current_plan: true,
-      },
-    });
-
-    return {
-      plan: userPlanFromDb?.current_plan,
-    };
-  }
-
-  return {
-    plan: userPlan,
-  };
+  const cache = await preloadUserCache(userId, ["plan"]);
+  return { plan: cache?.plan ?? "free" };
 }
 
 export async function requestValidation(userId: string, slidesNo: number) {
-  const userDetail = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      _count: {
-        select: {
-          Presentations: true,
-        },
-      },
-      current_plan: true,
-    },
-  });
+  const cache = await preloadUserCache(userId, ["plan", "pptCount"]);
 
-  const plan = userDetail?.current_plan as "free" | "pro" | "basic";
+  const plan = (cache?.plan as "free" | "basic" | "pro") ?? "free";
+  const pptCount = Number(cache?.pptCount ?? 0);
+
   const {
     maxPresentations,
     maxSlidesPerPresentation,
     maxImagePerPresentation,
   } = getPlanConfig(plan);
 
-  const canCreatePresentation =
-    (userDetail?._count.Presentations as number) < maxPresentations;
-
-  if (!canCreatePresentation) {
+  if (pptCount >= maxPresentations) {
     return {
       allowed: false,
       error: "INSUFFICIENT_ALLOWANCE",
@@ -100,9 +46,7 @@ export async function requestValidation(userId: string, slidesNo: number) {
     };
   }
 
-  const slidesAreAllowed = slidesNo <= maxSlidesPerPresentation;
-
-  if (!slidesAreAllowed) {
+  if (slidesNo > maxSlidesPerPresentation) {
     return {
       allowed: false,
       error: "INSUFFICIENT_ALLOWANCE",

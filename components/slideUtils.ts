@@ -5,6 +5,7 @@ export interface Slot {
   columnEnd: number;
   rowStart: number;
   rowEnd: number;
+  defaultComponentPath: string;
 }
 
 interface Widget {

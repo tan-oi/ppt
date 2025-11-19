@@ -108,9 +108,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
     })),
 
   updateSelectWidget: ({ slideId, id, widgetType, data }: WidgetData) => {
-    // const usePresentationStore = require("./presentation-store").default;
-    // const { getPresentationStore } = require("./store-bridge");
-
     const widget = getPresentationStore().getWidget(slideId, id);
     console.log(widget);
 

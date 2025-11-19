@@ -3,8 +3,7 @@
 import { useSlideScale } from "@/lib/hooks/useSlideScale";
 import { useWidgetDeselect } from "@/lib/hooks/useWidgetDeselect";
 import { Slide } from "./slide";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { usePresentationStore } from "@/lib/store/presentation-store";
+import { useEffect, useMemo, useState } from "react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import {
@@ -14,14 +13,11 @@ import {
 } from "@/lib/helper";
 
 import { DockBase } from "./dock/base";
-import { WidgetRegistry } from "@/lib/registry/widget";
 import { DrawerEditing } from "./widgets/drawer";
 import { cn } from "@/lib/utils";
 import { useSlideUrlSync } from "@/lib/hooks/useSlideSyncUrl";
 import { useUIStore } from "@/lib/store/ui-store";
-import { WidgetWrapper } from "./widget-wrapper";
-import { SLIDE_CONFIG } from "@/lib/config/slide";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+
 import { useQueryState } from "nuqs";
 import { useGenerationStore } from "@/lib/store/generation-store";
 import { useAutoSave } from "@/lib/hooks/useAutoSave";
@@ -34,7 +30,7 @@ import {
 } from "@/lib/hooks/usePresentationKeyboard";
 import { useSlideDragDrop } from "@/lib/hooks/useSlideDragDrop";
 import { PresentationModeView } from "./presentation-mode";
-
+  import { usePresentationStore } from "@/lib/store/presentation-store";
 
   export function Presentation({
     llmToBeCalled,
@@ -45,7 +41,8 @@ import { PresentationModeView } from "./presentation-mode";
     llmToBeCalled: boolean;
     id: string;
   }) {
-    const slides = usePresentationStore((s) => s.slides);
+    const slides = usePresentationStore((s) => s.slides) ?? [];
+
     const [, setCurrentSlideParam] = useQueryState("slide");
     const drawerOpen = useUIStore((s) => s.drawerOpen);
     const presentationMode = useUIStore((s) => s.presentationMode);

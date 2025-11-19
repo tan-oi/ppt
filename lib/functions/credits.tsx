@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { redis } from "@/lib/rate-limit";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getRedisKey } from "../config/plan";
+import { getUserCache, preloadUserCache, updateUserCache } from "./userCache";
 
 export async function deductCredits({
   type,
@@ -17,39 +16,16 @@ export async function deductCredits({
   }
 
   const userId = session.user.id;
-  const redisKey = getRedisKey(userId);
 
-  let credits = await redis.hget<number>(redisKey, "credits");
+  const cache = await preloadUserCache(userId, ["credits", "plan"]);
 
-  console.log(credits);
-
-  if (credits === null) {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { credits: true, current_plan: true },
-    });
-
-    if (!user) {
-      return { ok: false, error: "UNAUTHORIZED" };
-    }
-
-    credits = user.credits;
-
-    await redis
-      .pipeline()
-      .hset(redisKey, {
-        credits,
-        plan: user.current_plan ?? "free",
-      })
-      .expire(redisKey, 86400)
-      .exec();
-  }
+  let credits = Number(cache?.credits ?? 0);
 
   if (credits < amount) {
     return { ok: false, error: "INSUFFICIENT_CREDITS" };
   }
 
-  await redis.hincrby(redisKey, "credits", -amount);
+  await updateUserCache(userId, { credits: credits - amount });
 
   const tx = await prisma.$transaction(async (tx) => {
     const user = await tx.user.findUnique({
@@ -58,7 +34,7 @@ export async function deductCredits({
     });
 
     if (!user || user.credits < amount) {
-      await redis.hincrby(redisKey, "credits", amount);
+      await updateUserCache(userId, { credits });
       return { ok: false, error: "INSUFFICIENT_CREDITS" };
     }
 
@@ -85,12 +61,7 @@ export async function deductCredits({
   if (!tx.ok) {
     return tx;
   }
-
-  await redis
-    .pipeline()
-    .hset(redisKey, { credits: tx.newCredits })
-    .expire(redisKey, 86400)
-    .exec();
+  await updateUserCache(userId, { credits: tx.newCredits });
 
   return tx;
 }
@@ -102,20 +73,13 @@ export async function refundCredits({
   userId: string;
   amount: number;
 }) {
-  const redisKey = `user:${userId}:credits`;
-
-  await redis.incrby(redisKey, amount);
-
   await prisma.user.update({
     where: { id: userId },
     data: { credits: { increment: amount } },
   });
 
-  // await prisma.transactionHistory.create({
-  //   data: {
-  //     userId,
-  //     credits: amount,
-  //     type: "ppt",
-  //   },
-  // });
+  const current = await getUserCache(userId, ["credits"]);
+  const updated = Number(current?.credits ?? 0) + amount;
+
+  await updateUserCache(userId, { credits: updated });
 }

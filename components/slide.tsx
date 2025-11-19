@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { WidgetWrapper } from "./widget-wrapper";
 import { useDroppable } from "@dnd-kit/core";
@@ -49,8 +50,9 @@ function SlideBase({
   id,
   slideScale,
   isPresenting,
+  data,
 }: {
-  data?: any;
+  data: any;
   id: string;
   slideScale: number;
   isPresenting?: boolean;
@@ -60,13 +62,14 @@ function SlideBase({
     data: { type: "slide" },
   });
 
-  const slideData = usePresentationStore((s) =>
-    s.slides.find((slide: any) => slide.id === id)
-  );
+  // const slideData = usePresentationStore((s) =>
+  //   s.slides.find((slide: any) => slide.id === id)
+  // );
+  //changed each. slideData below it to data.
 
-  if (!slideData) return null;
+  if (!data) return null;
 
-  useThemeFonts(slideData.theme);
+  useThemeFonts(data.theme);
 
   return (
     <motion.div
@@ -92,14 +95,14 @@ function SlideBase({
         width: SLIDE_CONFIG.width * slideScale,
         height: SLIDE_CONFIG.height * slideScale,
         overflow: "hidden",
-      }}  
+      }}
       className={cn(
         "grid grid-cols-24 grid-rows-24 bg-background rounded-lg",
-        slideData.theme && slideData.theme !== "starter" ? slideData.theme : ""
+        data.theme && data.theme !== "starter" ? data.theme : ""
       )}
     >
       <SlidePresentation
-        data={slideData}
+        data={data}
         slideScale={slideScale}
         isPresenting={isPresenting}
       />

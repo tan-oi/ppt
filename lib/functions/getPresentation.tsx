@@ -156,53 +156,10 @@ export async function getAllPresentations(userId: string) {
   }
 }
 
-export async function getCredits(userId: string) {
-  const key = getRedisKey(userId);
-
-  const rawPlanData = await redis.hmget(key, "credits", "plan");
-
-  if (
-    rawPlanData &&
-    rawPlanData.credits !== null &&
-    rawPlanData.plan !== null
-  ) {
-    return {
-      credits: Number(rawPlanData.credits),
-      currentPlan: rawPlanData.plan || null,
-    };
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      credits: true,
-      current_plan: true,
-    },
-  });
-
-  const credits = user?.credits ?? 0;
-  const plan = user?.current_plan ?? "free";
-
-  await redis.hset(key, {
-    credits: credits,
-    plan: plan ?? "free",
-  });
-
-  await redis.expire(key, 86400);
-
-  return {
-    credits,
-    currentPlan: plan,
-  };
-}
-
 export async function getLibraryData(userId: string) {
   try {
-    const [presentationResult, plan] = await Promise.all([
-      getAllPresentations(userId),
-      getCredits(userId),
-    ]);
-    console.log(plan);
+    const presentationResult = await getAllPresentations(userId);
+
     if (!presentationResult.success) {
       return {
         success: false as const,
@@ -214,10 +171,6 @@ export async function getLibraryData(userId: string) {
     return {
       success: true,
       presentations: presentationResult.data,
-      planDetails: {
-        credit: plan.credits,
-        currentPlan: plan.currentPlan,
-      },
     };
   } catch (error) {
     console.error("Error fetching library data:", error);
@@ -228,4 +181,3 @@ export async function getLibraryData(userId: string) {
     };
   }
 }
-
