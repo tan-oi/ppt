@@ -53,6 +53,9 @@ interface GenerationInterface {
   id: null | string;
   setId: (id: string) => void;
 
+  imagePreference: "ai" | "stock";
+  setImagePreference: (pref: "ai" | "stock") => void;
+
   processedOutline?:
     | (Slide & {
         slots: Record<string, { type: string }>;
@@ -92,6 +95,12 @@ export const useGenerationStore = create<GenerationInterface>((set, get) => ({
     set({
       tone,
     }),
+  imagePreference: "stock",
+  setImagePreference: (pref) =>
+    set({
+      imagePreference: pref,
+    }),
+
   slidesCount: 1,
   setSlidesCount: (count) =>
     set({
