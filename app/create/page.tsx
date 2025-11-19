@@ -1,10 +1,17 @@
-"use client";
 import { FileText, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import * as motion from "motion/react-client";
+import { ensureUserCache } from "@/lib/functions/userCache";
 
-export default function CreatePage() {
+import { requireUser } from "@/lib/functions/user-check";
+
+export default async function CreatePage() {
+  const id = (await requireUser()).id;
+
+  await ensureUserCache(id);
+
   return (
     <div className="min-h-screen flex flex-col space-y-6">
       <div className="relative w-full px-6 py-6 space-y-8">
@@ -32,7 +39,21 @@ export default function CreatePage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.3,
+                delayChildren: 0.1,
+                ease: "easeOut",
+              },
+            },
+          }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
           <Link
             href={{
               pathname: "/create/generate",
@@ -41,7 +62,22 @@ export default function CreatePage() {
               },
             }}
           >
-            <div
+            <motion.div
+              variants={{
+                hidden: {
+                  scale: 0.98,
+                  opacity: 0,
+                },
+                visible: {
+                  scale: 1,
+                  opacity: 1,
+                  x: 0,
+                },
+              }}
+              whileHover={{
+                scale: 1.02,
+              }}
+              transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
               className={`group relative overflow-hidden rounded-xl border transition-all duration-300 cursor-pointer ${"border-neutral-800/40 bg-neutral-900/30 hover:border-neutral-700/40 hover:bg-neutral-900/40"}`}
             >
               <TextModePattern />
@@ -69,7 +105,7 @@ export default function CreatePage() {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </Link>
           <Link
             href={{
@@ -79,7 +115,22 @@ export default function CreatePage() {
               },
             }}
           >
-            <div
+            <motion.div
+              variants={{
+                hidden: {
+                  scale: 0.98,
+                  opacity: 0,
+                },
+                visible: {
+                  scale: 1,
+                  opacity: 1,
+                  x: 0,
+                },
+              }}
+              whileHover={{
+                scale: 1.02,
+              }}
+              transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
               className={`group relative overflow-hidden rounded-xl border transition-all duration-300 cursor-pointer ${"border-neutral-800/40 bg-neutral-900/30 hover:border-neutral-700/40 hover:bg-neutral-900/40"}`}
             >
               <PromptModePattern />
@@ -110,9 +161,9 @@ export default function CreatePage() {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </Link>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -7,10 +7,6 @@ export default async function PresentationView({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
   const { id } = await params;
 
   const viewData = await getSharedPresentation(id);

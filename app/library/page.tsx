@@ -1,23 +1,20 @@
 import { NewPresentation } from "@/components/library/new-presentation";
 import { PresentationList } from "@/components/library/presentation-list";
 import { Separator } from "@/components/ui/separator";
-import { auth } from "@/lib/auth";
+
 import { getLibraryData } from "@/lib/functions/getPresentation";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+
 import { CreditViewer } from "@/components/library/credit-viewer";
+import { preloadUserCache } from "@/lib/functions/userCache";
+import { requireUser } from "@/lib/functions/user-check";
 
 export default async function Library() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const userId = (await requireUser()).id;
+  const data = await preloadUserCache(userId, ["plan", "credits"]);
 
-  if (!session || !session?.user) return redirect("/check");
-
-  const userId = session?.user?.id;
   const getLibrary = await getLibraryData(userId);
 
-  if (!getLibrary?.success || !getLibrary.planDetails) {
+  if (!getLibrary?.success || !getLibrary.presentations) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-red-500">Failed to load presentations and credits</p>
@@ -25,7 +22,7 @@ export default async function Library() {
     );
   }
   // console.log(getLibrary);
-  const { presentations, planDetails } = getLibrary;
+  const { presentations } = getLibrary;
 
   return (
     <div className="min-h-screen flex flex-col space-y-6 max-w-7xl mx-auto backdrop-blur-xl">
@@ -46,8 +43,8 @@ export default async function Library() {
           </div>
           <div className="flex gap-2 items-center">
             <CreditViewer
-              credits={planDetails.credit as number}
-              currentPlan={planDetails.currentPlan as string}
+              credits={data?.credits as number}
+              currentPlan={data?.plan as string}
             />
             <NewPresentation />
           </div>

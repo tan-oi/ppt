@@ -7,17 +7,14 @@ import { redirect } from "next/navigation";
 import { toggleSharePresentation } from "./action";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { requireUser } from "@/lib/functions/user-check";
 
 export default async function PresentationDoc({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) redirect("/check");
+  const userId = (await requireUser()).id;
 
   const { id } = await params;
   const toBeGen = id.startsWith("ai-");
@@ -25,7 +22,7 @@ export default async function PresentationDoc({
   let presentationData = null;
 
   if (!toBeGen) {
-    presentationData = await getPresentationById(id, session.user.id);
+    presentationData = await getPresentationById(id, userId);
     if (!presentationData) {
       return <p className="text-white">Presentation not found</p>;
     }
