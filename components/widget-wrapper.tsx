@@ -22,37 +22,35 @@ export function WidgetWrapper({
 
   const [WidgetComponent, setWidgetComponent] = useState<any>(null);
 
-  useEffect(() => {
-    if (widget?.widgetType) {
-      loadWidgetComponent(widget.widgetType)
-        .then((comp) => setWidgetComponent(() => comp))
-        .catch((err) =>
-          console.error(`Failed to load widget ${widget.widgetType}`, err)
-        );
-    }
-  }, [widget?.widgetType]);
+  const type = widget?.widgetType;
 
+  useEffect(() => {
+    if (type) {
+      loadWidgetComponent(type)
+        .then((comp) => setWidgetComponent(() => comp))
+        .catch((err) => console.error(`Failed to load widget ${type}`, err));
+    }
+  }, [type]);
   if (!widget) {
     console.warn(`Widget ${widgetId} not found in store`);
     return null;
   }
 
   const { widgetType, data: widgetData, position } = widget;
-  const widgetInfo = WidgetMetadata[widgetType as keyof typeof WidgetMetadata];
+  const widgetInfo = WidgetMetadata[type as keyof typeof WidgetMetadata];
 
   if (!widgetInfo) {
-    console.warn(`Widget type ${widgetType} not found in metadata`);
+    console.warn(`Widget type ${type} not found in metadata`);
     return null;
   }
 
   if (!WidgetComponent) return null;
-
   return (
     <DraggableResizableWrapper
       x={position.x}
       y={position.y}
       height={
-        widgetType === "image" || widgetType === "divider"
+        type === "image" || type === "divider"
           ? position.height
           : null
       }

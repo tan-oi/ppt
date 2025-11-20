@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { SLIDE_CONFIG } from "../config/slide";
 
 export function useSlideScale() {
-  const [slideScale, setSlideScale] = useState(0.7);
+  //idk man lets see rn this seem to work well.
+  const [slideScale, setSlideScale] = useState(1);
 
   useEffect(() => {
     const updateScale = () => {
