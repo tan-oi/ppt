@@ -17,7 +17,7 @@ export function BadgeWidget({
   backgroundColor = "#000",
   id,
   slideId,
-  editable = false,
+  editable = true,
   className,
 }: BadgeWidgetProps) {
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
@@ -49,6 +49,7 @@ export function BadgeWidget({
       </>
     );
   }
+
   return (
     <>
       <div

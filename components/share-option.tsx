@@ -2,19 +2,24 @@
 
 import { useState, useTransition } from "react";
 import { Button } from "./ui/button";
-import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { Separator } from "./ui/separator";
-import { Input } from "./ui/input";
-import { Link, Loader2, Share2 } from "lucide-react";
+
+import {
+  Link as LinkIcon,
+  Loader2,
+  Share2,
+  Globe,
+  Lock,
+  Check,
+  Copy,
+  RefreshCw,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 
@@ -33,7 +38,6 @@ interface ShareOptionProps {
 export function ShareOption({
   shareUrl,
   isShared,
-  presentationId,
   type = "normal",
   onToggleShare,
 }: ShareOptionProps) {
@@ -44,6 +48,7 @@ export function ShareOption({
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);
     setCopied(true);
+    toast.success("Link copied to clipboard");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -51,172 +56,160 @@ export function ShareOption({
     startTransition(async () => {
       try {
         const result = await onToggleShare();
-
         if (result.success) {
           toast.success(
-            result.isShared
-              ? "Presentation is now shareable!"
-              : "Share link revoked"
+            result.isShared ? "Presentation is now live!" : "Share link revoked"
           );
 
-          if (!result.isShared) {
-            setIsOpen(false);
-          }
+          if (!result.isShared) setIsOpen(false);
         } else if (result.error) {
           toast.error(result.error);
         }
       } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Failed to update share status"
-        );
-        console.error(error);
+        toast.error("Failed to update share status");
       }
     });
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      {type === "normal" ? (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DialogTrigger asChild>
-              <Button size="sm" className="cursor-pointer">
-                Share
-              </Button>
-            </DialogTrigger>
-          </TooltipTrigger>
-          <TooltipContent className="text-zinc-900 bg-gray-50">
-            Share this presentation
-          </TooltipContent>
-        </Tooltip>
-      ) : (
-        <DialogTrigger asChild>
+      <DialogTrigger asChild>
+        {type === "normal" ? (
+          <Button
+            size="sm"
+            className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white border-0"
+          >
+            <Share2 size={14} />
+            Share
+          </Button>
+        ) : (
           <Button
             size="icon"
-            variant="link"
-            className="h-8 w-8 rounded-md transition-colors duration-200 text-neutral-400 hover:text-blue-600 hover:scale-[1.02] cursor-pointer"
+            variant="ghost"
+            className="h-8 w-8 text-zinc-400 hover:text-indigo-400 transition-colors"
           >
-            <Share2 className="w-3 h-3" />
+            <Share2 size={16} />
           </Button>
-        </DialogTrigger>
-      )}
-      {isOpen && (
-        <AnimatePresence mode="popLayout">
-          <motion.div>
-            <DialogContent
-              className="bg-zinc-900 backdrop-blur-lg rounded-xl font-sans"
-              showCloseButton={false}
-            >
-              <DialogHeader className="flex flex-col items-center justify-center gap-1">
-                <DialogTitle className="text-zinc-300 text-lg">
-                  {isShared ? "Share the presentation" : "Enable sharing"}
-                </DialogTitle>
-                <DialogDescription className="text-zinc-400 text-sm text-center">
-                  {isShared
-                    ? "Anyone with this link can view your presentation. They won't be able to edit it."
-                    : "Enable sharing to generate a public link for this presentation."}
-                </DialogDescription>
-              </DialogHeader>
+        )}
+      </DialogTrigger>
 
-              <Separator className="my-2" />
+      <DialogContent className="bg-zinc-950 border-zinc-800 sm:max-w-md p-0 overflow-hidden gap-0">
+        <DialogHeader className="p-6 pb-2">
+          <DialogTitle className="text-xl text-zinc-100 flex items-center gap-2">
+            {isShared ? (
+              <Globe className="w-5 h-5 text-green-500" />
+            ) : (
+              <Lock className="w-5 h-5 text-zinc-500" />
+            )}
+            {isShared ? "Public Access" : "Private Presentation"}
+          </DialogTitle>
+        </DialogHeader>
 
-              {isShared ? (
-                <>
-                  <div className="flex gap-2 mb-4 items-center w-full">
-                    <Input
-                      type="text"
-                      className="text-zinc-300"
-                      value={shareUrl}
-                      readOnly
-                    />
-                    <Button
-                      size="sm"
-                      onClick={handleCopy}
-                      className="cursor-pointer"
-                      disabled={isPending}
-                    >
-                      <Link size={16} />
+        <div className="p-6 pt-2">
+          <AnimatePresence mode="wait">
+            {isShared ? (
+              <motion.div
+                key="shared-state"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-4"
+              >
+                <p className="text-zinc-400 text-sm">
+                  Anyone with the link below can view this presentation.
+                </p>
 
-                      <AnimatePresence mode="wait" initial={false}>
-                        {copied ? (
-                          <motion.span
-                            key="copied"
-                            initial={{ y: -8, opacity: 0, scale: 0.95 }}
-                            animate={{ y: 0, opacity: 1, scale: 1 }}
-                            exit={{ y: 8, opacity: 0, scale: 0.95 }}
-                            transition={{
-                              duration: 0.25,
-                              ease: [0.16, 1, 0.3, 1],
-                            }}
-                            className="inline-block"
-                          >
-                            Copied
-                          </motion.span>
-                        ) : (
-                          <motion.span
-                            key="copy"
-                            initial={{ y: -8, opacity: 0, scale: 0.95 }}
-                            animate={{ y: 0, opacity: 1, scale: 1 }}
-                            exit={{ y: 8, opacity: 0, scale: 0.95 }}
-                            transition={{
-                              duration: 0.25,
-                              ease: [0.16, 1, 0.3, 1],
-                            }}
-                            className="inline-block"
-                          >
-                            Copy
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </Button>
+                {/* Custom Input Group */}
+                <div className="relative flex items-center">
+                  <div className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-3 pr-12 py-2.5 text-sm text-zinc-300 font-mono truncate transition-all hover:border-zinc-700 focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/20">
+                    {shareUrl}
                   </div>
-
                   <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleCopy}
+                    className="absolute right-1 h-8 w-8 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-md"
+                  >
+                    <AnimatePresence mode="wait" initial={false}>
+                      {copied ? (
+                        <motion.div
+                          key="check"
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0.5, opacity: 0 }}
+                        >
+                          <Check size={14} className="text-green-500" />
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="copy"
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0.5, opacity: 0 }}
+                        >
+                          <Copy size={14} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </Button>
+                </div>
+
+                <div className="pt-2 border-t border-zinc-900 flex justify-between items-center">
+                  <span className="text-xs text-zinc-500">
+                    Current status: Live
+                  </span>
+                  <Button
+                    variant="ghost"
                     size="sm"
-                    variant="destructive"
                     onClick={handleToggle}
                     disabled={isPending}
-                    className="mb-2"
+                    className="text-red-400 hover:text-red-300 hover:bg-red-400/10 h-8 text-xs"
                   >
                     {isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Revoking...
-                      </>
+                      <Loader2 className="w-3 h-3 animate-spin mr-2" />
                     ) : (
-                      "Revoke link"
+                      <RefreshCw className="w-3 h-3 mr-2" />
                     )}
+                    Unpublish
                   </Button>
-                </>
-              ) : (
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="unshared-state"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-4"
+              >
+                <div className="bg-zinc-900/50 rounded-lg p-4 border border-zinc-800/50 flex flex-col items-center justify-center gap-3 py-8">
+                  <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center">
+                    <LinkIcon className="w-6 h-6 text-zinc-400" />
+                  </div>
+                  <p className="text-zinc-400 text-sm text-center max-w-[200px]">
+                    Publish this presentation to generate a shareable link.
+                  </p>
+                </div>
+
                 <Button
-                  size="sm"
                   onClick={handleToggle}
                   disabled={isPending}
-                  className="mb-2"
+                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
                 >
                   {isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Enabling...
+                      Generating Link...
                     </>
                   ) : (
-                    "Enable sharing"
+                    "Enable Public Access"
                   )}
                 </Button>
-              )}
-
-              <DialogClose asChild>
-                <Button variant="ghost" size="sm">
-                  Close
-                </Button>
-              </DialogClose>
-            </DialogContent>
-          </motion.div>
-        </AnimatePresence>
-      )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </DialogContent>
     </Dialog>
   );
 }

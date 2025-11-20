@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { Slide } from "./slide";
 import { useSlideScale } from "@/lib/hooks/useSlideScale";
+import { useUIStore } from "@/lib/store/ui-store";
 
 export function PresentationViewer({ viewData }: { viewData: any }) {
   const slides = usePresentationStore((s) => s.slides);
@@ -19,6 +20,8 @@ export function PresentationViewer({ viewData }: { viewData: any }) {
     viewData.slides.forEach((slide: any) => {
       populateStores(slide);
     });
+
+    useUIStore.getState().setPresentationMode(true);
   }, []);
 
   const slideScale = useSlideScale();

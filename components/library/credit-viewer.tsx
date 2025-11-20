@@ -15,7 +15,13 @@ import { Zap, X } from "lucide-react";
 
 import * as motion from "motion/react-client";
 import { TooltipTrigger, Tooltip, TooltipContent } from "../ui/tooltip";
-export function CreditViewer({ credits }: { credits: number }) {
+export function CreditViewer({
+  credits,
+  currentPlan,
+}: {
+  credits: number;
+  currentPlan: string;
+}) {
   const usageData = [
     { id: 1, date: "Nov 1, 2025", type: "PPT Generation", credits: 5 },
     { id: 2, date: "Oct 31, 2025", type: "Image Generation", credits: 3 },
@@ -26,6 +32,10 @@ export function CreditViewer({ credits }: { credits: number }) {
     { id: 7, date: "Oct 30, 2025", type: "PPT Generation", credits: 5 },
     { id: 8, date: "Oct 30, 2025", type: "PPT Generation", credits: 5 },
   ];
+
+  const getData = async () => {
+    console.log("here it is");
+  };
 
   return (
     <>
@@ -58,6 +68,8 @@ export function CreditViewer({ credits }: { credits: number }) {
             <span className="text-sm font-medium text-foreground">
               {credits}
             </span>
+
+            <p className="text-gray-50">{currentPlan}</p>
           </motion.button>
         </DrawerTrigger>
 
@@ -158,34 +170,6 @@ export function CreditViewer({ credits }: { credits: number }) {
           </div>
         </DrawerContent>
       </Drawer>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex items-center gap-1 border border-secondary rounded-xl py-2 px-4 hover:bg-muted transition-colors shadow-md">
-            <motion.div
-              whileHover={{
-                x: [0, -1, 1, -1, 1, 0],
-                y: [0, 1, -1, 2, -2, 0],
-                rotate: [0, 1, -1, 0],
-                transition: {
-                  duration: 0.2,
-                  repeat: Infinity,
-                  repeatType: "mirror",
-                  ease: "linear",
-                },
-              }}
-            >
-              <Zap className="text-green-400 size-4" fill="currentColor" />
-            </motion.div>
-
-            <span className="text-sm font-medium text-foreground">
-              {credits}
-            </span>
-          </div>
-        </TooltipTrigger>
-
-        <TooltipContent>Each deck takes 5 credits</TooltipContent>
-      </Tooltip>
     </>
   );
 }

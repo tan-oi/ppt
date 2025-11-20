@@ -5,56 +5,11 @@ import { groq } from "@ai-sdk/groq";
 import { UIMessage, generateObject } from "ai";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { z } from "zod";
+
 import { nanoid } from "nanoid";
 import { deductCredits, refundCredits } from "@/lib/functions/credits";
 import { requestValidation } from "@/lib/functions/plan-enforcement";
-
-export const requestSchema = z.object({
-  instructions: z.string().min(5),
-  slidesNo: z.number().min(1).max(15),
-  type: z.enum(["text", "link", "prompt"]),
-  style: z.enum(["preserve", "extend", "base"]).optional(),
-  messages: z.array(z.any()) as z.ZodType<UIMessage[]>,
-  tone: z.enum([
-    "professional",
-    "creative",
-    "casual",
-    "academic",
-    "inspirational",
-    "minimalist",
-  ]),
-});
-
-const TEXT_LAYOUTS = [
-  "main-pointer",
-  "heading-paragraph",
-  "two-column",
-  "three-sections",
-  "title",
-  "chart-with-title",
-  "chart-comparison",
-  "four-quadrants",
-  "header-three-cards",
-  "stat-showcase",
-  "centered-callout",
-] as const;
-
-const IMAGE_LAYOUTS = [
-  "image-caption",
-  "image-text-split",
-  "two-media-paragraph",
-] as const;
-
-const ALL_LAYOUTS = [...TEXT_LAYOUTS, ...IMAGE_LAYOUTS] as const;
-
-const createOutlineSchema = (allowImages: boolean) => {
-  return z.object({
-    slideHeading: z.string(),
-    layoutType: z.enum(allowImages ? ALL_LAYOUTS : TEXT_LAYOUTS),
-    pointers: z.array(z.string().min(1)).min(1),
-  });
-};
+import { createOutlineSchema, requestSchema } from "@/lib/config/schema";
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: await headers() });

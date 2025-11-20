@@ -92,7 +92,7 @@ export function StatWidget({
       ref={widgetRef}
       onClick={() => {
         handleClick({
-          widgetType: "statWidget",
+          widgetType: "stat",
           data: {
             value: currentData.value,
             label: currentData.label,

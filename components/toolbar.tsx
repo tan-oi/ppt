@@ -9,16 +9,18 @@ export function Toolbar() {
   const [mounted, setMounted] = useState(false);
   const toolbarOpen = useUIStore((s) => s.toolbarOpen);
   const selectedWidget = useUIStore((s) => s.selectedWidget);
-
+  const isPresentationMode = useUIStore((s) => s.presentationMode === true);
   useEffect(() => setMounted(true), []);
 
   const ToolbarComponent = useMemo(() => {
     if (!selectedWidget) return null;
     const widgetType = selectedWidget.widgetType;
+
     //@ts-ignore
     return ToolbarRegistry[widgetType]?.component || null;
   }, [selectedWidget]);
 
+  if (isPresentationMode) return null;
   if (!mounted || !toolbarOpen || !selectedWidget?.data?.position) return null;
 
   const { position } = selectedWidget.data;

@@ -1,7 +1,15 @@
-import { useState, useEffect } from 'react';
-import { Check, Cloud, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Check, Cloud, AlertCircle } from "lucide-react";
 
-export function AutoSaveIndicator({ isSaving, lastSaved, error }) {
+export function AutoSaveIndicator({
+  isSaving,
+  lastSaved,
+  error,
+}: {
+  isSaving: boolean;
+  lastSaved: Date | null;
+  error: Error | null;
+}) {
   const [showSaved, setShowSaved] = useState(false);
 
   useEffect(() => {
@@ -12,11 +20,11 @@ export function AutoSaveIndicator({ isSaving, lastSaved, error }) {
     }
   }, [isSaving, lastSaved]);
 
-  const getTimeAgo = (date) => {
-    if (!date) return '';
+  const getTimeAgo = (date: Date) => {
+    if (!date) return "";
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    
-    if (seconds < 10) return 'just now';
+
+    if (seconds < 10) return "just now";
     if (seconds < 60) return `${seconds}s ago`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     return `${Math.floor(seconds / 3600)}h ago`;

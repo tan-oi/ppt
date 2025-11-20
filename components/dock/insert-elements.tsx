@@ -24,6 +24,7 @@ import {
   Forward,
   Pill,
   Image,
+  ChartColumn,
 } from "lucide-react";
 import { DraggableMenuItem } from "./draggableItems";
 import { AnimatePresence, motion } from "motion/react";
@@ -71,6 +72,12 @@ const elements = [
     id: "icon-card",
     slug: "iconCard",
     icon: Wand,
+  },
+  {
+    name: "Stats card",
+    id: "stat-card",
+    slug: "statWidget",
+    icon: ChartColumn,
   },
   {
     name: "Divider",

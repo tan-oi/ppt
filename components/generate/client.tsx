@@ -10,39 +10,13 @@ import { z } from "zod";
 import { createBlankPresentation } from "@/app/create/action";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-
-const outlineSchema = z.object({
-  slideHeading: z.string(),
-  layoutType: z.enum([
-    "main-pointer",
-    "heading-paragraph",
-    "two-column",
-    "three-sections",
-    "title",
-    "chart-with-title",
-    "chart-comparison",
-    "image-caption",
-    "four-quadrants",
-    "header-three-cards",
-    "stat-showcase",
-    "centered-callout",
-    "image-caption",
-    "image-text-split",
-    "two-media-paragraph",
-  ]),
-  pointers: z.array(z.string().min(1)).min(1, "At least 1 pointers required"),
-});
+import { PLAN_CONFIG } from "@/lib/config/plan";
+import { createOutlineSchema } from "@/lib/config/schema";
 
 const COMPONENTS: Record<"text" | "prompt", React.FC<any>> = {
   text: Text,
   prompt: PromptInput,
 };
-
-const apiResponseSchema = z.object({
-  slidesOutline: z.array(outlineSchema),
-  presentationId: z.string(),
-  transactionId: z.string().optional(),
-});
 
 const ERROR_MESSAGES: Record<string, string> = {
   UNAUTHORIZED: "You need to be logged in to do this.",
@@ -62,7 +36,9 @@ export function GenerateClient({
   type: "text" | "prompt";
   [key: string]: any;
 }) {
-  const plan = props.plan;
+  const plan = props.plan as "free" | "pro" | "basic";
+  const maxImagesAllowed = PLAN_CONFIG[plan].maxImagePerPresentation;
+
   const [isCreatingScratch, setIsCreatingScratch] = useState(false);
 
   const router = useRouter();
@@ -70,6 +46,12 @@ export function GenerateClient({
   const setResult = useGenerationStore((s) => s.setResult);
   const setId = useGenerationStore((s) => s.setId);
   const [screen, setScreen] = useState<"form" | "result">("form");
+
+  const apiResponseSchema = z.object({
+    slidesOutline: z.array(createOutlineSchema(maxImagesAllowed > 0)),
+    presentationId: z.string(),
+    transactionId: z.string().optional(),
+  });
 
   useEffect(() => {
     setGenerateType(type);
@@ -177,7 +159,7 @@ export function GenerateClient({
     }
   };
 
-  if (screen === "result") return <OutlineViewer />;
+  if (screen === "result") return <OutlineViewer plan={plan} />;
 
   return (
     <div className="flex flex-col max-w-7xl mx-auto min-h-screen space-y-6">

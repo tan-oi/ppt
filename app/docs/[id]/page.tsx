@@ -35,8 +35,8 @@ export default async function PresentationDoc({
         presentationData={presentationData}
         id={id}
       />
-      {!toBeGen && presentationData && (
-        <div className="fixed top-4 right-4 z-50 bg-gray-50/10 backdrop-blur-xl px-4 py-2 rounded-xl flex items-center gap-2">
+      <div className="fixed top-4 right-4 z-50 backdrop-blur-xl px-4 py-2 rounded-xl flex items-center gap-2">
+        {!toBeGen && presentationData && (
           <ShareOption
             type="normal"
             shareUrl={`${process.env.NEXT_PUBLIC_APP_URL}/p/${id}`}
@@ -50,14 +50,13 @@ export default async function PresentationDoc({
               );
             }}
           />
-
-          <Link href="/library">
-            <Button variant="ghost" size="sm">
-              Back
-            </Button>
-          </Link>
-        </div>
-      )}
+        )}
+        <Link href="/library">
+          <Button variant="default" size="sm">
+            Back
+          </Button>
+        </Link>
+      </div>
     </>
   );
 }
