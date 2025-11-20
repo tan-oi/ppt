@@ -102,22 +102,26 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
   addSlideAfterCurrent: (layoutSlug) => {
     const { slides, currentSlide, theme } = get();
     const currentIndex = slides.findIndex((s) => s.id === currentSlide);
+    const insertAt = currentIndex >= 0 ? currentIndex + 1 : slides.length;
 
     const newSlide: Slide = {
       id: nanoid(10),
-      slideNumber: currentIndex + 1,
+      slideNumber: insertAt + 1,
       heading: "",
       widgets: {},
       theme: theme || "starter",
     };
 
     const newSlides = [...slides];
-    console.log(newSlides);
-    const insertAt = currentIndex >= 0 ? currentIndex + 1 : slides.length;
     newSlides.splice(insertAt, 0, newSlide);
 
+    console.log(newSlides);
+    const reindexedSlides = newSlides.map((slide, index) => ({
+      ...slide,
+      slideNumber: index + 1,
+    }));
     set({
-      slides: newSlides,
+      slides: reindexedSlides,
       currentSlide: newSlide.id,
     });
 
@@ -132,7 +136,6 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
         SLIDE_CONFIG.rows
       );
 
-     
       positions.forEach((pos) => {
         const slot = layout.slots.find((s) => s.id === pos.id);
         if (!slot) return;
@@ -217,7 +220,7 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       y: 0,
       width: 200,
       height: 200,
-    };
+    };  
 
     const widget: WidgetData = {
       id: widgetId,
@@ -321,6 +324,7 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       slides: [],
       currentSlide: undefined,
       topic: undefined,
+      theme: undefined,
     }),
   resetStore: () =>
     set({

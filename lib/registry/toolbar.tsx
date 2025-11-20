@@ -7,6 +7,7 @@ import { ImageToolbar } from "@/components/widgets/toolbars/image-toolbar";
 import { LinkToolbar } from "@/components/widgets/toolbars/link-toolbar";
 import { ListToolbar } from "@/components/widgets/toolbars/list-toolbar";
 import { ProgressToolbar } from "@/components/widgets/toolbars/progress-toolbar";
+import { StatToolbar } from "@/components/widgets/toolbars/stats-toolbar";
 
 export const ToolbarRegistry = {
   badge: {
@@ -37,12 +38,15 @@ export const ToolbarRegistry = {
     component: BasicToolbar,
   },
   stat: {
-    component: BasicToolbar,
+    component: StatToolbar,
   },
   chart: {
     component: ChartToolbar,
   },
   image: {
     component: ImageToolbar,
+  },
+  basic: {
+    component: BasicToolbar,
   },
 };

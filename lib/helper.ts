@@ -3,7 +3,11 @@ import { SLIDE_CONFIG } from "./config/slide";
 import { LayoutRegistry } from "./registry/layout";
 import { usePresentationStore } from "./store/presentation-store";
 import { nanoid } from "nanoid";
-import { COMPONENT_TO_TYPE, TYPE_TO_WIDGET } from "./store/generation-store";
+import {
+  COMPONENT_TO_TYPE,
+  TYPE_TO_WIDGET,
+  useGenerationStore,
+} from "./store/generation-store";
 import {
   COMPONENT_PATH_CONVERSION,
   COMPONENT_PATH_TO_WIDGET,
@@ -32,6 +36,7 @@ export function transformAndStorePresentation(presentationData: any) {
 }
 
 export function transformSlideAndStore(slideData: any, addSlide: any) {
+  const pref = useGenerationStore.getState().imagePreference;
   const layout = LayoutRegistry[slideData.layoutId];
   if (!layout) {
     console.error(`Layout ${slideData.layoutId} not found`);
@@ -56,8 +61,19 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
     const layoutSlot = layout.slots.find((s) => s.id === slotId);
     if (!layoutSlot) return;
 
+    let data = slotData;
     console.log(layoutSlot);
     let widgetType = "paragraph";
+
+    //@ts-ignore
+    if (pref === "stock" && slotData.imagePrompt) {
+      data = {
+        imageUrl:
+          "https://res.cloudinary.com/dcuxne34n/image/upload/v1761637833/ai-generated-images/jzyhx6xug4nltulbxhgz.png",
+        alt: "",
+        objectFit: "cover",
+      };
+    }
 
     const componentPath =
       layoutSlot.defaultComponentPath || "@/components/widgets/paragraph";
@@ -86,7 +102,7 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
     widgets[nanoid(7)] = {
       id: nanoid(7),
       widgetType,
-      data: slotData,
+      data: data,
       position: {
         x: positionedSlot.x,
         y: positionedSlot.y,

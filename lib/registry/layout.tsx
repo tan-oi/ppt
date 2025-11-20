@@ -104,12 +104,12 @@ export const LayoutRegistry: Record<string, Layout> = {
     description: "Main heading followed by three feature cards",
     layoutType: "Only Text",
   },
-  "big-number": {
-    slots: BigNumberWithContext,
-    name: "Big Display",
-    description: "Emphasize a key metric or statistic with context",
-    layoutType: "Only Text",
-  },
+  // "big-number": {
+  //   slots: BigNumberWithContext,
+  //   name: "Big Display",
+  //   description: "Emphasize a key metric or statistic with context",
+  //   layoutType: "Only Text",
+  // },
   "text-over-image": {
     slots: TextOverImage,
     name: "Hero with Overlay",
@@ -174,3 +174,24 @@ export const LayoutRegistry: Record<string, Layout> = {
      *Format:* Massive number/stat + context paragraph explaining significance
   
  */
+
+
+     /* for llm generations */
+     export const baseLayouts = [
+      "main-pointer",
+      "heading-paragraph",
+      "two-column",
+      "three-sections",
+      "title",
+      "four-quadrants",
+      "header-three-cards",
+      "stat-showcase",
+      "centered-callout",
+    ];
+
+    export const imageLayouts = [
+      "image-caption",
+      "image-text-split",
+      "two-media-paragraph",
+    ];
+    

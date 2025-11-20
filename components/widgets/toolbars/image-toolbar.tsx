@@ -6,7 +6,6 @@ import { Upload, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 
-
 export function ImageToolbar() {
   const editBuffer = useUIStore((s) => s.editBuffer);
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
@@ -26,51 +25,50 @@ export function ImageToolbar() {
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-  
+
     if (!file.type.startsWith("image/")) {
       alert("Please select an image file");
       return;
     }
-  
+
     if (file.size > 10 * 1024 * 1024) {
       alert("Image must be less than 10MB");
       return;
     }
-  
+
     setUploading(true);
     setProcessing(true);
-  
+
     try {
-      console.log("📤 Uploading file:", file.name);
-  
+      console.log("Uploading file:", file.name);
+
       const formData = new FormData();
       formData.append("file", file);
-  
-      // ✅ Use fetch instead of server action
+
       const response = await fetch("/api/upload-image", {
         method: "POST",
         body: formData,
       });
-  
+
       if (!response.ok) {
         throw new Error("Upload failed");
       }
-  
+
       const result = await response.json();
-  
+
       if (result.error) {
         throw new Error(result.error);
       }
-  
-      console.log("✅ Got URL:", result.url);
-  
+
+      console.log("Got URL:", result.url);
+
       handleUpdate("imageUrl", result.url);
-  
+
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     } catch (error) {
-      console.error("💥 Upload error:", error);
+      console.error("Upload error:", error);
       alert(error instanceof Error ? error.message : "Failed to upload image");
     } finally {
       setUploading(false);
@@ -108,6 +106,7 @@ export function ImageToolbar() {
           </>
         )}
       </Button>
+      <div className="w-px h-8 bg-gradient-to-b from-transparent via-zinc-600 to-transparent" />
 
       <BaseDropdown
         tooltip="Select the fit"

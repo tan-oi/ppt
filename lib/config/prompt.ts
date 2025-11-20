@@ -6,20 +6,20 @@ export type PresentationTone =
   | "inspirational"
   | "minimalist";
 
-
-
 export function buildPresentationPrompt({
   instructions,
   slidesNo,
   type,
   style,
   tone = "professional",
+  maxImagesAllowed = 0,
 }: {
   instructions: string;
   slidesNo: number;
   type: "text" | "prompt" | "link";
   style?: "preserve" | "extend" | "base";
   tone?: PresentationTone;
+  maxImagesAllowed?: number;
 }) {
   const toneProfiles = {
     professional: {
@@ -30,7 +30,7 @@ export function buildPresentationPrompt({
         '"73% of enterprises report...", "According to McKinsey research..."',
       layouts:
         "Prefer heading-paragraph, two-column, header-three-cards for clarity",
-      emoji: "❌ Never use emojis",
+      emoji: "Never use emojis",
       contentLength:
         "Keep it slide-appropriate: 2–4 sentence paragraphs (40–60 words max).",
     },
@@ -41,7 +41,7 @@ export function buildPresentationPrompt({
       examples:
         '"Sleep is your brain\'s night shift", "Your neurons throw a cleaning party at 3 AM"',
       layouts: "Mix big-number, main-pointer, title for dramatic impact",
-      emoji: "✨ Use sparingly for emphasis (1–2 per presentation)",
+      emoji: "Use sparingly for emphasis (1–2 per presentation)",
       contentLength:
         "Punchy 2–3 sentence statements for impact, or vivid 3–5 sentence narratives.",
     },
@@ -53,7 +53,7 @@ export function buildPresentationPrompt({
         '"Here\'s the thing...", "Think about it this way...", "We\'ve all been there"',
       layouts:
         "Prefer header-three-cards, two-column, heading-paragraph — keep it scannable.",
-      emoji: "👍 Use naturally where it feels right",
+      emoji: " Use naturally where it feels right",
       contentLength:
         "Conversational 2–3 sentence explanations that flow naturally.",
     },
@@ -65,7 +65,7 @@ export function buildPresentationPrompt({
         '"Peer-reviewed studies (n=1,247) demonstrate...", "Meta-analysis by Walker et al. (2023)"',
       layouts:
         "Favor three-sections, heading-paragraph, two-column for systematic argumentation.",
-      emoji: "❌ Never use emojis",
+      emoji: " Never use emojis",
       contentLength:
         "Detailed: 3–5 sentence paragraphs (60–90 words). Include citations where relevant.",
     },
@@ -75,7 +75,7 @@ export function buildPresentationPrompt({
         "Use powerful verbs, transformation language, future-focused phrasing.",
       examples: '"Imagine waking up energized...", "Transform your life by..."',
       layouts: "Use title, big-number, main-pointer for emotional peaks.",
-      emoji: "💪 Use motivational emojis strategically.",
+      emoji: "Use motivational emojis strategically.",
       contentLength:
         "Compelling 2–4 sentence calls to action or inspiring narratives.",
     },
@@ -86,7 +86,7 @@ export function buildPresentationPrompt({
       examples:
         '"Sleep = Performance", "8 hours. Every night. Non-negotiable."',
       layouts: "Heavy use of title, big-number. Avoid dense layouts entirely.",
-      emoji: "⚡ One per slide maximum, for punch.",
+      emoji: "One per slide maximum, for punch.",
       contentLength: "Ultra-concise: 5–10 words per statement.",
     },
   };
@@ -108,9 +108,90 @@ export function buildPresentationPrompt({
     link: "You have referenced material. Extract key insights and structure them into a coherent presentation.",
   };
 
-  return `🎨 **PRESENTATION ARCHITECT MODE: ${tone.toUpperCase()} STYLE** 🎨
+  const imageLayoutSection =
+    maxImagesAllowed > 0
+      ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   **IMAGE LAYOUT UTILIZATION RULE**
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   
-You are a world-class presentation designer creating a ${tone} presentation that ${
+  Use image-based layouts when the slide's content gains clarity, emphasis, or contextual grounding from a visual. Do not default to text-only layouts when imagery provides a clearer or stronger representation.
+  
+  • If ${slidesNo} < 5:
+    – You may include up to **one** image-based layout (maximum allowed: ${maxImagesAllowed}).
+    – Use it only if a visual meaningfully strengthens the explanation.
+    – If no slide benefits from imagery, use none.
+  
+  • If ${slidesNo} ≥ 5:
+    – You may include up to **${Math.min(
+      2,
+      maxImagesAllowed
+    )}** image-based layouts.
+    – Select them only when a visual enhances comprehension, comparison, or narrative flow.
+    – Never exceed ${maxImagesAllowed} image-based layouts.
+  
+  • Do not avoid image layouts when they are a natural fit for the concept.
+  • Do not use image layouts as decoration; use them only when they add semantic value.
+  
+  `
+      : `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   **IMAGE LAYOUT RESTRICTION**
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  **IMPORTANT:** Your current plan does not allow image-based layouts.
+  
+  • DO NOT use any of these layouts: "image-caption", "image-text-split", "two-media-paragraph"
+  • Use only TEXT-BASED layouts for all slides
+  • Focus on creating compelling content using text layouts exclusively
+  
+  `;
+
+  const layoutAssignmentRules =
+    maxImagesAllowed > 0
+      ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   **LAYOUT ASSIGNMENT RULES**
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  When assigning \`layoutType\`, select the most contextually appropriate layout according to slide function:
+  
+    --- TEXT---
+  • Use **"title"** for opening slides and closing slides. Keep it short, brief to the point.   
+  • Use **"heading-paragraph"** for introductions, definitions, concepts, or detailed explanations.  
+  • Use **"two-column"** for comparisons, causes vs effects, or opposing viewpoints.  
+  • Use **"three-sections"** for processes, frameworks, or grouped principles.  
+  • Use **"header-three-cards"** for multiple examples, benefits, or key pillars.  
+  • Use **"four-quadrants"** for strategic matrices, multi-factor analyses, or classification models.  
+  • Use **"stat-showcase"** for quantitative findings, metrics, or survey results.  
+  • Use **"centered-callout"** for conclusions, insights, or future directives.
+  
+  
+    --IMAGE--
+   * Use **"image-caption"** for single visual emphasis, figure highlights, or context-setting illustrations. 
+    * Use "image-text-split" for visual–explanation pairing, concept–diagram breakdowns, or insight tied to imagery
+    * Use"two-media-paragraph" for dual visuals supporting a unified idea, before–after displays, or comparative illustrations
+  
+  Do not assign the same layout to every slide. Maintain variety that aligns with slide intent and narrative pacing.
+  `
+      : `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   **LAYOUT ASSIGNMENT RULES**
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  When assigning \`layoutType\`, select the most contextually appropriate TEXT-BASED layout according to slide function:
+  
+  • Use **"title"** for opening slides and closing slides. Keep it short, brief to the point.   
+  • Use **"heading-paragraph"** for introductions, definitions, concepts, or detailed explanations.  
+  • Use **"two-column"** for comparisons, causes vs effects, or opposing viewpoints.  
+  • Use **"three-sections"** for processes, frameworks, or grouped principles.  
+  • Use **"header-three-cards"** for multiple examples, benefits, or key pillars.  
+  • Use **"four-quadrants"** for strategic matrices, multi-factor analyses, or classification models.  
+  • Use **"stat-showcase"** for quantitative findings, metrics, or survey results.  
+  • Use **"centered-callout"** for conclusions, insights, or future directives.
+  
+  Do not assign the same layout to every slide. Maintain variety that aligns with slide intent and narrative pacing.
+  `;
+
+  return ` **PRESENTATION ARCHITECT MODE: ${tone.toUpperCase()} STYLE** 
+    
+  You are a world-class presentation designer creating a ${tone} presentation that ${
     tone === "professional"
       ? "commands credibility and clarity"
       : tone === "creative"
@@ -123,133 +204,96 @@ You are a world-class presentation designer creating a ${tone} presentation that
       ? "drives motivation and change"
       : "delivers maximum clarity with minimal words"
   }.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 **PROJECT BRIEF**
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-**Topic:** "${instructions}"
-**Slides:** ${slidesNo}
-**Content Type:** ${type} — ${typeGuidance[type]}
-**Design Philosophy:** ${
+  
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   **PROJECT BRIEF**
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  **Topic:** "${instructions}"
+  **Slides:** ${slidesNo}
+  **Content Type:** ${type} — ${typeGuidance[type]}
+  **Design Philosophy:** ${
     style
       ? styleGuidance[style]
       : "Polished, data-grounded, and structurally coherent presentation."
   }
-**Tone:** ${tone.toUpperCase()} — ${selectedTone.voice}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧭 **SLIDE CONTENT GUIDELINE**
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-For every slide, generate a single key \`"slideDescription"\` instead of bullet pointers.
-
-Write **one cohesive paragraph (3–5 sentences)** that expresses the slide’s central message, data theme, or conceptual insight in neutral, formal language.
-
-• Do NOT list or separately describe quadrants, columns, or cards.  
-• Integrate all sub-ideas naturally into a continuous explanation.  
-• Maintain the assigned tone; avoid creative self-references such as “this slide” or “we will discuss.”  
-• Use quantitative or causal phrasing naturally, but without enumeration.  
-• Each paragraph must read as a concise, standalone executive summary.
-
-**Example**
-❌ Wrong: “1. Cool roofs reduce load. 2. Tree canopy lowers temperature. 3. Smart design improves airflow.”  
-✅ Right: “Key mitigation measures include reflective roofing, expanded urban greenery, and optimized city airflow design, collectively reducing heat accumulation and energy demand.”
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🖼️ **IMAGE LAYOUT UTILIZATION RULE**
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Use image-based layouts when the slide’s content gains clarity, emphasis, or contextual grounding from a visual. Do not default to text-only layouts when imagery provides a clearer or stronger representation.
-
-• If ${slidesNo} < 5:
-  – You may include up to **one** image-based layout.
-  – Use it only if a visual meaningfully strengthens the explanation.
-  – If no slide benefits from imagery, use none.
-
-• If ${slidesNo} ≥ 5:
-  – You may include up to **two** image-based layouts.
-  – Select them only when a visual enhances comprehension, comparison, or narrative flow.
-  – Never exceed two unless explicitly instructed elsewhere.
-
-• Do not avoid image layouts when they are a natural fit for the concept.
-• Do not use image layouts as decoration; use them only when they add semantic value.
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧩 **LAYOUT ASSIGNMENT RULES**
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-When assigning \`layoutType\`, select the most contextually appropriate layout according to slide function:
-
-  --- TEXT---
-• Use **"title"** for opening slides and closing slides. Keep it short, brief to the point.   
-• Use **"heading-paragraph"** for introductions, definitions, concepts, or detailed explanations.  
-• Use **"two-column"** for comparisons, causes vs effects, or opposing viewpoints.  
-• Use **"three-sections"** for processes, frameworks, or grouped principles.  
-• Use **"header-three-cards"** for multiple examples, benefits, or key pillars.  
-• Use **"four-quadrants"** for strategic matrices, multi-factor analyses, or classification models.  
-• Use **"stat-showcase"** for quantitative findings, metrics, or survey results.  
-• Use **"centered-callout"** for conclusions, insights, or future directives.
-
-
-  --IMAGE--
- * Use **"image-caption"** for single visual emphasis, figure highlights, or context-setting illustrations. 
-  * Use "image-text-split" for visual–explanation pairing, concept–diagram breakdowns, or insight tied to imagery
-  * Use"two-media-paragraph" for dual visuals supporting a unified idea, before–after displays, or comparative illustrations
-
-Do not assign the same layout to every slide. Maintain variety that aligns with slide intent and narrative pacing.
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📐 **NARRATIVE SHAPING GUIDELINE**
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Structure the presentation with a clear logical flow across ${slidesNo} slides:
-
-• **Opening (≈20%)** → Establish context, define the problem, and articulate why the topic matters.  
-  *Layouts:* title, heading-paragraph.  
-
-• **Core Development (≈60%)** → Present evidence, frameworks, or analysis.  
-  Each slide should expand naturally from the previous one — no repetition.  
-  *Layouts:* two-column, three-sections, header-three-cards, stat-showcase.  
-
-• **Closing (≈20%)** → Synthesize insights and recommend forward direction or action.  
-  *Layouts:* four-quadrants (if summarizing multi-factor outcomes) or centered-callout (if issuing strategic takeaways).  
-
-Ensure slides progress logically — each should **extend or resolve** the previous one, never restart the argument.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📤 **OUTPUT FORMAT**
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-For each slide, output the following:
-
-\`\`\`json
-{
-  "slideHeading": "[Slide Title]",
-  "layoutType": "[Layout]",
-  "pointers": "A cohesive 3–5 sentence paragraph presenting the slide’s main idea, context, and relevance in professional tone."
-}
-\`\`\`
-
-No lists, enumeration, or meta phrasing. Each paragraph should clearly convey what the slide communicates, not how it is structured.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ **QUALITY STANDARDS**
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-□ Consistent ${tone} voice across all slides.  
-□ Logical narrative flow from opening → body → conclusion.  
-□ Each \`slideDescription\` adheres to ${selectedTone.contentLength}.  
-□ Terminology consistent throughout.  
-□ No creative self-reference or redundant phrasing.  
-□ JSON must be valid and serializable.
-
-Now create a ${tone} presentation outline with ${slidesNo} slides, each containing a single, well-written paragraph under \`"slideDescription"\`.
-
-BEGIN ${tone.toUpperCase()} PRESENTATION OUTLINE:`;
+  **Tone:** ${tone.toUpperCase()} — ${selectedTone.voice}
+  
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  **SLIDE CONTENT GUIDELINE**
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  For every slide, generate a single key \`"slideDescription"\` instead of bullet pointers.
+  
+  Write **one cohesive paragraph (3–5 sentences)** that expresses the slide's central message, data theme, or conceptual insight in neutral, formal language.
+  
+  • Do NOT list or separately describe quadrants, columns, or cards.  
+  • Integrate all sub-ideas naturally into a continuous explanation.  
+  • Maintain the assigned tone; avoid creative self-references such as "this slide" or "we will discuss."  
+  • Use quantitative or causal phrasing naturally, but without enumeration.  
+  • Each paragraph must read as a concise, standalone executive summary.
+  
+  **Example**
+   Wrong: "1. Cool roofs reduce load. 2. Tree canopy lowers temperature. 3. Smart design improves airflow."  
+   Right: "Key mitigation measures include reflective roofing, expanded urban greenery, and optimized city airflow design, collectively reducing heat accumulation and energy demand."
+  
+  
+  ${imageLayoutSection}
+  ${layoutAssignmentRules}
+  
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  **NARRATIVE SHAPING GUIDELINE**
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  Structure the presentation with a clear logical flow across ${slidesNo} slides:
+  
+  • **Opening (≈20%)** → Establish context, define the problem, and articulate why the topic matters.  
+    *Layouts:* title, heading-paragraph.  
+  
+  • **Core Development (≈60%)** → Present evidence, frameworks, or analysis.  
+    Each slide should expand naturally from the previous one — no repetition.  
+    *Layouts:* two-column, three-sections, header-three-cards, stat-showcase.  
+  
+  • **Closing (≈20%)** → Synthesize insights and recommend forward direction or action.  
+    *Layouts:* four-quadrants (if summarizing multi-factor outcomes) or centered-callout (if issuing strategic takeaways).  
+  
+  Ensure slides progress logically — each should **extend or resolve** the previous one, never restart the argument.
+  
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   **OUTPUT FORMAT**
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  For each slide, output the following:
+  
+  \`\`\`json
+  {
+    "slideHeading": "[Slide Title]",
+    "layoutType": "[Layout]",
+    "pointers": "A cohesive 3–5 sentence paragraph presenting the slide's main idea, context, and relevance in professional tone."
+  }
+  \`\`\`
+  
+  No lists, enumeration, or meta phrasing. Each paragraph should clearly convey what the slide communicates, not how it is structured.
+  
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ **QUALITY STANDARDS**
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  □ Consistent ${tone} voice across all slides.  
+  □ Logical narrative flow from opening → body → conclusion.  
+  □ Each \`slideDescription\` adheres to ${selectedTone.contentLength}.  
+  □ Terminology consistent throughout.  
+  □ No creative self-reference or redundant phrasing.  
+  □ JSON must be valid and serializable.
+  ${
+    maxImagesAllowed === 0
+      ? "NO image-based layouts used (image layouts not available in your plan)."
+      : `Image-based layouts limited to maximum ${maxImagesAllowed}.`
+  }
+  
+  Now create a ${tone} presentation outline with ${slidesNo} slides, each containing a single, well-written paragraph under \`"slideDescription"\`.
+  
+  BEGIN ${tone.toUpperCase()} PRESENTATION OUTLINE:`;
 }
 
 export const SYSTEM_PROMPT = `

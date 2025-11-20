@@ -18,7 +18,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBlankPresentation } from "@/app/create/action";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
+import { toast } from "sonner";
 
 export function NewPresentation() {
   const [open, setOpen] = useState<boolean>(false);
@@ -34,7 +35,14 @@ export function NewPresentation() {
     if (result.success) {
       router.push(`/docs/${result.id}`);
     } else {
-      alert(result.error || "Failed to create presentation");
+      toast.error(result.error || "Failed to create presentation");
+
+      if (result.upgrade) {
+        setTimeout(() => {
+          alert("Upgrade to another plan");
+        }, 2000);
+      }
+
       setIsCreating(false);
     }
   };
@@ -95,7 +103,7 @@ export function NewPresentation() {
                   hidden: {},
                   visible: {
                     transition: {
-                      staggerChildren: 0.2,
+                      staggerChildren: 0.1,
                       delayChildren: 0.1,
                       duration: 0.25,
                       ease: [0.16, 1, 0.3, 1],

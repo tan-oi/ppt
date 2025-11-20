@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { usePresentationStore } from "../store/presentation-store";
 import { WidgetRegistry } from "../registry/widget";
+import { WidgetMetadata } from "../core/widget-metadata";
 
 export function useSlideDragDrop(slideScale: number) {
   const [activeElement, setActiveElement] = useState<any>(null);
@@ -31,7 +32,9 @@ export function useSlideDragDrop(slideScale: number) {
 
       const slug = active?.data?.current?.slug;
       const slideId = String(over?.id);
-      const data = WidgetRegistry[slug].defaultData;
+      type WidgetKey = keyof typeof WidgetMetadata;
+
+      const data = WidgetMetadata[slug as WidgetKey].defaultData;
 
       usePresentationStore
         .getState()

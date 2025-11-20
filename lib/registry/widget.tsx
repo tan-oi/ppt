@@ -11,6 +11,7 @@ import { ButtonLinkWidget } from "@/components/widgets/links/base";
 import { ParagraphWidget } from "@/components/widgets/paragraph";
 import { ProgressBarWidget } from "@/components/widgets/progress-bar";
 import { HeadingWidget } from "@/components/widgets/headings";
+import { StatWidget } from "@/components/widgets/stat-widget";
 interface WidgetConfig {
   slug: string;
   type: "text" | "chart" | "image" | "decoration";
@@ -34,7 +35,7 @@ export const WidgetRegistry: Record<string, WidgetConfig> = {
       content: "Add Your Heading Here",
       level: 1,
     },
-    defaultPosition: { x: 80, y: 60, width: 200, height: 80 },
+    defaultPosition: { x: 80, y: 60, width: 400, height: 100 },
     description:
       "Headings frobm level 1 to 3 to be written while emphasising on a topic",
   },
@@ -258,11 +259,25 @@ export const WidgetRegistry: Record<string, WidgetConfig> = {
     component: ImageWidget,
     defaultData: {
       imageUrl:
-        "https://cdn.cosmos.so/9f93c036-e0fd-4e83-8ff2-bace67bf9886?format=jpeg",
+        "https://res.cloudinary.com/dcuxne34n/image/upload/v1761637833/ai-generated-images/jzyhx6xug4nltulbxhgz.png",
       alt: "Slide image demo",
       objectFit: "contain",
     },
     defaultPosition: { x: 150, y: 150, width: 400, height: 300 },
     description: "Add images to your slides with upload support",
+  },
+  statWidget: {
+    slug: "statWidget",
+    type: "text",
+    component: StatWidget,
+    defaultData: {
+      value: "85%",
+      label: "Customer Satisfaction",
+      trend: "up",
+      trendValue: "+12%",
+      unit: "",
+    },
+    defaultPosition: { x: 100, y: 150, width: 400, height: 350 },
+    description: "Large impactful number with trend indicator",
   },
 };

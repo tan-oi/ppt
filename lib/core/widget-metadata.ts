@@ -4,7 +4,35 @@ export const WidgetMetadata = {
     type: "text",
     path: "@/components/widgets/headings",
     defaultData: {
-      content: "Add Your Heading Here",
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            attrs: {
+              textAlign: null,
+            },
+            content: [
+              {
+                type: "text",
+                marks: [
+                  {
+                    type: "textStyle",
+                    attrs: {
+                      fontSize: "24px",
+                      color: null,
+                    },
+                  },
+                  {
+                    type: "bold",
+                  },
+                ],
+                text: "Add Your Heading Here",
+              },
+            ],
+          },
+        ],
+      },
       level: 1,
     },
     defaultPosition: { x: 80, y: 60, width: 400, height: 100 },
@@ -17,8 +45,24 @@ export const WidgetMetadata = {
     path: "@/components/widgets/paragraph",
 
     defaultData: {
-      content:
-        "Click to edit this paragraph. Add your key points, explanations, or supporting details here.",
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            attrs: {
+              textAlign: null,
+            },
+            content: [
+              {
+                type: "text",
+
+                text: "Click to edit this paragraph. Add your key points, explanations, or supporting details here.",
+              },
+            ],
+          },
+        ],
+      },
     },
     defaultPosition: { x: 80, y: 200, width: 500, height: 120 },
     description: "Normal paragraphs to write",
@@ -28,8 +72,34 @@ export const WidgetMetadata = {
     type: "text",
     path: "@/components/widgets/cards/features",
     defaultData: {
-      title: "Key Feature",
-      body: "Describe the main benefit or feature that makes your solution stand out. Focus on value and impact.",
+      title: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "Key features.",
+              },
+            ],
+          },
+        ],
+      },
+      body: {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "Describe the main benefit or feature that makes your solution stand out. Focus on value and impact.",
+              },
+            ],
+          },
+        ],
+      },
     },
     defaultPosition: { x: 80, y: 180, width: 380, height: 280 },
     description: "Card to highlight a feature or an example",
@@ -61,8 +131,94 @@ export const WidgetMetadata = {
     type: "text",
     path: "@/components/widgets/cards/list",
     defaultData: {
-      content:
-        "<ul><li>Increase productivity by 40%</li><li>Reduce operational costs</li><li>Improve team collaboration</li><li>Scale effortlessly</li></ul>",
+      type: "bullet",
+      content: {
+        type: "doc",
+        content: [
+          {
+            type: "bulletList",
+            attrs: {
+              textAlign: null,
+            },
+            content: [
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    attrs: {
+                      textAlign: null,
+                    },
+                    content: [
+                      {
+                        text: "Increase productivity by 40%",
+                        type: "text",
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    attrs: {
+                      textAlign: null,
+                    },
+                    content: [
+                      {
+                        text: "Reduce operational costs",
+                        type: "text",
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    attrs: {
+                      textAlign: null,
+                    },
+                    content: [
+                      {
+                        text: "Improve team collaboration",
+                        type: "text",
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    attrs: {
+                      textAlign: null,
+                    },
+                    content: [
+                      {
+                        text: "Scale effortlessly",
+                        type: "text",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "paragraph",
+            attrs: {
+              textAlign: null,
+            },
+          },
+        ],
+      },
     },
     defaultPosition: { x: 80, y: 200, width: 450, height: 350 },
     description: "A list card",
