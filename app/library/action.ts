@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { lightLimit } from "@/lib/rate-limit";
+import { incrementUserCache, updateUserCache } from "@/lib/functions/userCache";
 
 export async function deletePresentation(presentationId: string) {
   try {
@@ -51,6 +52,8 @@ export async function deletePresentation(presentationId: string) {
     await prisma.presentation.delete({
       where: { id: presentationId },
     });
+
+    await incrementUserCache(id, "pptCount", -1);
 
     revalidatePath("/library");
 

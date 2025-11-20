@@ -6,6 +6,7 @@ import { nanoid } from "nanoid";
 import { prisma } from "@/lib/prisma";
 import { strictLimit } from "@/lib/rate-limit";
 import { canCreatePresentation } from "@/lib/functions/plan-enforcement";
+import { incrementUserCache } from "@/lib/functions/userCache";
 
 export async function createBlankPresentation() {
   const session = await auth.api.getSession({
@@ -84,6 +85,8 @@ export async function createBlankPresentation() {
         },
       },
     });
+
+    await incrementUserCache(userId, "pptCount", 1);
 
     return { success: true, id };
   } catch (err) {

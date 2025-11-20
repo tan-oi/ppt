@@ -63,3 +63,13 @@ export async function preloadUserCache(userId: string, fields: fieldsT[]) {
   await ensureUserCache(userId);
   return await getUserCache(userId, fields);
 }
+
+
+export async function incrementUserCache(
+  userId: string,
+  field: string,
+  amount = 1
+) {
+  const key = getRedisKey(userId);
+  await redis.hincrby(key, field, amount);
+}
