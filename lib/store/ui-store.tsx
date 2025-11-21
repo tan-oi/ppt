@@ -30,6 +30,8 @@ interface WidgetPositionChange {
 }
 
 interface UIStore {
+  showAuth: boolean;
+  toggleAuth: (value: boolean) => void;
   toolbarOpen: boolean;
   drawerOpen: boolean;
   selectedWidget: WidgetData | null;
@@ -61,11 +63,16 @@ interface UIStore {
 export const useUIStore = create<UIStore>((set, get) => ({
   toolbarOpen: false,
   drawerOpen: false,
+  showAuth: false,
   editBuffer: null,
   selectedWidget: null,
   isProcessing: false,
   presentationMode: false,
 
+  toggleAuth: (value) =>
+    set((state) => ({
+      showAuth: value,
+    })),
   setPresentationMode: (mode) =>
     set({
       presentationMode: mode,

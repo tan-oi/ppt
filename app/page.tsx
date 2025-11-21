@@ -1,8 +1,10 @@
+import { LoginGate } from "@/components/base/user-auth";
 import { CallToAction } from "@/components/landing/cta";
 import { FaqsSection } from "@/components/landing/faq";
 import { Features } from "@/components/landing/features";
 import { HeroComponent } from "@/components/landing/hero";
 import { Navbar } from "@/components/landing/navbar";
+import Signin from "@/components/sign-in";
 import Image from "next/image";
 
 export default function App() {
@@ -13,15 +15,15 @@ export default function App() {
         <div className="min-h-screen">
           <div className="pt-28 w-full">
             <HeroComponent />
-            <div className="max-w-7xl min-h-screen p-8 bg-card mx-auto rounded-xl mt-10">
+            {/* <div className="max-w-7xl min-h-screen p-8 bg-card mx-auto rounded-xl mt-10">
               <Image
                 src={"/demo.png"}
-                width={800}
+                width={800}b
                 height={100}
                 className="w-full"
                 alt="demo image"
               />
-            </div>
+            </div> */}
 
             <div className="mt-4 w-full">
               <Features />
@@ -37,6 +39,9 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      <LoginGate />
+      <Signin />
     </>
   );
 }

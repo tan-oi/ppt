@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +10,11 @@ import {
 import { Loader2, X, Command, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 import { authClient } from "@/lib/auth-client";
+import { useUIStore } from "@/lib/store/ui-store";
 
-export default function Check() {
-  const [open, setOpen] = useState(false);
+export default function Signin() {
+  const showAuth = useUIStore((s) => s.showAuth);
+  const toggleAuth = useUIStore((s) => s.toggleAuth);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -30,13 +31,7 @@ export default function Check() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="h-9 px-4 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200 cursor-pointer shadow-sm">
-          Join
-        </Button>
-      </DialogTrigger>
-
+    <Dialog open={showAuth} onOpenChange={toggleAuth}>
       <DialogContent className="p-0 overflow-hidden bg-transparent border-0 shadow-none sm:max-w-[380px] focus:outline-none [&>button]:hidden">
         <DialogTitle className="sr-only">Sign In</DialogTitle>
 
@@ -52,7 +47,8 @@ export default function Check() {
           />
 
           <button
-            onClick={() => setOpen(false)}
+            type="button"
+            onClick={() => toggleAuth(false)}
             className="absolute top-4 right-4 z-50 p-2 text-zinc-500 hover:text-zinc-200 transition-colors rounded-full hover:bg-white/5 outline-none"
           >
             <X size={16} />
@@ -97,6 +93,7 @@ export default function Check() {
               className="w-full space-y-3"
             >
               <button
+                type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
                 className="group relative w-full h-12 bg-white text-black font-medium rounded-xl flex items-center justify-center gap-3 transition-all hover:bg-zinc-100 active:scale-[0.98] disabled:opacity-80 overflow-hidden shadow-[0_0_30px_-10px_rgba(255,255,255,0.3)]"

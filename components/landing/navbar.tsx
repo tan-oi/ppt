@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useUIStore } from "@/lib/store/ui-store";
 
 const menuItems = [
   { name: "Features", href: "#features" },
@@ -87,10 +88,13 @@ export const Navbar = () => {
                 </ul>
               </div>
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <Button asChild size="sm" className="inline-flex">
-                  <Link href="#">
-                    <span>Get Started</span>
-                  </Link>
+                <Button
+                  asChild
+                  size="sm"
+                  className="inline-flex"
+                  onClick={() => useUIStore.getState().toggleAuth(true)}
+                >
+                  <span>Get Started</span>
                 </Button>
               </div>
             </div>

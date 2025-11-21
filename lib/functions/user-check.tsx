@@ -7,7 +7,7 @@ export async function requireUser() {
     headers: await headers(),
   });
 
-  if (!session?.user) redirect("/check");
+  if (!session?.user) redirect("/?login=true");
 
   return session.user;
 }

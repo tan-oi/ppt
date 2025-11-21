@@ -3,7 +3,6 @@ import { ShareOption } from "@/components/share-option";
 import { auth } from "@/lib/auth";
 import { getPresentationById } from "@/lib/functions/getPresentation";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { toggleSharePresentation } from "./action";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
