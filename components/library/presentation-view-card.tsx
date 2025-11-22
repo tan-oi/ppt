@@ -96,7 +96,7 @@ export function PresentationCard({
         </div>
       )}
 
-      <div className="relative h-48 bg-neutral-900/50 overflow-hidden flex-shrink-0">
+      <div className="relative h-48 bg-neutral-900/50 overflow-hidden shrink-0">
         <svg
           className="absolute inset-0 w-full h-full"
           viewBox="0 0 400 300"
@@ -199,7 +199,7 @@ export function PresentationCard({
             <Button
               size="icon"
               variant={"link"}
-              className="h-8 w-8 rounded-md transition-colors duration-200 text-neutral-400 rounded cursor-pointer hover:text-neutral-200 hover:scale-[1.02]"
+              className="h-8 w-8 rounded-md transition-colors duration-200 text-neutral-400 cursor-pointer hover:text-neutral-200 hover:scale-[1.02]"
             >
               <Edit className="w-3 h-3" />
             </Button>
@@ -226,7 +226,7 @@ export function PresentationCard({
               <Button
                 size="icon"
                 variant="link"
-                className="h-8 w-8 rounded-md transition-colors duration-200 text-neutral-400 hover:text-red-400 cursor-pointer hover:scale-[1.02]"
+                className="h-8 w-8 rounded-md transition-colors duration-200 text-neutral-400 hover:text-red-400 cursor-pointer hover:scale-115"
               >
                 <Trash2 className="w-3 h-3" />
               </Button>
@@ -257,7 +257,7 @@ export function PresentationCard({
               <div className="space-y-3 pt-2">
                 <p className="text-sm text-neutral-400 leading-relaxed">
                   You're about to permanently delete{" "}
-                  <span className="font-medium text-neutral-300">
+                  <span className="font-medium text-neutral-300 line-clamp-2">
                     "{item.topic}"
                   </span>{" "}
                   and all its slides.

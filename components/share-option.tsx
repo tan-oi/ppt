@@ -86,7 +86,7 @@ export function ShareOption({
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 text-zinc-400 hover:text-indigo-400 transition-colors"
+            className="h-8 w-8 text-zinc-400 hover:text-blue-500 transition-colors hover:bg-transparent hover:scale-110 hover:cursor-pointer"
           >
             <Share2 size={16} />
           </Button>
@@ -119,7 +119,6 @@ export function ShareOption({
                   Anyone with the link below can view this presentation.
                 </p>
 
-                {/* Custom Input Group */}
                 <div className="relative flex items-center">
                   <div className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-3 pr-12 py-2.5 text-sm text-zinc-300 font-mono truncate transition-all hover:border-zinc-700 focus-within:border-indigo-500/50 focus-within:ring-2 focus-within:ring-indigo-500/20">
                     {shareUrl}

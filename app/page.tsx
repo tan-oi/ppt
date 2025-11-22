@@ -6,6 +6,7 @@ import { HeroComponent } from "@/components/landing/hero";
 import { Navbar } from "@/components/landing/navbar";
 import Signin from "@/components/sign-in";
 import Image from "next/image";
+import { Suspense } from "react";
 
 export default function App() {
   return (
@@ -40,7 +41,9 @@ export default function App() {
         </div>
       </div>
 
+      <Suspense fallback={null}>
       <LoginGate />
+      </Suspense>
       <Signin />
     </>
   );
