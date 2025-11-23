@@ -5,7 +5,6 @@ import { Features } from "@/components/landing/features";
 import { HeroComponent } from "@/components/landing/hero";
 import { Navbar } from "@/components/landing/navbar";
 import Signin from "@/components/sign-in";
-import Image from "next/image";
 import { Suspense } from "react";
 
 export default function App() {
@@ -13,28 +12,17 @@ export default function App() {
     <>
       <div className="bg-background scroll-smooth">
         <Navbar />
-        <div className="min-h-screen">
-          <div className="pt-28 w-full">
+        <div className="min-h-screen ">
+          <div className="w-full">
             <HeroComponent />
-            {/* <div className="max-w-7xl min-h-screen p-8 bg-card mx-auto rounded-xl mt-10">
-              <Image
-                src={"/demo.png"}
-                width={800}b
-                height={100}
-                className="w-full"
-                alt="demo image"
-              />
-            </div> */}
 
-            <div className="mt-4 w-full">
+            <div className="mt-8 w-full">
               <Features />
             </div>
-
-            <div className="mt-4">
+            <div className="mt-8">
               <FaqsSection />
             </div>
-
-            <div className="mt-4">
+            <div className="mt-8">
               <CallToAction />
             </div>
           </div>
@@ -42,7 +30,7 @@ export default function App() {
       </div>
 
       <Suspense fallback={null}>
-      <LoginGate />
+        <LoginGate />
       </Suspense>
       <Signin />
     </>

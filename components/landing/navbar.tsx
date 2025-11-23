@@ -1,106 +1,50 @@
-"use client";
-import Link from "next/link";
-import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import React from "react";
-import { cn } from "@/lib/utils";
-import { useUIStore } from "@/lib/store/ui-store";
+import { AuthButton } from "../base/auth-button";
+import { Button } from "../ui/button";
 
-const menuItems = [
-  { name: "Features", href: "#features" },
-  { name: "Faqs", href: "#faq" },
-  { name: "Pricing", href: "#link" },
-  { name: "About", href: "#link" },
-];
-
-export const Navbar = () => {
-  const [menuState, setMenuState] = React.useState(false);
-  const [isScrolled, setIsScrolled] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+export function Navbar() {
   return (
     <header>
-      <nav
-        data-state={menuState && "active"}
-        className="fixed z-20 w-full px-2"
-      >
-        <div
-          className={cn(
-            "mx-auto mt-2 max-w-7xl px-6 transition-all duration-300 border-b border-px border-zinc-700 lg:px-12",
-            isScrolled &&
-              "bg-background max-w-4xl mx-auto rounded-2xl border backdrop-blur-md lg:px-5 "
-          )}
-        >
-          <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-2">
-            <div className="flex w-full justify-between lg:w-auto">
-              <Link
-                href="/"
-                aria-label="home"
-                className="flex items-center space-x-2 text-white"
-              >
-                logo
-              </Link>
-
-              <button
-                onClick={() => setMenuState(!menuState)}
-                aria-label={menuState == true ? "Close Menu" : "Open Menu"}
-                className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden"
-              >
-                <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
-                <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
-              </button>
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 w-[95%] max-w-fit">
+        <div className="bg-zinc-900/80 backdrop-blur-md border border-white/10 rounded-full pl-2 pr-2 py-2 flex gap-1 items-center shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 pl-3 pr-4 border-r border-white/10 mr-2 shrink-0">
+            <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-linear-to-tr from-transparent to-amber-500"></div>
             </div>
 
-            <div className="absolute inset-0 m-auto hidden size-fit lg:block">
-              <ul className="flex gap-8 text-sm">
-                {menuItems.map((item, index) => (
-                  <li key={index}>
-                    <Link
-                      href={item.href}
-                      className="text-muted-foreground hover:text-accent-foreground block duration-150"
-                    >
-                      <span>{item.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <span className="font-semibold tracking-tight text-sm text-white">
+              PPT
+            </span>
+          </div>
 
-            <div className="bg-background in-data-[state=active]:block lg:in-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
-              <div className="lg:hidden">
-                <ul className="space-y-6 text-base">
-                  {menuItems.map((item, index) => (
-                    <li key={index}>
-                      <Link
-                        href={item.href}
-                        className="text-muted-foreground hover:text-accent-foreground block duration-150"
-                      >
-                        <span>{item.name}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <Button
-                  asChild
-                  size="sm"
-                  className="inline-flex"
-                  onClick={() => useUIStore.getState().toggleAuth(true)}
-                >
-                  <span>Get Started</span>
-                </Button>
-              </div>
-            </div>
+          <div className="flex items-center gap-1 text-xs font-medium text-zinc-400 mr-2 shrink-0">
+            <a
+              href="#features"
+              className="hover:text-white hover:bg-white/5 px-3 py-1.5 rounded-full transition-all whitespace-nowrap"
+            >
+              Features
+            </a>
+
+            <a
+              href="#faq"
+              className="hover:text-white hover:bg-white/5 px-3 py-1.5 rounded-full transition-all whitespace-nowrap"
+            >
+              FAQ
+            </a>
+            <a
+              href="#roadmap"
+              className="hover:text-white hover:bg-white/5 px-3 py-1.5 rounded-full transition-all whitespace-nowrap"
+            >
+              Roadmap
+            </a>
+          </div>
+
+          <div />
+
+          <div className="flex items-center gap-2 pl-2 border-l border-white/10">
+            <AuthButton type="small" label={"Get started"} />
           </div>
         </div>
       </nav>
     </header>
   );
-};
+}

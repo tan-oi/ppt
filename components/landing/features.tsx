@@ -1,5 +1,6 @@
 import { Palette, Sparkles, Share2, Presentation, Link } from "lucide-react";
 import { Separator } from "../ui/separator";
+import * as motion from "motion/react-client";
 
 const featuredLayouts = [
   {
@@ -161,12 +162,13 @@ export function Features() {
   return (
     <>
       <div className="flex flex-col items-center py-10 space-y-8">
-        <div 
-        id="features"
-        className="flex flex-col items-center space-y-1 md:space-y-2 space-y-4">
-          <p className="text-amber-500 text-sm tracking-widest font-mono hover:underline">
+        <div
+          id="features"
+          className="flex flex-col items-center space-y-1 md:space-y-2"
+        >
+          <motion.p className="text-amber-500 text-sm tracking-widest font-mono hover:underline">
             Features
-          </p>
+          </motion.p>
           <p className="text-zinc-50 text-center text-md sm:text-xl md:text-3xl tracking-tighter">
             Everything you need to make quick & beautiful decks
           </p>
@@ -276,7 +278,7 @@ export function Features() {
                   </div>
                 ))}
 
-                <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-zinc-900/90 via-zinc-900/60 to-transparent flex items-end justify-center pointer-events-none pb-2">
+                <div className="absolute bottom-0 left-0 right-0 h-20 bg-linear-to-t from-zinc-900/90 via-zinc-900/60 to-transparent flex items-end justify-center pointer-events-none pb-2">
                   <p className="text-xs text-zinc-500 font-mono">
                     +22 more inside
                   </p>

@@ -104,7 +104,7 @@ export function GenerateClient({
       if (error.code === "UNAUTHORIZED") {
         toast.error("Not logged in, you'd be redirect in a couple of seconds");
         setTimeout(() => {
-          router.replace("/check");
+          router.replace("/?login=true");
         }, 1000);
         return;
       }

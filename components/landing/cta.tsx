@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { authClient } from "@/lib/auth-client";
 import { useUIStore } from "@/lib/store/ui-store";
+import { AuthButton } from "../base/auth-button";
 export function CallToAction() {
   const toggleAuth = useUIStore((s) => s.toggleAuth);
   // const handleBuy = async () => {
@@ -58,22 +59,13 @@ export function CallToAction() {
           required.
         </p>
 
-        <div className="pt-4">
-          <button
-            onClick={() => toggleAuth(true)}
-            className="group relative inline-flex items-center justify-center gap-2 px-10 py-4 text-base font-medium text-background bg-foreground rounded-full transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:scale-105 active:scale-95 hover:rotate-3 hover:cursor-pointer"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              Start Creating
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </span>
-            <div className="absolute inset-0 bg-linear-to-r from-primary to-primary/60 rounded-full opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
-          </button>
-        </div>
+        <div className="pt-4 flex flex-col gap-2 w-fit mx-auto">
+          <AuthButton type="large" label="Start creating" />
 
-        <p className="text-xs text-muted-foreground/50 pt-4">
-          Join • No credit card required
-        </p>
+          <p className="text-xs text-muted-foreground/50 pt-4">
+            Join • No credit card required
+          </p>
+        </div>
       </div>
     </div>
   );
