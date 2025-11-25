@@ -1,41 +1,71 @@
 import { Presentation } from "@/components/presentation";
 import { ShareOption } from "@/components/share-option";
-import { auth } from "@/lib/auth";
 import { getPresentationById } from "@/lib/functions/getPresentation";
-import { headers } from "next/headers";
 import { toggleSharePresentation } from "./action";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { requireUser } from "@/lib/functions/user-check";
+import { getGenerationRedisKey } from "@/lib/config/plan";
+import { redis } from "@/lib/rate-limit";
+import AccessStatus from "@/components/base/access-status";
 
 export default async function PresentationDoc({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const userId = (await requireUser()).id;
 
-  const { id } = await params;
-  const toBeGen = id.startsWith("ai-");
-  console.log(id);
+  let { id } = await params;
+  id = id.startsWith("ai-") ? id.slice(3) : id;
+  const { ticket } = await searchParams;
+
+  let allowGeneration = false;
+
+  if (typeof ticket === "string") {
+    const genKey = getGenerationRedisKey(ticket);
+
+    const rawData = await redis.getdel(genKey);
+
+    if (rawData) {
+      console.log(rawData);
+
+      //@ts-ignore
+      if (rawData.userId === userId && rawData.presentationId === id) {
+        allowGeneration = true;
+      }
+    }
+  }
+
   let presentationData = null;
 
-  if (!toBeGen) {
+  if (!allowGeneration) {
     presentationData = await getPresentationById(id, userId);
     if (!presentationData) {
-      return <p className="text-white">Presentation not found</p>;
+      return (
+        <AccessStatus
+          type="deleted"
+          title="Presentation not found"
+          description="Either this doesnt exist or the lookup is wrong"
+          backHref="/library"
+          backHrefLabel="library"
+          homeHref="/"
+        />
+      );
     }
   }
 
   return (
     <>
       <Presentation
-        llmToBeCalled={toBeGen}
+        llmToBeCalled={allowGeneration}
         presentationData={presentationData}
         id={id}
       />
       <div className="fixed top-4 right-4 z-50 backdrop-blur-xl px-4 py-2 rounded-xl flex items-center gap-2">
-        {!toBeGen && presentationData && (
+        {!allowGeneration && presentationData && (
           <ShareOption
             type="normal"
             shareUrl={`${process.env.NEXT_PUBLIC_APP_URL}/p/${id}`}

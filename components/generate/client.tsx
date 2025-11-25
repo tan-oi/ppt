@@ -45,12 +45,14 @@ export function GenerateClient({
   const setGenerateType = useGenerationStore((s) => s.setGenerateType);
   const setResult = useGenerationStore((s) => s.setResult);
   const setId = useGenerationStore((s) => s.setId);
+  const setTicket = useGenerationStore((s) => s.setTicket);
   const [screen, setScreen] = useState<"form" | "result">("form");
 
   const apiResponseSchema = z.object({
     slidesOutline: z.array(createOutlineSchema(maxImagesAllowed > 0)),
     presentationId: z.string(),
     transactionId: z.string().optional(),
+    ticket: z.string(),
   });
 
   useEffect(() => {
@@ -86,6 +88,7 @@ export function GenerateClient({
       toast.success("Outline created successfully");
       const id = `ai-${event.object.presentationId}`;
       setId(id);
+      setTicket(event.object.ticket);
 
       window.history.replaceState(
         null,

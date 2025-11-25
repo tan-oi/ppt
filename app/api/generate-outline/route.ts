@@ -10,6 +10,8 @@ import { nanoid } from "nanoid";
 import { deductCredits, refundCredits } from "@/lib/functions/credits";
 import { requestValidation } from "@/lib/functions/plan-enforcement";
 import { createOutlineSchema, requestSchema } from "@/lib/config/schema";
+import { redis } from "@/lib/rate-limit";
+import { getGenerationRedisKey } from "@/lib/config/plan";
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -103,6 +105,7 @@ export async function POST(req: Request) {
     }
 
     const presentationId = nanoid(10);
+    const checkTicket = nanoid(32);
 
     await prisma.outline.create({
       data: {
@@ -113,11 +116,22 @@ export async function POST(req: Request) {
         finalContent: "",
       },
     });
-
+    const genKey = getGenerationRedisKey(checkTicket);
+    await redis.set(
+      genKey,
+      JSON.stringify({
+        userId,
+        presentationId,
+      }),
+      {
+        ex: 300,
+      }
+    );
     return NextResponse.json(
       {
         slidesOutline: slideObject,
         presentationId,
+        ticket: checkTicket,
       },
       { status: 200 }
     );

@@ -177,11 +177,12 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
     useGenerationStore.getState().setResult(localSlides);
     useGenerationStore.getState().setImagePreference?.(imagePreference);
     const id = useGenerationStore.getState().id;
+    const ticket = useGenerationStore.getState().ticket;
     prepareForLLM();
 
     console.log(useGenerationStore.getState().processedOutline);
     console.log(useGenerationStore.getState().imagePreference);
-    router.push(`/docs/${id}`);
+    router.push(`/docs/${id}?ticket=${ticket}`);
   };
 
   if (!result) {
