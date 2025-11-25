@@ -65,3 +65,7 @@ export function getCreditCost(
 export function getRedisKey(userId: string) {
   return `user:${userId}:meta`;
 }
+
+export function getGenerationRedisKey(ticket: string) {
+  return `gen:ticket:${ticket}`;
+}

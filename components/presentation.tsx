@@ -22,7 +22,7 @@ import { useQueryState } from "nuqs";
 import { useGenerationStore } from "@/lib/store/generation-store";
 import { useAutoSave } from "@/lib/hooks/useAutoSave";
 import { z } from "zod";
-import { toast } from "sonner";
+
 import { AutoSaveIndicator } from "./auto-save-indicator";
 import {
   usePresentationKeyboard,
@@ -30,7 +30,9 @@ import {
 } from "@/lib/hooks/usePresentationKeyboard";
 import { useSlideDragDrop } from "@/lib/hooks/useSlideDragDrop";
 import { PresentationModeView } from "./presentation-mode";
-  import { usePresentationStore } from "@/lib/store/presentation-store";
+import { usePresentationStore } from "@/lib/store/presentation-store";
+import SlideLoader from "./base/loaders/slide-loader";
+import { toast } from "sonner";
 
   export function Presentation({
     llmToBeCalled,
@@ -82,7 +84,7 @@ import { PresentationModeView } from "./presentation-mode";
           });
 
           if (!res.ok) {
-            console.error("Failed to save the presentation!");
+            return;
           }
 
           window.history.replaceState(
@@ -134,6 +136,10 @@ import { PresentationModeView } from "./presentation-mode";
       if (llmToBeCalled && !presentationData) {
         setType("llm");
         const processedOutline = useGenerationStore.getState().processedOutline;
+        console.log(processedOutline, "here");
+        if (!processedOutline) {
+          return;
+        }
         submit({ processedOutline: JSON.stringify({ processedOutline }) });
       } else if (presentationData && !llmToBeCalled) {
         if (needsTransformation(presentationData)) {
@@ -160,7 +166,7 @@ import { PresentationModeView } from "./presentation-mode";
     }, [presentationMode, currentSlideIndex, slides, setCurrentSlideParam]);
 
     if (!slides) return <p>Loading....</p>;
-    if (isLoading) return <p className="text-white text-center">LLM cooking</p>;
+    if (isLoading) return <SlideLoader />;
 
     if (presentationMode) {
       return (
@@ -192,7 +198,7 @@ import { PresentationModeView } from "./presentation-mode";
               pptTheme && pptTheme !== "starter" ? `${pptTheme}` : "font-sans"
             )}
           >
-            <div className="fixed top-4 right-4 z-10">
+            <div className="fixed bottom-4 right-4 z-10">
               <AutoSaveIndicator
                 isSaving={isSaving}
                 lastSaved={lastSaved}

@@ -466,3 +466,138 @@ export const COMPONENT_PATH_CONVERSION: Record<string, Conversion> = {
     typeSet: "stats",
   },
 };
+
+type WidgetType =
+  | "heading"
+  | "paragraph"
+  | "featureCard"
+  | "basicCard"
+  | "quoteCard";
+
+export const TIPTAP_TEMPLATES: Record<WidgetType, (text: any) => any> = {
+  heading: (text) => ({
+    type: "doc",
+    content: [
+      {
+        type: "heading",
+        attrs: { level: 1 },
+        content: [
+          {
+            type: "text",
+            text,
+            marks: [
+              { type: "bold" },
+              { type: "textStyle", attrs: { fontSize: "20px" } },
+            ],
+          },
+        ],
+      },
+    ],
+  }),
+
+  paragraph: (text) => ({
+    type: "doc",
+    content: [
+      {
+        type: "paragraph",
+        content: [
+          {
+            type: "text",
+            text,
+            marks: [{ type: "textStyle", attrs: { fontSize: "16px" } }],
+          },
+        ],
+      },
+    ],
+  }),
+  featureCard: (data) => ({
+    title: {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: data.title,
+            },
+          ],
+        },
+      ],
+    },
+    body: {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: data.body,
+            },
+          ],
+        },
+      ],
+    },
+  }),
+  basicCard: (text) => ({
+    content: {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: text.content,
+            },
+          ],
+        },
+      ],
+    },
+  }),
+  quoteCard: (data) => ({
+    body: {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: data.body,
+            },
+          ],
+        },
+      ],
+    },
+    person: {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: data.person,
+            },
+          ],
+        },
+      ],
+    },
+    company: {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: data.company,
+            },
+          ],
+        },
+      ],
+    },
+  }),
+};

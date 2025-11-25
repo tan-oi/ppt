@@ -11,6 +11,7 @@ import {
 import {
   COMPONENT_PATH_CONVERSION,
   COMPONENT_PATH_TO_WIDGET,
+  TIPTAP_TEMPLATES,
 } from "./core/widget-metadata";
 
 export function needsTransformation(presentationData: any) {
@@ -86,6 +87,35 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
     // widgetType = TYPE_TO_WIDGET[genericType] || "paragraph";
 
     widgetType = COMPONENT_PATH_CONVERSION[componentPath].widgetType;
+
+    // @ts-ignore
+    if (TIPTAP_TEMPLATES[widgetType]) {
+      try {
+        // @ts-ignore
+        const template = TIPTAP_TEMPLATES[widgetType];
+        if (widgetType === "heading") {
+          // @ts-ignore
+          if (typeof data.content === "string") {
+            // @ts-ignore
+            data = { ...data, content: template(data.content) };
+          }
+        } else if (widgetType === "paragraph") {
+          // @ts-ignore
+          if (typeof data.content === "string") {
+            // @ts-ignore
+            data = { ...data, content: template(data.content) };
+          }
+        } else if (
+          widgetType === "featureCard" ||
+          widgetType === "basicCard" ||
+          widgetType === "quoteCard"
+        ) {
+          data = template(data);
+        }
+      } catch (e) {
+        console.error("Error converting to Tiptap JSON", e);
+      }
+    }
 
     console.log(widgetType);
     // if (genericType === "chart" && slotData?.type) {
