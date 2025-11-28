@@ -1,65 +1,5 @@
-// "use client";
-// import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
-
-// import {
-//   ChartContainer,
-//   ChartTooltip,
-//   ChartTooltipContent,
-// } from "@/components/ui/chart";
-// interface LineChart {
-//   chartConfig: any;
-//   chartData: any;
-// }
-
-// export const LineChartBase: React.FC<LineChart> = ({
-//   chartConfig,
-//   chartData,
-// }) => {
-//   return (
-//     <>
-//       <ChartContainer config={chartConfig}>
-//         <LineChart
-//           accessibilityLayer
-//           data={chartData}
-//           margin={{
-//             left: 12,
-//             right: 12,
-//           }}
-//         >
-//           <CartesianGrid vertical={false} />
-//           <XAxis
-//             dataKey="month"
-//             tickLine={false}
-//             axisLine={false}
-//             tickMargin={8}
-//             tickFormatter={(value) => value.slice(0, 3)}
-//           />
-//           <ChartTooltip
-//             cursor={false}
-//             content={<ChartTooltipContent hideLabel />}
-//           />
-//           <Line
-//             dataKey="desktop"
-//             type="linear"
-//             stroke="var(--color-desktop)"
-//             dot={false}
-//             strokeDasharray="4 4"
-//           />
-//           <Line dataKey="mobile" type="linear" stroke="var(--color-mobile)" />
-//           <Line
-//             dataKey="computer"
-//             type="linear"
-//             stroke="var(--color-computer)"
-//           />
-//           <Line dataKey="ipod" type="linear" stroke="var(--color-ipod )" />
-//         </LineChart>
-//       </ChartContainer>
-//     </>
-//   );
-// };
-
 "use client";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -69,14 +9,17 @@ import {
 interface LineChartProps {
   chartConfig: any;
   chartData: any;
+  xKeyToUse: string;
 }
 
 export const LineChartBase: React.FC<LineChartProps> = ({
   chartConfig,
   chartData,
+  xKeyToUse,
 }) => {
   const dataKeys = Object.keys(chartConfig);
-  const xAxisKey = chartData[0] ? Object.keys(chartData[0])[0] : "month";
+  const xKey =
+    xKeyToUse || (chartData?.[0] ? Object.keys(chartData[0])[0] : "month");
 
   return (
     <ChartContainer config={chartConfig}>
@@ -90,13 +33,20 @@ export const LineChartBase: React.FC<LineChartProps> = ({
       >
         <CartesianGrid vertical={false} />
         <XAxis
-          dataKey={xAxisKey}
+          dataKey={xKey}
           tickLine={false}
           axisLine={false}
           tickMargin={8}
           tickFormatter={(value) =>
             typeof value === "string" ? value.slice(0, 3) : value
           }
+        />
+         <YAxis
+          tickLine={false}
+          axisLine={false}
+          className="text-xs"
+          tick={{ fill: "currentColor", opacity: 0.6 }}
+          width={40}
         />
         <ChartTooltip
           cursor={false}

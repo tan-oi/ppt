@@ -116,7 +116,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
   updateSelectWidget: ({ slideId, id, widgetType, data }: WidgetData) => {
     const widget = getPresentationStore().getWidget(slideId, id);
-    console.log(widget);
 
     set({
       selectedWidget: {
@@ -142,7 +141,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
     const { isProcessing } = get();
 
     if (isProcessing) {
-      console.log("Processing");
       return;
     }
 
@@ -158,7 +156,6 @@ export const useUIStore = create<UIStore>((set, get) => ({
     const { selectedWidget, editBuffer, isProcessing } = get();
 
     if (isProcessing) {
-      console.log(" Processing ");
       return;
     }
 
@@ -234,8 +231,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
 
   updateWidgetPosition: (changes: Partial<WidgetPositionChange>) => {
     const { editBuffer } = get();
-    console.log(changes);
-    console.log(editBuffer);
+
     set((state) => ({
       editBuffer: {
         widgetData: {

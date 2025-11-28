@@ -16,8 +16,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Prsented",
-  description: "Coolest way to generate presentations.",
+  title: "Glyph",
+  description: "Elegant and polished decks.",
+
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

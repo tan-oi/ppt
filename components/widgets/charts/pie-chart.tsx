@@ -1,73 +1,3 @@
-// "use client"
-// import {
-//   ChartContainer,
-//   ChartTooltip,
-//   ChartTooltipContent,
-// } from "@/components/ui/chart";
-// import { Cell, LabelList, Pie, PieChart } from "recharts";
-
-// interface PieChartProps {
-//   chartConfig: any;
-//   chartData: any;
-// }
-
-// export const PieChartBase: React.FC<PieChartProps> = ({
-//   chartConfig,
-//   chartData,
-// }) => {
-//   const pieData = [
-//     {
-//       name: "Desktop",
-//       value: chartData.reduce((acc: number, d: any) => acc + d.desktop, 0),
-//     },
-//     {
-//       name: "Mobile",
-//       value: chartData.reduce((acc: number, d: any) => acc + d.mobile, 0),
-//     },
-//     {
-//       name: "Computer",
-//       value: chartData.reduce((acc: number, d: any) => acc + d.computer, 0),
-//     },
-//   ];
-
-//   return (
-//     <ChartContainer
-//       config={chartConfig}
-//       className="[&_.recharts-text]:fill-background mx-auto w-full h-full"
-//     >
-//       <PieChart>
-//         <ChartTooltip
-//           content={<ChartTooltipContent nameKey="name" hideLabel />}
-//         />
-//         <Pie
-//           data={pieData}
-//           dataKey="value"
-//           nameKey="name"
-//           innerRadius={30}
-//           outerRadius={80}
-//           cornerRadius={8}
-//           paddingAngle={4}
-//         >
-//           {pieData.map((entry: any, index: number) => (
-//             <Cell
-//               key={`cell-${index}`}
-//               fill={chartConfig[entry.name.toLowerCase()].color}
-//             />
-//           ))}
-//           <LabelList
-//             dataKey="value"
-//             stroke="none"
-//             fontSize={12}
-//             fontWeight={500}
-//             fill="currentColor"
-//             formatter={(value: number) => value.toString()}
-//           />
-//         </Pie>
-//       </PieChart>
-//     </ChartContainer>
-//   );
-// };
-
 "use client";
 import {
   ChartContainer,
@@ -75,47 +5,64 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Cell, LabelList, Pie, PieChart } from "recharts";
+import React from "react";
+import { PieChartProps } from "@/lib/types";
 
-interface PieChartProps {
-  chartConfig: any;
-  chartData: any;
-}
+const COLORS = [
+  "hsl(220, 90%, 56%)",
+  "hsl(160, 85%, 45%)",
+  "hsl(30, 90%, 55%)",
+  "hsl(280, 90%, 60%)",
+  "hsl(340, 85%, 55%)",
+  "hsl(200, 85%, 55%)",
+  "hsl(0, 85%, 55%)",
+];
 
 export const PieChartBase: React.FC<PieChartProps> = ({
   chartConfig,
   chartData,
+  xKeyToUse,
 }) => {
-  // For pie charts, the data should already be in the right format
-  // e.g., [{ name: "Product A", value: 35, fill: "..." }, ...]
+  
+  if (!chartData || chartData.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full">No data</div>
+    );
+  }
+
+  const keys = Object.keys(chartData[0]);
+
+  const nameKey = xKeyToUse || keys[0] || "name";
+
+  const valueKey = keys.find((key) => key !== nameKey) || "value";
+
+  console.log("Using nameKey:", nameKey, "valueKey:", valueKey);
 
   return (
-    <ChartContainer
-      config={chartConfig}
-      className="[&_.recharts-text]:fill-background mx-auto w-full h-full"
-    >
+    <ChartContainer config={chartConfig} className="h-full w-full">
       <PieChart>
         <ChartTooltip
-          content={<ChartTooltipContent nameKey="name" hideLabel />}
+          content={<ChartTooltipContent nameKey={nameKey} hideLabel />}
         />
         <Pie
           data={chartData}
-          dataKey="value"
-          nameKey="name"
-          innerRadius={30}
-          outerRadius={80}
+          dataKey={valueKey}
+          nameKey={nameKey}
+          innerRadius={20}
+          outerRadius={"100%"}
           cornerRadius={8}
           paddingAngle={4}
         >
           {chartData.map((entry: any, index: number) => (
-            <Cell key={`cell-${index}`} fill={entry.fill} />
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
           <LabelList
-            dataKey="value"
+            dataKey={valueKey}
             stroke="none"
             fontSize={12}
             fontWeight={500}
             fill="currentColor"
-            formatter={(value: number) => value.toString()}
+            formatter={(value: number) => value?.toString() || "0"}
           />
         </Pie>
       </PieChart>

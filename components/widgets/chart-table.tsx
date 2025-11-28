@@ -1,149 +1,49 @@
+"use client";
+
 import { useUIStore } from "@/lib/store/ui-store";
-import { Check, Copy, Plus, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-
-type RowData = Record<string, string | number>;
-
-type Data = {
-  data: RowData[];
-  chartType: "bar" | "line" | "area" | "pie";
-};
-interface ChartTableProps {
-  data?: Data;
-}
-
-interface EditingCell {
-  row: number;
-  col: string;
-}
+import { Plus, X } from "lucide-react";
+import { useMemo } from "react";
+import { ChartTableProps } from "@/lib/types";
+import { useChartTableData } from "@/lib/hooks/useChartTableData";
 
 export function ChartTable(props: ChartTableProps) {
-  const MAX_ROWS = 8;
-  const MAX_COLUMNS = 8;
-
-  console.log(props);
-  const [data, setData] = useState<RowData[]>(
-    //@ts-ignore
-    props?.data || [
-      { month: "January", desktop: 186.4, mobile: 80, computer: 20, ipod: 20 },
-      { month: "February", desktop: 305, mobile: 200, computer: 20, ipod: 40 },
-      { month: "March", desktop: 237, mobile: 120, computer: 20, ipod: 40 },
-      { month: "April", desktop: 73, mobile: 190, computer: 20, ipod: 100 },
-    ]
-  );
-
-  const columns = useMemo(
-    () => (data.length > 0 ? Object.keys(data[0]) : []),
-    [data]
-  );
-  const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
-  const [editingHeader, setEditingHeader] = useState<string | null>(null);
-  const [showJson, setShowJson] = useState<boolean>(false);
-  const [copied, setCopied] = useState<boolean>(false);
-  const [newlyAddedRows, setNewlyAddedRows] = useState<Set<number>>(new Set());
-  const [newlyAddedColumns, setNewlyAddedColumns] = useState<Set<string>>(
-    new Set()
-  );
-
-  useEffect(() => {
-    if (newlyAddedRows.size > 0) {
-      const timer = setTimeout(() => setNewlyAddedRows(new Set()), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [newlyAddedRows]);
-
-  useEffect(() => {
-    if (newlyAddedColumns.size > 0) {
-      const timer = setTimeout(() => setNewlyAddedColumns(new Set()), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [newlyAddedColumns]);
-
-  useEffect(() => {
-    if (!editingCell) {
-      useUIStore.getState().updateEditBuffer({
-        data: data,
-      });
-    }
-  }, [editingCell, data]);
-
-  const updateCell = (rowIndex: number, colName: string, value: string) => {
-    const newData = [...data];
-    const numValue = colName === columns[0] ? value : Number(value) || 0;
-    newData[rowIndex] = { ...newData[rowIndex], [colName]: numValue };
-    setData(newData);
-  };
-
-  const updateColumnName = (oldName: string, newName: string) => {
-    if (!newName.trim() || newName === oldName) return;
-    if (columns.includes(newName)) {
-      alert("Column name already exists!");
-      return;
-    }
-
-    const newData = data.map((row) => {
-      const newRow: Record<string, string | number> = {
-        ...row,
-        [newName]: row[oldName],
-      };
-      delete newRow[oldName];
-      return newRow;
+  const normalizedData = useMemo(() => {
+    if (!props?.data?.length) return null;
+    const xKey = props.xKey || Object.keys(props.data[0])[0];
+    return props.data.map((row) => {
+      const { [xKey]: xValue, ...rest } = row;
+      return { [xKey]: xValue, ...rest };
     });
-    setData(newData);
-  };
+  }, [props?.data, props?.xKey]);
 
-  const addRow = () => {
-    if (data.length >= MAX_ROWS) return;
-    const newRow: RowData = {};
-    columns.forEach((col, i) => {
-      newRow[col] = i === 0 ? "" : 0;
-    });
-    setData([...data, newRow]);
-    setNewlyAddedRows(new Set([...newlyAddedRows, data.length]));
-  };
-
-  const deleteRow = (index: number) => {
-    if (data.length <= 1) return;
-    setData(data.filter((_, i) => i !== index));
-    const updated = new Set<number>();
-    newlyAddedRows.forEach((idx) => {
-      if (idx > index) updated.add(idx - 1);
-      else if (idx < index) updated.add(idx);
-    });
-    setNewlyAddedRows(updated);
-  };
-
-  const addColumn = () => {
-    if (columns.length >= MAX_COLUMNS) return;
-
-    let newColName = `column${columns.length + 1}`;
-    let counter = 1;
-    while (columns.includes(newColName)) {
-      counter++;
-      newColName = `column${columns.length + counter}`;
-    }
-
-    const newData = data.map((row) => ({ ...row, [newColName]: 0 }));
-    setData(newData);
-    setNewlyAddedColumns(new Set([...newlyAddedColumns, newColName]));
-  };
-
-  const deleteColumn = (colName: string) => {
-    if (columns.length <= 1) return;
-    const newData = data.map((row) => {
-      const newRow = { ...row };
-      delete newRow[colName];
-      return newRow;
-    });
-    setData(newData);
-    const updated = new Set(newlyAddedColumns);
-    updated.delete(colName);
-    setNewlyAddedColumns(updated);
-  };
-
-  const isMaxRows = data.length >= MAX_ROWS;
-  const isMaxColumns = columns.length >= MAX_COLUMNS;
-
+  const {
+    data,
+    config,
+    xAxisKey,
+    dataColumns,
+    editingCell,
+    editingHeader,
+    newlyAddedRows,
+    newlyAddedColumns,
+    isMaxRows,
+    isMaxColumns,
+    setEditingCell,
+    setEditingHeader,
+    updateCell,
+    updateXAxisName,
+    updateSeriesName,
+    addRow,
+    deleteRow,
+    addColumn,
+    deleteColumn,
+    MAX_ROWS,
+    MAX_COLUMNS,
+  } = useChartTableData({
+    initialData: normalizedData,
+    initialConfig: props.config,
+    initialXKey: props.xKey,
+    chartType: props.type,
+  });
   return (
     <div className="w-full h-full flex flex-col gap-3">
       <div className="flex gap-3">
@@ -157,20 +57,24 @@ export function ChartTable(props: ChartTableProps) {
           }`}
         >
           <Plus size={18} />
-          <span className="text-gray-50">Add Row {isMaxRows && `(Max ${MAX_ROWS})`}</span>
+          <span className="text-gray-50">
+            Add Row {isMaxRows && `(Max ${MAX_ROWS})`}
+          </span>
         </button>
 
         <button
           onClick={addColumn}
-          disabled={isMaxColumns}
+          disabled={isMaxColumns || props.type === "pie"}
           className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm transition-all ${
-            isMaxColumns
+            isMaxColumns || props.type === "pie"
               ? "bg-slate-700 text-slate-500 cursor-not-allowed opacity-60"
               : "bg-indigo-600 text-white hover:bg-indigo-500 shadow-md hover:shadow-lg"
           }`}
         >
           <Plus size={18} />
-          <span className="text-gray-50">Add Column {isMaxColumns && `(Max ${MAX_COLUMNS})`}</span>
+          <span className="text-gray-50">
+            Add Column {isMaxColumns && `(Max ${MAX_COLUMNS - 1})`}
+          </span>
         </button>
       </div>
 
@@ -178,8 +82,12 @@ export function ChartTable(props: ChartTableProps) {
         className="flex-1 bg-secondary rounded-xl overflow-hidden border border-muted"
         data-drawer
         onBlur={() => {
+          const currentBuffer = useUIStore.getState().editBuffer?.widgetData;
           useUIStore.getState().updateEditBuffer({
-            data: data,
+            ...currentBuffer,
+            data,
+            config,
+            xKey: xAxisKey,
           });
         }}
       >
@@ -187,7 +95,40 @@ export function ChartTable(props: ChartTableProps) {
           <table className="w-full">
             <thead className="sticky top-0 bg-accent z-10">
               <tr>
-                {columns.map((col) => (
+                <th className="px-6 py-4 text-left group relative bg-blue-900/30 border-r-2 border-blue-700/50">
+                  {editingHeader === xAxisKey ? (
+                    <input
+                      type="text"
+                      defaultValue={xAxisKey}
+                      autoFocus
+                      onBlur={(e) => {
+                        updateXAxisName(e.target.value);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          updateXAxisName(e.currentTarget.value);
+                        }
+                      }}
+                      className="bg-slate-900 text-white px-3 py-2 rounded-lg border-2 border-blue-500 outline-none w-full focus:ring-2 focus:ring-blue-500/50 font-semibold"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span
+                          onClick={() => setEditingHeader(xAxisKey)}
+                          className="text-blue-300 font-semibold cursor-pointer hover:text-white transition-colors"
+                        >
+                          {xAxisKey}
+                        </span>
+                        <span className="text-[10px] text-blue-400 font-bold px-2 py-1 bg-blue-900/50 rounded-full border border-blue-500">
+                          X-AXIS
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </th>
+
+                {dataColumns.map((col) => (
                   <th
                     key={col}
                     className={`px-6 py-4 text-left group relative transition-all ${
@@ -202,13 +143,11 @@ export function ChartTable(props: ChartTableProps) {
                         defaultValue={col}
                         autoFocus
                         onBlur={(e) => {
-                          updateColumnName(col, e.target.value);
-                          setEditingHeader(null);
+                          updateSeriesName(col, e.target.value);
                         }}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
-                            updateColumnName(col, e.currentTarget.value);
-                            setEditingHeader(null);
+                            updateSeriesName(col, e.currentTarget.value);
                           }
                         }}
                         className="bg-slate-900 text-neutral px-3 py-2 rounded-lg border-2 border-indigo-500 outline-none w-full focus:ring-2 focus:ring-indigo-500/50"
@@ -228,7 +167,7 @@ export function ChartTable(props: ChartTableProps) {
                             </span>
                           )}
                         </div>
-                        {columns.length > 1 && (
+                        {dataColumns.length > 1 && (
                           <button
                             onClick={() => deleteColumn(col)}
                             className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-400 transition-all ml-2"
@@ -240,24 +179,59 @@ export function ChartTable(props: ChartTableProps) {
                     )}
                   </th>
                 ))}
-                <th className="px-6 py-4 w-16 sticky top-0 bg-accent"></th>
+                <th className="px-6 py-4 w-16 sticky top-0 bg-accent" />
               </tr>
             </thead>
             <tbody>
               {data.map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className={` group transition-all ${
+                  className={`group transition-all ${
                     newlyAddedRows.has(rowIndex) ? "bg-emerald-900/20" : ""
                   }`}
                 >
-                  {columns.map((col, colIndex) => (
+                  <td className="px-6 py-4 border-r-2 border-blue-700/30">
+                    {editingCell?.row === rowIndex &&
+                    editingCell?.col === xAxisKey ? (
+                      <input
+                        type="text"
+                        defaultValue={row[xAxisKey] ?? ""}
+                        autoFocus
+                        onBlur={(e) => {
+                          updateCell(rowIndex, xAxisKey, e.target.value);
+                          setEditingCell(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            updateCell(
+                              rowIndex,
+                              xAxisKey,
+                              e.currentTarget.value
+                            );
+                            setEditingCell(null);
+                          }
+                        }}
+                        className="bg-slate-900 text-white px-3 py-2 rounded-lg border-2 border-blue-500 outline-none w-full focus:ring-2 focus:ring-blue-500/50 shadow-lg"
+                      />
+                    ) : (
+                      <div
+                        onClick={() =>
+                          setEditingCell({ row: rowIndex, col: xAxisKey })
+                        }
+                        className="text-zinc-300 cursor-pointer hover:text-white hover:bg-blue-900/50 px-3 py-2 rounded-lg transition-all min-h-10 flex items-center"
+                      >
+                        {row[xAxisKey] ?? "—"}
+                      </div>
+                    )}
+                  </td>
+
+                  {dataColumns.map((col) => (
                     <td key={col} className="px-6 py-4">
                       {editingCell?.row === rowIndex &&
                       editingCell?.col === col ? (
                         <input
-                          type={colIndex === 0 ? "text" : "number"}
-                          defaultValue={row[col] ?? ""}
+                          type="number"
+                          defaultValue={row[col] ?? 0}
                           autoFocus
                           onBlur={(e) => {
                             updateCell(rowIndex, col, e.target.value);
@@ -274,7 +248,7 @@ export function ChartTable(props: ChartTableProps) {
                       ) : (
                         <div
                           onClick={() => setEditingCell({ row: rowIndex, col })}
-                          className="text-zinc-600 cursor-pointer hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all min-h-[2.5rem] flex items-center"
+                          className="text-zinc-600 cursor-pointer hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all min-h-10 flex items-center"
                         >
                           {row[col] ?? "—"}
                         </div>

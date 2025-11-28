@@ -1,4 +1,4 @@
-import { useUIStore } from "@/lib/store/ui-store";
+  import { useUIStore } from "@/lib/store/ui-store";
 import {
   Drawer,
   DrawerClose,
@@ -23,13 +23,14 @@ export function DrawerEditing() {
   const chartType = editBuffer?.widgetData?.type;
   const chartData = editBuffer?.widgetData?.data;
   const chartConfig = editBuffer?.widgetData?.config;
+  const xKey = editBuffer?.widgetData?.xKey
   //@ts-ignore
   const ChartComponent = chartRegistry[chartType];
 
   if (!drawerSync) return null;
 
   return (
-    <>
+  <>
       <Drawer open={drawerSync}>
         <DrawerContent
           className={cn(
@@ -52,6 +53,9 @@ export function DrawerEditing() {
               <div className="flex-1 overflow-auto rounded-lg">
                 <ChartTable
                   data={chartData}
+                  config={chartConfig}
+                  xKey = {xKey}
+                  type = {chartType}
                   // onChange={handleDataChange}
                 />
               </div>

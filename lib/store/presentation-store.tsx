@@ -115,7 +115,6 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
     const newSlides = [...slides];
     newSlides.splice(insertAt, 0, newSlide);
 
-    console.log(newSlides);
     const reindexedSlides = newSlides.map((slide, index) => ({
       ...slide,
       slideNumber: index + 1,
@@ -220,7 +219,7 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
       y: 0,
       width: 200,
       height: 200,
-    };  
+    };
 
     const widget: WidgetData = {
       id: widgetId,
@@ -256,15 +255,10 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
     })),
 
   updateWidgetPosition: (slideId, widgetId, position) => {
-    console.log(slideId);
-    console.log(widgetId);
-    console.log(position);
-
     set((state) => ({
       slides: state.slides.map((slide) => {
         if (slide.id !== slideId) return slide;
 
-        console.log("im here!");
         return {
           ...slide,
           widgets: {
@@ -280,8 +274,6 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
         };
       }),
     }));
-
-    console.log(get().slides);
   },
 
   deleteWidget: (slideId, widgetId) =>
@@ -309,9 +301,6 @@ export const usePresentationStore = create<PresentationState>((set, get) => ({
     }),
 
   updateSlideTheme: (slideId: string, theme: string) => {
-    console.log(slideId);
-    console.log(theme);
-
     set((state) => ({
       slides: state.slides.map((slide) =>
         slide.id === slideId ? { ...slide, theme } : slide

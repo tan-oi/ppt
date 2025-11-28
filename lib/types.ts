@@ -46,7 +46,7 @@ export interface WidgetPositionChange {
   height: number;
 }
 
- export interface Slide {
+export interface Slide {
   id: string;
   slideNumber: number;
   heading: string;
@@ -56,3 +56,52 @@ export interface WidgetPositionChange {
   theme: string;
 }
 
+/* charts */
+export type RowData = Record<string, string | number>;
+
+export type Data = {
+  data: RowData[];
+  chartType: "bar" | "line" | "area" | "pie";
+};
+
+export type ChartConfig = Record<
+  string,
+  {
+    label?: string;
+    color?: string;
+  }
+>;
+
+export interface ChartTableProps {
+  data: RowData[];
+  config?: ChartConfig;
+  xKey?: string;
+  type: "bar" | "area" | "line" | "pie";
+}
+
+export interface EditingCell {
+  row: number;
+  col: string;
+}
+
+export interface BaseChartRenderProps {
+  type: "bar" | "area" | "line" | "pie";
+  data?: any;
+  id: string;
+  className?: string;
+  slideId: string;
+  config?: any;
+  xKey?: string;
+}
+
+export interface PieChartProps {
+  chartConfig: any;
+  chartData: any;
+  xKeyToUse : string;
+}
+
+export interface BarChartProps {
+  chartConfig: any;
+  chartData: any;
+  xKeyToUse: string | null;
+}

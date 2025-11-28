@@ -1,28 +1,44 @@
 "use client";
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid } from "recharts";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-interface BarChartProps {
-  chartConfig: any;
-  chartData: any;
-}
+import { BarChartProps } from "@/lib/types";
 
 export const BarChartBase: React.FC<BarChartProps> = ({
-  chartConfig,
   chartData,
+  chartConfig,
+  xKeyToUse,
 }) => {
+  const xKey =
+    xKeyToUse || (chartData?.[0] ? Object.keys(chartData[0])[0] : "month");
+
   const dataKeys = Object.keys(chartConfig);
-  const xAxisKey = chartData[0] ? Object.keys(chartData[0])[0] : "month";
+
+  // const seriesKeys = (() => {
+  //   if (!chartData?.length || !chartData[0]) return [];
+  //   return Object.keys(chartData[0]).filter((key) => key !== xKeyToUse);
+  // })();
+
+  // const cleanConfig = (() => {
+  //   const config = { ...chartConfig };
+  //   delete config[xKey];
+  //   return config;
+  // })();
+
+  // if (seriesKeys.length === 0) {
+  //   return (
+  //     <div className="flex items-center justify-center h-full text-muted-foreground">
+  //       Add a series to see bars
+  //     </div>
+  //   );
+  // }
 
   return (
     <ChartContainer config={chartConfig} className="w-full h-full">
       <BarChart
-        accessibilityLayer
         data={chartData}
         margin={{ top: 10, right: 10, bottom: 5, left: 5 }}
       >
@@ -52,13 +68,6 @@ export const BarChartBase: React.FC<BarChartProps> = ({
               />
             </linearGradient>
           ))}
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-            <feMerge>
-              <feMergeNode in="coloredBlur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
 
         <CartesianGrid
@@ -69,14 +78,15 @@ export const BarChartBase: React.FC<BarChartProps> = ({
         />
 
         <XAxis
-          dataKey={xAxisKey}
+          dataKey={xKey}
+          type="category"
           tickLine={false}
           tickMargin={12}
           axisLine={false}
           className="text-xs"
           tick={{ fill: "currentColor", opacity: 0.6 }}
           tickFormatter={(value) =>
-            typeof value === "string" ? value.slice(0, 3) : value
+            typeof value === "string" ? value.slice(0, 3) : String(value)
           }
         />
 

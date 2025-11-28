@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import React from "react";
+import React, { useMemo } from "react";
 import { BarChartBase } from "./bar-chart";
 import { AreaChartBase } from "./area-chart";
 import { ChartConfig } from "@/components/ui/chart";
@@ -7,15 +7,7 @@ import { LineChartBase } from "./line-chart";
 import { useUIStore } from "@/lib/store/ui-store";
 import { PieChartBase } from "./pie-chart";
 import { useWidgetSelection } from "@/lib/hooks/useWidgetSelection";
-
-interface BaseChartRenderProps {
-  type: "bar" | "area" | "line" | "pie";
-  data?: any;
-  id: string;
-  className?: string;
-  slideId: string;
-  config?: any;
-}
+import { BaseChartRenderProps } from "@/lib/types";
 
 const defaultData = [
   { month: "January", desktop: 186.4, mobile: 80, computer: 20, ipod: 20 },
@@ -33,7 +25,11 @@ const chartConfig = {
 
 export const chartRegistry: Record<
   BaseChartRenderProps["type"],
-  React.ComponentType<{ chartData: any; chartConfig: ChartConfig }>
+  React.ComponentType<{
+    chartData: any;
+    chartConfig: ChartConfig;
+    xKeyToUse: string;
+  }>
 > = {
   bar: BarChartBase,
   pie: PieChartBase,
@@ -47,16 +43,38 @@ export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
   id,
   className,
   slideId,
+  config,
+  xKey,
   ...props
 }) => {
-  const config = props.config;
-  const updateSelectWidget = useUIStore((s) => s.updateSelectWidget);
+  console.log(xKey);
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
   const ChartComponent = chartRegistry[type];
 
-  const chartConfigToUse = config ?? chartConfig;
-  const chartDataToUse = data ?? defaultData;
+  const editBuffer = useUIStore((s) => s.editBuffer);
+  const isSelected = useUIStore((s) => s.selectedWidget?.id === id);
 
+  const currentData =
+    isSelected && editBuffer?.widgetData
+      ? editBuffer.widgetData
+      : {
+          type,
+          xKey : xKey ?? null,
+          data: data ?? defaultData,
+          config: config ?? chartConfig,
+        };
+
+  // const chartConfigToUse = currentData.config;
+  const chartConfigToUse = currentData.config;
+  const chartDataToUse = currentData.data;
+  const xKeyToUse = currentData.xKey;
+
+  // const chartConfigToUse = useMemo(() => {
+  //   if (!chartDataToUse?.length) return rawConfig;
+  //   const xKey = Object.keys(chartDataToUse[0])[0];
+  //   const { [xKey]: _, ...clean } = rawConfig ?? {};
+  //   return clean;
+  // }, [chartDataToUse, rawConfig]);
   return (
     <div
       ref={widgetRef}
@@ -66,24 +84,21 @@ export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
       onClick={() =>
         handleClick({
           widgetType: "chart",
-          data: {
-            type: type,
-            data: chartDataToUse,
-            config: chartConfigToUse,
-          },
+          data: currentData,
         })
       }
     >
-      <Card className="border-none backdrop-blur-sm bg-gradient-to-br from-background/95 to-background/80 shadow-2xl min-w-[180px] min-h-[200px] w-full h-full overflow-hidden">
-        <CardHeader className="p1-2">
+      <Card className="border-none backdrop-blur-sm bg-linear-to-br from-background/95 to-background/80 shadow-2xl min-w-[180px] min-h-[200px] w-full h-full overflow-hidden">
+        <CardHeader className="">
           <CardTitle className="text-foreground/70 text-xs font-semibold tracking-wider uppercase">
-            {type} chart
+            {currentData.type} chart
           </CardTitle>
         </CardHeader>
-        <CardContent className="w-full h-[calc(100%-10px)] pb-2">
+        <CardContent className="w-full h-[calc(100%-2px)]">
           <ChartComponent
             chartData={chartDataToUse}
             chartConfig={chartConfigToUse}
+            xKeyToUse={xKeyToUse ?? null}
           />
         </CardContent>
       </Card>

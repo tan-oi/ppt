@@ -230,6 +230,7 @@ export const WidgetMetadata = {
     path: "@/components/widgets/charts/base",
     defaultData: {
       type: "bar",
+      xKey: "month",
       data: [
         { month: "Q1", desktop: 4500, mobile: 3200 },
         { month: "Q2", desktop: 5200, mobile: 4100 },
@@ -250,6 +251,7 @@ export const WidgetMetadata = {
     path: "@/components/widgets/charts/base",
     defaultData: {
       type: "line",
+      xKey: "month",
       data: [
         { month: "Jan", users: 2400, revenue: 3800 },
         { month: "Feb", users: 3200, revenue: 4200 },
@@ -272,6 +274,7 @@ export const WidgetMetadata = {
     path: "@/components/widgets/charts/base",
     defaultData: {
       type: "area",
+      xKey: "month",
       data: [
         { month: "Jan", performance: 3200, target: 3000 },
         { month: "Feb", performance: 4100, target: 3500 },
@@ -293,12 +296,13 @@ export const WidgetMetadata = {
     type: "chart",
     path: "@/components/widgets/charts/base",
     defaultData: {
+      xKey: "category",
       type: "pie",
       data: [
-        { category: "Product A", value: 3500, fill: "hsl(var(--chart-1))" },
-        { category: "Product B", value: 2800, fill: "hsl(var(--chart-2))" },
-        { category: "Product C", value: 2200, fill: "hsl(var(--chart-3))" },
-        { category: "Product D", value: 1500, fill: "hsl(var(--chart-4))" },
+        { category: "Product A", value: 3500 },
+        { category: "Product B", value: 2800 },
+        { category: "Product C", value: 2200 },
+        { category: "Product D", value: 1500 },
       ],
       config: {
         value: { label: "Sales" },
