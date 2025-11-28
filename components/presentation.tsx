@@ -154,6 +154,16 @@ import { toast } from "sonner";
           });
         }
       }
+
+      const slidesList = usePresentationStore.getState().slides;
+      if (
+        slidesList.length > 0 &&
+        !usePresentationStore.getState().currentSlide
+      ) {
+        const firstSlideId = slidesList[0].id;
+        setCurrentSlideParam(firstSlideId);
+        usePresentationStore.getState().setCurrentSlide(firstSlideId);
+      }
     }, []);
 
     useEffect(() => {

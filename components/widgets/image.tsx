@@ -105,7 +105,6 @@ export function ImageWidget({
     );
   }
 
-  // Final generated image
   return (
     <div
       ref={widgetRef}
@@ -114,12 +113,16 @@ export function ImageWidget({
       onClick={() =>
         handleClick({
           widgetType: "image",
-          data: { imageUrl: url, alt, objectFit },
+          data: {
+            imageUrl: currentData.imageUrl || url,
+            alt: currentData.alt,
+            objectFit: currentData.objectFit,
+          },
         })
       }
     >
       <img
-        src={url || "/placeholder-image.png"}
+        src={currentData.imageUrl || url || "/placeholder-image.png"}
         alt={alt}
         className="w-full h-full"
         style={{ objectFit }}

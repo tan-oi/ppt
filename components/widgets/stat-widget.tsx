@@ -19,7 +19,7 @@ export function StatWidget({
   value,
   label,
   trend = "up",
-  trendValue = "+12%",
+  trendValue,
   unit = "",
   editable,
 }: StatWidgetProps) {
@@ -60,9 +60,9 @@ export function StatWidget({
 
   if (!editable)
     [
-      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-background to-muted/30 rounded-lg p-8">
+      <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-background to-muted/30 rounded-lg p-8">
         <div className="flex items-baseline gap-2 mb-4">
-          <span className="text-8xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <span className="text-8xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             {currentData.value}
           </span>
           {currentData.unit && (
@@ -102,10 +102,10 @@ export function StatWidget({
           },
         });
       }}
-      className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-background to-muted/30 rounded-lg p-8"
+      className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-background to-muted/30 rounded-lg p-8"
     >
       <div className="flex items-baseline gap-2 mb-4">
-        <span className="text-8xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+        <span className="text-8xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           {currentData.value}
         </span>
         {currentData.unit && (

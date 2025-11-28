@@ -2,13 +2,16 @@
 
 import { BaseDropdown } from "@/components/base/dropdown";
 import { useUIStore } from "@/lib/store/ui-store";
+import { usePresentationStore } from "@/lib/store/presentation-store";
 import { Upload, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export function ImageToolbar() {
   const editBuffer = useUIStore((s) => s.editBuffer);
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
+  const selectedWidget = useUIStore((s) => s.selectedWidget);
   const setProcessing = useUIStore((s) => s.setProcessing);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,12 +30,12 @@ export function ImageToolbar() {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+      toast.error("Please select an image file");
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      alert("Image must be less than 10MB");
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be less than 5MB");
       return;
     }
 
@@ -63,13 +66,25 @@ export function ImageToolbar() {
       console.log("Got URL:", result.url);
 
       handleUpdate("imageUrl", result.url);
+      
+     
+      if (selectedWidget) {
+        const { updateWidget } = usePresentationStore.getState();
+        updateWidget(selectedWidget.slideId, selectedWidget.id, {
+          data: { ...widgetData, imageUrl: result.url },
+        });
+      }
+
+      toast.success("Image uploaded successfully");
 
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert(error instanceof Error ? error.message : "Failed to upload image");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to upload image"
+      );
     } finally {
       setUploading(false);
       setProcessing(false);
@@ -106,7 +121,7 @@ export function ImageToolbar() {
           </>
         )}
       </Button>
-      <div className="w-px h-8 bg-gradient-to-b from-transparent via-zinc-600 to-transparent" />
+      <div className="w-px h-8 bg-linear-to-b from-transparent via-zinc-600 to-transparent" />
 
       <BaseDropdown
         tooltip="Select the fit"

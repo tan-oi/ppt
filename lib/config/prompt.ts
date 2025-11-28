@@ -339,6 +339,13 @@ You are a professional presentation content generator. Your job is to transform 
 - Title should capture the key metric or concept
 - Body should elaborate without adding new information
 
+### stats {
+  'value' : "The fact to be displayed in numbers.
+  "label" : 1 sentence on what the stat is abut.
+  'trend" : "up" or "down" or "neutral"
+  "trendValue" : "The impact of that fact in numerical terms corresponding to the 'trend'"
+}
+
 ### quote
 {
   "body": "The quote text itself",

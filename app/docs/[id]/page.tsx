@@ -64,7 +64,7 @@ export default async function PresentationDoc({
         presentationData={presentationData}
         id={id}
       />
-      <div className="fixed top-4 right-4 z-50 backdrop-blur-xl px-4 py-2 rounded-xl flex items-center gap-2">
+      <div className="fixed top-4 right-4 z-50 px-4 py-2 rounded-xl flex items-center gap-2">
         {!allowGeneration && presentationData && (
           <ShareOption
             type="normal"
