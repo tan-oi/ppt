@@ -20,12 +20,24 @@ export function useSlideDragDrop(slideScale: number) {
       const slideContainer = document.getElementById(String(over.id));
       if (!slideContainer) return;
 
-      const containerRect = slideContainer.getBoundingClientRect();
-      const finalScreenX = activatorEvent.clientX + delta.x;
-      const finalScreenY = activatorEvent.clientY + delta.y;
+      const activeRect = active?.rect?.current?.translated;
 
-      const relativeX = finalScreenX - containerRect.left;
-      const relativeY = finalScreenY - containerRect.top;
+      const finalScreenX = activeRect
+        ? activeRect.left
+        : activatorEvent.clientX + delta.x;
+      const finalScreenY = activeRect
+        ? activeRect.top
+        : activatorEvent.clientY + delta.y;
+
+      const presentationContainer = slideContainer.querySelector(
+        ".slide-presentation-content"
+      );
+      const referenceRect = presentationContainer
+        ? presentationContainer.getBoundingClientRect()
+        : slideContainer.getBoundingClientRect();
+
+      const relativeX = finalScreenX - referenceRect.left;
+      const relativeY = finalScreenY - referenceRect.top;
 
       const actualX = relativeX / slideScale;
       const actualY = relativeY / slideScale;

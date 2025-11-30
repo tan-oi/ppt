@@ -1,38 +1,38 @@
-"use client";
+  "use client";
 
-import { useSlideScale } from "@/lib/hooks/useSlideScale";
-import { useWidgetDeselect } from "@/lib/hooks/useWidgetDeselect";
-import { Slide } from "./slide";
-import { useEffect, useMemo, useState } from "react";
-import { experimental_useObject as useObject } from "@ai-sdk/react";
-import { DndContext, DragOverlay } from "@dnd-kit/core";
-import {
-  needsTransformation,
-  populateStores,
-  transformAndStorePresentation,
-} from "@/lib/helper";
+  import { useSlideScale } from "@/lib/hooks/useSlideScale";
+  import { useWidgetDeselect } from "@/lib/hooks/useWidgetDeselect";
+  import { Slide } from "./slide";
+  import { useEffect, useMemo, useState } from "react";
+  import { experimental_useObject as useObject } from "@ai-sdk/react";
+  import { DndContext, DragOverlay } from "@dnd-kit/core";
+  import {
+    needsTransformation,
+    populateStores,
+    transformAndStorePresentation,
+  } from "@/lib/helper";
 
-import { DockBase } from "./dock/base";
-import { DrawerEditing } from "./widgets/drawer";
-import { cn } from "@/lib/utils";
-import { useSlideUrlSync } from "@/lib/hooks/useSlideSyncUrl";
-import { useUIStore } from "@/lib/store/ui-store";
+  import { DockBase } from "./dock/base";
+  import { DrawerEditing } from "./widgets/drawer";
+  import { cn } from "@/lib/utils";
+  import { useSlideUrlSync } from "@/lib/hooks/useSlideSyncUrl";
+  import { useUIStore } from "@/lib/store/ui-store";
 
-import { useQueryState } from "nuqs";
-import { useGenerationStore } from "@/lib/store/generation-store";
-import { useAutoSave } from "@/lib/hooks/useAutoSave";
-import { z } from "zod";
+  import { useQueryState } from "nuqs";
+  import { useGenerationStore } from "@/lib/store/generation-store";
+  import { useAutoSave } from "@/lib/hooks/useAutoSave";
+  import { z } from "zod";
 
-import { AutoSaveIndicator } from "./auto-save-indicator";
-import {
-  usePresentationKeyboard,
-  useSaveShortcut,
-} from "@/lib/hooks/usePresentationKeyboard";
-import { useSlideDragDrop } from "@/lib/hooks/useSlideDragDrop";
-import { PresentationModeView } from "./presentation-mode";
-import { usePresentationStore } from "@/lib/store/presentation-store";
-import SlideLoader from "./base/loaders/slide-loader";
-import { toast } from "sonner";
+  import { AutoSaveIndicator } from "./auto-save-indicator";
+  import {
+    usePresentationKeyboard,
+    useSaveShortcut,
+  } from "@/lib/hooks/usePresentationKeyboard";
+  import { useSlideDragDrop } from "@/lib/hooks/useSlideDragDrop";
+  import { PresentationModeView } from "./presentation-mode";
+  import { usePresentationStore } from "@/lib/store/presentation-store";
+  import SlideLoader from "./base/loaders/slide-loader";
+  import { toast } from "sonner";
 
   export function Presentation({
     llmToBeCalled,
@@ -60,23 +60,58 @@ import { toast } from "sonner";
     const [saveError, setSaveError] = useState<Error | null>(null);
     const [isSaving, setIsSaving] = useState(false);
 
-    const { submit, object, isLoading } = useObject({
+    const {
+      submit,
+      object,
+      isLoading,
+      error: llmError,
+    } = useObject({
       api: "/api/generate-ppt",
       schema: z.array(z.any()),
+
       onFinish: async (options) => {
-        const payload = { slides: options.object };
-        clearPresentation();
-        transformAndStorePresentation(payload);
-
-        const updatedSlideData = usePresentationStore.getState().slides;
-        const payloadToBeSent = {
-          topic: useGenerationStore.getState().userInstruction,
-          outlineId: id.startsWith("ai-") ? id.slice(3) : id,
-          theme: pptTheme,
-          slides: updatedSlideData,
-        };
-
         try {
+          console.log("Raw response:", options.object);
+
+          let slides = options.object;
+
+          if (typeof slides === "string") {
+            slides = JSON.parse(slides);
+          }
+
+          if (!Array.isArray(slides) || slides.length === 0) {
+            throw new Error("Invalid slides data");
+          }
+
+          console.log(`Got ${slides.length} slides`);
+
+          const payload = { slides };
+          clearPresentation();
+          transformAndStorePresentation(payload);
+
+          const updatedSlideData = usePresentationStore.getState().slides;
+
+        
+          const topic =
+            useGenerationStore.getState().userInstruction ||
+            "Untitled Presentation";
+
+          const payloadToBeSent = {
+            topic,
+            outlineId: id.startsWith("ai-") ? id.slice(3) : id,
+            theme: pptTheme || "starter",
+            isModified: false,
+            slides: updatedSlideData.map((slide) => ({
+              id: slide.id,
+              theme: slide.theme || "starter",
+              slideNumber: parseInt(String(slide.slideNumber)),
+              heading: slide.heading,
+              widgets: slide.widgets,
+            })),
+          };
+
+      
+
           const res = await fetch(`/api/presentation/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -84,19 +119,19 @@ import { toast } from "sonner";
           });
 
           if (!res.ok) {
-            return;
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Save failed");
           }
 
-          window.history.replaceState(
-            null,
-            "",
-            `/docs/${id.startsWith("ai-") ? id.slice(3) : id}`
-          );
+          const cleanId = id.startsWith("ai-") ? id.slice(3) : id;
+          window.history.replaceState(null, "", `/docs/${cleanId}`);
 
           setLastSaved(new Date());
-        } catch (err) {
-          console.error("Some network/db error");
-          setSaveError(err as Error);
+          toast.success("Presentation created!");
+        } catch (err: any) {
+          console.error(" Error:", err);
+          toast.error(err.message);
+          setSaveError(err.message);
         }
       },
     });
@@ -112,7 +147,7 @@ import { toast } from "sonner";
       onSaveSuccess: () => {
         setIsSaving(false);
         setLastSaved(new Date());
-        toast.success("saved");
+        // toast.success("saved");
       },
       onSaveError: (error) => {
         setIsSaving(false);

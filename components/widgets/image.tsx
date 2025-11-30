@@ -125,7 +125,8 @@ export function ImageWidget({
         src={currentData.imageUrl || url || "/placeholder-image.png"}
         alt={alt}
         className="w-full h-full"
-        style={{ objectFit }}
+        style={{ objectFit, pointerEvents: "none", userSelect: "none" }}
+        draggable={false}
         loading="lazy"
       />
     </div>

@@ -605,3 +605,9 @@ export const TIPTAP_TEMPLATES: Record<WidgetType, (text: any) => any> = {
     },
   }),
 };
+
+
+export const heightRequired = (slug : string) => {
+  if(slug === "image" || slug === "divider" || slug === "barChart" || slug === "areaChart" || slug === "pieChart" || slug === "lineChart") return true;
+  else return false;
+}

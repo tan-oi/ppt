@@ -21,6 +21,7 @@ const SlidePresentation = React.memo(
   }) => {
     return (
       <div
+        className="relative slide-presentation-content"
         style={{
           transform: `scale(${slideScale})`,
           transformOrigin: "top left",
@@ -29,7 +30,6 @@ const SlidePresentation = React.memo(
           transition: "transform 0.5s ease-out",
           position: "relative",
         }}
-        className="relative"
       >
         {data &&
           Object.keys(data.widgets).map((widgetId) => (

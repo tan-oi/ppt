@@ -54,7 +54,7 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
 
   const widgets: Record<string, any> = {};
 
-  console.log(positionedSlots);
+
   Object.entries(slideData.content).forEach(([slotId, slotData]) => {
     const positionedSlot = positionedSlots.find((s) => s.id === slotId);
     if (!positionedSlot) return;
@@ -63,7 +63,7 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
     if (!layoutSlot) return;
 
     let data = slotData;
-    console.log(layoutSlot);
+
     let widgetType = "paragraph";
 
     //@ts-ignore
@@ -117,7 +117,6 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
       }
     }
 
-    console.log(widgetType);
     // if (genericType === "chart" && slotData?.type) {
     //   const chartMap: Record<string, string> = {
     //     bar: "barChart",
@@ -128,7 +127,7 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
     //   widgetType = chartMap[slotData.type] || "barChart";
     // }
 
-    console.log(slotData);
+   
     widgets[nanoid(7)] = {
       id: nanoid(7),
       widgetType,
@@ -144,7 +143,7 @@ export function transformSlideAndStore(slideData: any, addSlide: any) {
 
   addSlide({
     id: nanoid(10),
-    slideNumber: slideData.slideNumber,
+    slideNumber: parseInt(slideData.slideNumber),
     heading: slideData.heading,
     widgets,
     theme: "starter",

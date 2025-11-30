@@ -14,7 +14,9 @@ export function useWidgetDeselect() {
         target.closest("[data-toolbar]") ||
         target.closest("[widget-element]") ||
         target.closest("[data-drawer]") ||
-        target.closest("[data-widget-interactive]")
+        target.closest("[data-widget-interactive]") || 
+        target.closest(".resize-handle") 
+
       )
         return;
       if (isToolbarOpen) {

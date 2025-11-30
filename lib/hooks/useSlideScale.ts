@@ -8,8 +8,8 @@ export function useSlideScale() {
   useEffect(() => {
     const updateScale = () => {
       const padding = 20;
-      const availableWidth = window.innerWidth - padding;
-      const availableHeight = window.innerHeight - padding;
+      const availableWidth = window.innerWidth;
+      const availableHeight = window.innerHeight;
 
       const scaleX = availableWidth / SLIDE_CONFIG.width;
       const scaleY = availableHeight / SLIDE_CONFIG.height;

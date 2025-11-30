@@ -26,3 +26,15 @@ export const createOutlineSchema = (allowImages: boolean) => {
     pointers: z.array(z.string().min(1)).min(1),
   });
 };
+
+const BaseWidgetSchema = z.object({}).catchall(z.any());
+export const createPresentationSchema = (allowImages: boolean) => {
+  const ALL_LAYOUTS = [...baseLayouts, ...imageLayouts];
+
+  return z.object({
+    slideNumber: z.number(),
+    heading: z.string(),
+    layoutId: z.enum(allowImages ? ALL_LAYOUTS : baseLayouts),
+    content: z.record(z.string(), BaseWidgetSchema),
+  });
+};

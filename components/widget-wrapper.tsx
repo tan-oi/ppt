@@ -3,7 +3,7 @@ import { usePresentationStore } from "@/lib/store/presentation-store";
 import { DraggableResizableWrapper } from "./wrapper";
 import { useUIStore } from "@/lib/store/ui-store";
 
-import { WidgetMetadata } from "@/lib/core/widget-metadata";
+import { WidgetMetadata, heightRequired } from "@/lib/core/widget-metadata";
 import { loadWidgetComponent } from "@/lib/core/widget-loader";
 
 export function WidgetWrapper({
@@ -45,15 +45,12 @@ export function WidgetWrapper({
   }
 
   if (!WidgetComponent) return null;
+  console.log(type);
   return (
     <DraggableResizableWrapper
       x={position.x}
       y={position.y}
-      height={
-        type === "image" || type === "divider"
-          ? position.height
-          : null
-      }
+      height={heightRequired(type as string) ? position.height : null}
       width={position.width}
       scale={slideScale}
       selected={selectedWidget}

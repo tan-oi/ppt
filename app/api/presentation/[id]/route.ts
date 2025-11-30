@@ -82,6 +82,99 @@ export async function PUT(
   try {
     const body = await request.json();
 
+    // await prisma.$transaction(
+    //   async (tx) => {
+    //     const existing = await tx.presentation.findUnique({
+    //       where: { id },
+    //       select: { userId: true },
+    //     });
+
+    //     if (existing) {
+    //       if (existing.userId !== session.user.id) {
+    //         throw new Error("Unauthorized");
+    //       }
+
+    //       await tx.widget.deleteMany({
+    //         where: {
+    //           slide: { presentationId: id },
+    //         },
+    //       });
+
+    //       await tx.slide.deleteMany({
+    //         where: { presentationId: id },
+    //       });
+
+    //       await tx.presentation.update({
+    //         where: { id },
+    //         data: {
+    //           topic: body.topic,
+    //           isModified: body.isModified,
+    //           theme: body.theme,
+    //         },
+    //       });
+
+    //       const slidesData = body.slides.map((slide: any) => ({
+    //         id: slide.id,
+    //         theme: slide.theme,
+    //         slideNumber: slide.slideNumber,
+    //         heading: slide.heading,
+    //         presentationId: id,
+    //       }));
+
+    //       await tx.slide.createMany({ data: slidesData });
+
+    //       const widgetsData = body.slides.flatMap((slide: any) =>
+    //         Object.entries(slide.widgets).map(([key, widget]: any) => ({
+    //           id: widget.id || key,
+    //           widgetType: widget.widgetType,
+    //           data: widget.data,
+    //           position: widget.position,
+    //           slideId: slide.id,
+    //         }))
+    //       );
+
+    //       await tx.widget.createMany({ data: widgetsData });
+    //     } else {
+    //       await tx.presentation.create({
+    //         data: {
+    //           id,
+    //           topic: body.topic,
+    //           isModified: body.isModified || false,
+    //           userId: session.user.id,
+    //           outlineId: body.outlineId,
+    //           theme: body.theme,
+    //         },
+    //       });
+
+    //       const slidesData = body.slides.map((slide: any) => ({
+    //         id: slide.id,
+    //         theme: slide.theme,
+    //         slideNumber: slide.slideNumber,
+    //         heading: slide.heading,
+    //         presentationId: id,
+    //       }));
+
+    //       await tx.slide.createMany({ data: slidesData });
+
+    //       const widgetsData = body.slides.flatMap((slide: any) =>
+    //         Object.entries(slide.widgets).map(([key, widget]: any) => ({
+    //           id: widget.id || key,
+    //           widgetType: widget.widgetType,
+    //           data: widget.data,
+    //           position: widget.position,
+    //           slideId: slide.id,
+    //         }))
+    //       );
+
+    //       await tx.widget.createMany({ data: widgetsData });
+    //     }
+    //   },
+    //   {
+    //     maxWait: 10000,
+    //     timeout: 15000,
+    //   }
+    // );
+
     await prisma.$transaction(
       async (tx) => {
         const existing = await tx.presentation.findUnique({
@@ -89,84 +182,80 @@ export async function PUT(
           select: { userId: true },
         });
 
-        if (existing) {
-          if (existing.userId !== session.user.id) {
-            throw new Error("Unauthorized");
+        if (existing && existing.userId !== session.user.id) {
+          throw new Error("Unauthorized");
+        }
+
+        const slidesInput = Array.isArray(body.slides) ? body.slides : [];
+
+        let topic = body.topic;
+        if (!topic) {
+          const outlineId = body.outlineId;
+          if (outlineId) {
+            const outline = await tx.outline.findUnique({
+              where: { id: outlineId },
+              select: { topic: true },
+            });
+            topic = outline?.topic || "Untitled Presentation";
+          } else {
+            topic = "Untitled Presentation";
           }
+        }
 
-          await tx.widget.deleteMany({
-            where: {
-              slide: { presentationId: id },
-            },
+        await tx.widget.deleteMany({
+          where: { slide: { presentationId: id } },
+        });
+
+        await tx.slide.deleteMany({
+          where: { presentationId: id },
+        });
+
+        await tx.presentation.upsert({
+          where: { id },
+          create: {
+            id,
+            topic,
+            isModified: body.isModified || false,
+            userId: session.user.id,
+            outlineId: body.outlineId || id,
+            theme: body.theme || "starter",
+          },
+          update: {
+            topic,
+            isModified: body.isModified !== undefined ? body.isModified : true,
+            theme: body.theme || "starter",
+          },
+        });
+
+        const slidesData = slidesInput.map((slide: any) => ({
+          id: slide.id,
+          theme: slide.theme || "starter",
+          slideNumber: Number.isFinite(Number(slide.slideNumber))
+            ? parseInt(String(slide.slideNumber), 10)
+            : 0,
+          heading: slide.heading,
+          presentationId: id,
+        }));
+
+        if (slidesData.length > 0) {
+          await tx.slide.createMany({ data: slidesData, skipDuplicates: true });
+        }
+
+        const widgetsData = slidesInput.flatMap((slide: any) =>
+          Object.entries(slide.widgets || {}).map(([key, widget]: any) => ({
+            id: widget.id || key,
+            widgetType: widget.widgetType,
+            data: widget.data,
+            position: widget.position,
+            slideId: slide.id,
+          }))
+        );
+
+        if (widgetsData.length > 0) {
+          await tx.widget.createMany({
+            data: widgetsData,
+            skipDuplicates: true,
           });
-
-          await tx.slide.deleteMany({
-            where: { presentationId: id },
-          });
-
-          await tx.presentation.update({
-            where: { id },
-            data: {
-              topic: body.topic,
-              isModified: body.isModified,
-              theme: body.theme,
-            },
-          });
-
-          const slidesData = body.slides.map((slide: any) => ({
-            id: slide.id,
-            theme: slide.theme,
-            slideNumber: slide.slideNumber,
-            heading: slide.heading,
-            presentationId: id,
-          }));
-
-          await tx.slide.createMany({ data: slidesData });
-
-          const widgetsData = body.slides.flatMap((slide: any) =>
-            Object.entries(slide.widgets).map(([key, widget]: any) => ({
-              id: widget.id || key,
-              widgetType: widget.widgetType,
-              data: widget.data,
-              position: widget.position,
-              slideId: slide.id,
-            }))
-          );
-
-          await tx.widget.createMany({ data: widgetsData });
-        } else {
-          await tx.presentation.create({
-            data: {
-              id,
-              topic: body.topic,
-              isModified: body.isModified || false,
-              userId: session.user.id,
-              outlineId: body.outlineId,
-              theme: body.theme,
-            },
-          });
-
-          const slidesData = body.slides.map((slide: any) => ({
-            id: slide.id,
-            theme: slide.theme,
-            slideNumber: slide.slideNumber,
-            heading: slide.heading,
-            presentationId: id,
-          }));
-
-          await tx.slide.createMany({ data: slidesData });
-
-          const widgetsData = body.slides.flatMap((slide: any) =>
-            Object.entries(slide.widgets).map(([key, widget]: any) => ({
-              id: widget.id || key,
-              widgetType: widget.widgetType,
-              data: widget.data,
-              position: widget.position,
-              slideId: slide.id,
-            }))
-          );
-
-          await tx.widget.createMany({ data: widgetsData });
         }
       },
       {
