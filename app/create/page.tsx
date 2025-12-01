@@ -3,14 +3,11 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import * as motion from "motion/react-client";
-import { ensureUserCache } from "@/lib/functions/userCache";
 
 import { requireUser } from "@/lib/functions/user-check";
 
 export default async function CreatePage() {
-  const id = (await requireUser()).id;
-
-  await ensureUserCache(id);
+  await requireUser();
 
   return (
     <div className="min-h-screen flex flex-col space-y-6">

@@ -31,6 +31,7 @@ export async function POST(req: Request) {
     await deductCredits({
       type: "image",
       amount: creditCost,
+      userId,
     });
 
     const { prompt } = await req.json();

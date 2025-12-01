@@ -91,7 +91,6 @@
 
           const updatedSlideData = usePresentationStore.getState().slides;
 
-        
           const topic =
             useGenerationStore.getState().userInstruction ||
             "Untitled Presentation";
@@ -109,8 +108,6 @@
               widgets: slide.widgets,
             })),
           };
-
-      
 
           const res = await fetch(`/api/presentation/${id}`, {
             method: "PUT",
@@ -171,11 +168,15 @@
       if (llmToBeCalled && !presentationData) {
         setType("llm");
         const processedOutline = useGenerationStore.getState().processedOutline;
-        console.log(processedOutline, "here");
+        console.log(processedOutline);
         if (!processedOutline) {
           return;
         }
-        submit({ processedOutline: JSON.stringify({ processedOutline }) });
+        submit({
+          processedOutline: JSON.stringify(
+            useGenerationStore.getState().processedOutline
+          ),
+        });
       } else if (presentationData && !llmToBeCalled) {
         if (needsTransformation(presentationData)) {
           transformAndStorePresentation(presentationData);

@@ -167,7 +167,7 @@ export function CreditViewer({
         </motion.div>
         <span className="text-sm font-medium text-foreground">{credits}</span>
 
-        <p className="text-gray-50">{currentPlan}</p>
+        {/* <p className="text-gray-50">{currentPlan}</p> */}
       </motion.button>
     </>
   );

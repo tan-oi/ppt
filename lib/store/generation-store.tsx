@@ -57,11 +57,13 @@ interface GenerationInterface {
   setImagePreference: (pref: "ai" | "stock") => void;
   ticket: string | null;
   setTicket: (value: string) => void;
-  processedOutline?:
-    | (Slide & {
-        slots: Record<string, { type: string }>;
-      })[]
-    | null;
+  processedOutline?: {
+    slides: (Slide & {
+      slots: Record<string, { type: string }>;
+    })[];
+    tone: PresentationTone;
+  } | null;
+
   prepareForLLM: () => void;
 }
 
@@ -116,6 +118,12 @@ export const useGenerationStore = create<GenerationInterface>((set, get) => ({
   processedOutline: null,
   prepareForLLM: () => {
     const outlines = get().result;
+    if (!outlines) {
+      set({ processedOutline: null });
+      return;
+    }
+
+    const tone = get().tone;
 
     const processed = outlines?.map(
       (outline: {
@@ -145,6 +153,6 @@ export const useGenerationStore = create<GenerationInterface>((set, get) => ({
       }
     );
 
-    set({ processedOutline: processed });
+    set({ processedOutline: { slides: processed, tone } });
   },
 }));

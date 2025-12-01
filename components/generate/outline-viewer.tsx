@@ -7,6 +7,7 @@ import {
   Plus,
   Trash2,
   X,
+  ArrowRight,
 } from "lucide-react";
 import { useGenerationStore } from "@/lib/store/generation-store";
 import { Button } from "../ui/button";
@@ -39,6 +40,7 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
   const [localSlides, setLocalSlides] = useState<Slide[]>([]);
   const [messageIndex, setMessageIndex] = useState(0);
   const [imagePreference, setImagePreference] = useState<"ai" | "stock">("ai");
+  const [timer, setTimer] = useState(240); // seconds (4 minutes)
 
   const planConfig = PLAN_CONFIG[plan];
 
@@ -46,13 +48,29 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
     ? [...baseLayouts, ...imageLayouts]
     : baseLayouts;
 
+  // Loading message rotation (when result is not ready)
   useEffect(() => {
-    if (!result) {
-      const interval = setInterval(() => {
-        setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
-      }, 1000);
-      return () => clearInterval(interval);
-    }
+    if (result) return;
+    const id = window.setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [result]);
+
+  // Start 4-minute timer when data renders (result becomes truthy)
+  useEffect(() => {
+    if (!result) return;
+    setTimer(240); // reset to 4:00 when result arrives
+    const id = window.setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(id);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
   }, [result]);
 
   useEffect(() => {
@@ -185,6 +203,12 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
     router.push(`/docs/${id}?ticket=${ticket}`);
   };
 
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${String(s).padStart(2, "0")}`;
+  };
+
   if (!result) {
     return (
       <div className="min-h-screen bg-transparent flex items-center justify-center">
@@ -206,36 +230,53 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
   return (
     <div className="min-h-screen bg-transparent p-8">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center gap-3 mb-8 justify-between">
-          <div className="flex gap-3 items-center">
-            <Sparkles className="w-6 h-6 text-cyan-400" />
-            <div className="flex flex-col">
-              <div className="flex items-center gap-4">
-                <h1 className="text-3xl font-bold text-white">
-                  Slides Outline
-                </h1>
-                <span className="text-sm text-zinc-500">
-                  {localSlides.length} /{" "}
-                  {Math.min(slidesCount, planConfig.maxSlidesPerPresentation)}{" "}
-                  slides
-                </span>
+        <div className=" z-50">
+          <div className="flex items-center gap-3 mb-8 justify-between p-3 rounded-xl">
+            <div className="flex gap-3 items-center">
+              <Sparkles className="w-6 h-6 text-cyan-400" />
+              <div className="flex flex-col">
+                <div className="flex items-center gap-4">
+                  <h1 className="text-3xl font-bold text-white">
+                    Slides Outline
+                  </h1>
+                  <span className="text-sm text-zinc-500">
+                    {localSlides.length} /{" "}
+                    {Math.min(slidesCount, planConfig.maxSlidesPerPresentation)}{" "}
+                    slides
+                  </span>
+                </div>
+                <p className="text-zinc-600 text-sm">
+                  Click on any text to edit it
+                </p>
               </div>
-              <p className="text-zinc-600 text-sm">
-                Click on any text to edit it
-              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                className="cursor-pointer hover:opacity-80 transition-colors hover:text-zinc-700 text-zinc-900 rounded-lg"
+                size="lg"
+                onClick={() => {
+                  router.replace("/create");
+                  useGenerationStore.getState().setResult(null);
+                }}
+              >
+                Go back
+              </Button>
+              {result && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-zinc-800 border border-zinc-700">
+                  <p className="text-xs text-zinc-400">Time left</p>
+                  <p className="text-[8px] text-zinc-600">
+                    You're required to do proceed to the next step before the
+                    timer runs out, and do not close the window as it would lead
+                    cause no generation
+                  </p>
+                  <div className="text-sm font-mono text-white">
+                    {formatTime(timer)}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-
-          <Button
-            className="cursor-pointer hover:opacity-80 transition-colors hover:text-zinc-700 text-zinc-900 rounded-lg"
-            size="lg"
-            onClick={() => {
-              router.replace("/create");
-              useGenerationStore.getState().setResult(null);
-            }}
-          >
-            Go back
-          </Button>
         </div>
 
         {localSlides.length === 0 ? (
@@ -303,18 +344,17 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
                     key={pointerIdx}
                     className="flex gap-3 text-zinc-300 group/pointer"
                   >
-                    <span className="text-cyan-400 mt-1">•</span>
                     <textarea
                       value={pointer}
                       onChange={(e) => {
                         handlePointerChange(index, pointerIdx, e.target.value);
-                        const target = e.target as HTMLTextAreaElement;
-                        target.style.height = "auto";
-                        target.style.height = target.scrollHeight + "px";
+                        const t = e.target as HTMLTextAreaElement;
+                        t.style.height = "auto";
+                        t.style.height = t.scrollHeight + "px";
                       }}
-                      className="flex-1 leading-relaxed text-sm bg-transparent border-none outline-none focus:ring-2 focus:ring-cyan-500/50 rounded px-2 py-1 resize-none overflow-hidden"
+                      className="flex-1 text-sm leading-tight bg-transparent border-none outline-none focus:ring-2 focus:ring-cyan-500/50 rounded px-1 py-0 resize-none overflow-hidden"
                       placeholder="Pointer text..."
-                      style={{ height: "auto" }}
+                      style={{ minHeight: "0px" }}
                       ref={(el) => {
                         if (el) {
                           el.style.height = "auto";
@@ -322,6 +362,7 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
                         }
                       }}
                     />
+
                     {slide.pointers.length > 1 && (
                       <button
                         onClick={() => deletePointer(index, pointerIdx)}
@@ -395,7 +436,7 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
                 }`}
               >
                 Create presentation
-                <ArrowBigRight className="w-6 h-6 ml-2" />
+                <ArrowRight className="w-8 h-8" />
               </Button>
             </div>
           </div>

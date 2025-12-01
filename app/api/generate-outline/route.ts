@@ -37,11 +37,9 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    console.log("i did");
     const { slidesNo } = parsed.data;
 
     const planCheck = await requestValidation(userId, slidesNo);
-
     if (!planCheck.allowed) {
       return NextResponse.json(
         {
@@ -59,10 +57,10 @@ export async function POST(req: Request) {
     const { instructions, type, style, tone } = parsed.data;
 
     const requiredCredits = Number(process.env.PPT_REQUIRED_CREDITS);
-    console.log(requiredCredits);
     const isDeducted = await deductCredits({
       type: "ppt",
       amount: requiredCredits,
+      userId: userId,
     });
 
     if (!isDeducted.ok) {
@@ -103,10 +101,8 @@ export async function POST(req: Request) {
       await refundCredits({ userId, amount: requiredCredits });
       throw err;
     }
-
     const presentationId = nanoid(10);
     const checkTicket = nanoid(32);
-
     await prisma.outline.create({
       data: {
         id: presentationId,

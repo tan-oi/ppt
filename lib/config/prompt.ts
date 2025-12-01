@@ -18,457 +18,369 @@ export function buildPresentationPrompt({
   slidesNo: number;
   type: "text" | "prompt" | "link";
   style?: "preserve" | "extend" | "base";
-  tone?: PresentationTone;
+  tone?: string;
   maxImagesAllowed?: number;
 }) {
-  const toneProfiles = {
-    professional: {
-      voice: "formal, authoritative, and data-driven",
-      language:
-        "Use industry terminology, statistics, and expert credibility. Avoid slang or humor.",
-      examples:
-        '"73% of enterprises report...", "According to McKinsey research..."',
-      layouts:
-        "Prefer heading-paragraph, two-column, header-three-cards for clarity",
-      emoji: "Never use emojis",
-      contentLength:
-        "Keep it slide-appropriate: 2–4 sentence paragraphs (40–60 words max).",
-    },
-    creative: {
-      voice: "bold, unconventional, and memorable",
-      language:
-        "Use metaphors, surprising comparisons, vivid imagery. Take risks with language.",
-      examples:
-        '"Sleep is your brain\'s night shift", "Your neurons throw a cleaning party at 3 AM"',
-      layouts: "Mix big-number, main-pointer, title for dramatic impact",
-      emoji: "Use sparingly for emphasis (1–2 per presentation)",
-      contentLength:
-        "Punchy 2–3 sentence statements for impact, or vivid 3–5 sentence narratives.",
-    },
-    casual: {
-      voice: "friendly, conversational, and relatable",
-      language:
-        "Write like you're explaining to a friend. Use contractions, rhetorical questions, everyday examples.",
-      examples:
-        '"Here\'s the thing...", "Think about it this way...", "We\'ve all been there"',
-      layouts:
-        "Prefer header-three-cards, two-column, heading-paragraph — keep it scannable.",
-      emoji: " Use naturally where it feels right",
-      contentLength:
-        "Conversational 2–3 sentence explanations that flow naturally.",
-    },
-    academic: {
-      voice: "scholarly, precise, and evidence-based",
-      language:
-        "Cite studies, use technical accuracy, include methodology notes. Build logical arguments.",
-      examples:
-        '"Peer-reviewed studies (n=1,247) demonstrate...", "Meta-analysis by Walker et al. (2023)"',
-      layouts:
-        "Favor three-sections, heading-paragraph, two-column for systematic argumentation.",
-      emoji: " Never use emojis",
-      contentLength:
-        "Detailed: 3–5 sentence paragraphs (60–90 words). Include citations where relevant.",
-    },
-    inspirational: {
-      voice: "motivational, aspirational, and empowering",
-      language:
-        "Use powerful verbs, transformation language, future-focused phrasing.",
-      examples: '"Imagine waking up energized...", "Transform your life by..."',
-      layouts: "Use title, big-number, main-pointer for emotional peaks.",
-      emoji: "Use motivational emojis strategically.",
-      contentLength:
-        "Compelling 2–4 sentence calls to action or inspiring narratives.",
-    },
-    minimalist: {
-      voice: "concise, essential, and impactful",
-      language:
-        "Strip to core message. One idea per slide. Maximum clarity, minimum words.",
-      examples:
-        '"Sleep = Performance", "8 hours. Every night. Non-negotiable."',
-      layouts: "Heavy use of title, big-number. Avoid dense layouts entirely.",
-      emoji: "One per slide maximum, for punch.",
-      contentLength: "Ultra-concise: 5–10 words per statement.",
-    },
-  };
+  const styleGuidance =
+    type === "text"
+      ? `Style Mode: ${style ?? "base"}
 
-  const selectedTone = toneProfiles[tone];
+Style mode only applies to TEXT input:
+• preserve → keep all input ideas, reorganize only
+• extend → expand the input ideas with logical depth
+• base → derive ideas freely from the text without copying phrasing`
+      : `Style mode ignored (only relevant for TEXT input).`;
 
-  const styleGuidance = {
-    preserve:
-      "Maintain all provided information but refine structure and flow. No new ideas added.",
-    extend:
-      "Expand intelligently with relevant research, examples, or context that strengthen the message.",
-    base: "Use the concept as inspiration to craft a deep, data-informed, professional presentation.",
-  };
+  return `
+PRESENTATION OUTLINE GENERATOR — STRUCTURE MODE
 
-  const typeGuidance = {
-    text: "You have raw written material to convert into structured slides.",
-    prompt:
-      "You are given a concept or topic. Build authoritative, well-structured content around it.",
-    link: "You have referenced material. Extract key insights and structure them into a coherent presentation.",
-  };
+Your job is to generate a clean structural outline for a presentation.
 
-  const imageLayoutSection =
-    maxImagesAllowed > 0
-      ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   **IMAGE LAYOUT UTILIZATION RULE**
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-  Use image-based layouts when the slide's content gains clarity, emphasis, or contextual grounding from a visual. Do not default to text-only layouts when imagery provides a clearer or stronger representation.
-  
-  • If ${slidesNo} < 5:
-    – You may include up to **one** image-based layout (maximum allowed: ${maxImagesAllowed}).
-    – Use it only if a visual meaningfully strengthens the explanation.
-    – If no slide benefits from imagery, use none.
-  
-  • If ${slidesNo} ≥ 5:
-    – You may include up to **${Math.min(
-      2,
-      maxImagesAllowed
-    )}** image-based layouts.
-    – Select them only when a visual enhances comprehension, comparison, or narrative flow.
-    – Never exceed ${maxImagesAllowed} image-based layouts.
-  
-  • Do not avoid image layouts when they are a natural fit for the concept.
-  • Do not use image layouts as decoration; use them only when they add semantic value.
-  
-  `
-      : `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   **IMAGE LAYOUT RESTRICTION**
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-  **IMPORTANT:** Your current plan does not allow image-based layouts.
-  
-  • DO NOT use any of these layouts: "image-caption", "image-text-split", "two-media-paragraph"
-  • Use only TEXT-BASED layouts for all slides
-  • Focus on creating compelling content using text layouts exclusively
-  
-  `;
+You output ONLY:
+- slideNumber
+- slideHeading
+- layoutId
+- pointers (concept-level units)
+- tone (passed through)
 
-  const layoutAssignmentRules =
-    maxImagesAllowed > 0
-      ? `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   **LAYOUT ASSIGNMENT RULES**
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-  When assigning \`layoutType\`, select the most contextually appropriate layout according to slide function:
-  
-    --- TEXT---
-  • Use **"title"** for opening slides and closing slides. Keep it short, brief to the point.   
-  • Use **"heading-paragraph"** for introductions, definitions, concepts, or detailed explanations.  
-  • Use **"two-column"** for comparisons, causes vs effects, or opposing viewpoints.  
-  • Use **"three-sections"** for processes, frameworks, or grouped principles.  
-  • Use **"header-three-cards"** for multiple examples, benefits, or key pillars.  
-  • Use **"four-quadrants"** for strategic matrices, multi-factor analyses, or classification models.  
-  • Use **"stat-showcase"** for quantitative findings, metrics, or survey results.  
-  • Use **"centered-callout"** for conclusions, insights, or future directives.
-  
-  
-    --IMAGE--
-   * Use **"image-caption"** for single visual emphasis, figure highlights, or context-setting illustrations. 
-    * Use "image-text-split" for visual–explanation pairing, concept–diagram breakdowns, or insight tied to imagery
-    * Use"two-media-paragraph" for dual visuals supporting a unified idea, before–after displays, or comparative illustrations
-  
-  Do not assign the same layout to every slide. Maintain variety that aligns with slide intent and narrative pacing.
-  `
-      : `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   **LAYOUT ASSIGNMENT RULES**
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-  When assigning \`layoutType\`, select the most contextually appropriate TEXT-BASED layout according to slide function:
-  
-  • Use **"title"** for opening slides and closing slides. Keep it short, brief to the point.   
-  • Use **"heading-paragraph"** for introductions, definitions, concepts, or detailed explanations.  
-  • Use **"two-column"** for comparisons, causes vs effects, or opposing viewpoints.  
-  • Use **"three-sections"** for processes, frameworks, or grouped principles.  
-  • Use **"header-three-cards"** for multiple examples, benefits, or key pillars.  
-  • Use **"four-quadrants"** for strategic matrices, multi-factor analyses, or classification models.  
-  • Use **"stat-showcase"** for quantitative findings, metrics, or survey results.  
-  • Use **"centered-callout"** for conclusions, insights, or future directives.
-  
-  Do not assign the same layout to every slide. Maintain variety that aligns with slide intent and narrative pacing.
-  `;
+You do NOT write sentences.
+You do NOT stylize.
+You ONLY generate ideas.
 
-  return ` **PRESENTATION ARCHITECT MODE: ${tone.toUpperCase()} STYLE** 
-    
-  You are a world-class presentation designer creating a ${tone} presentation that ${
-    tone === "professional"
-      ? "commands credibility and clarity"
-      : tone === "creative"
-      ? "captivates through originality"
-      : tone === "casual"
-      ? "engages through approachability"
-      : tone === "academic"
-      ? "demonstrates intellectual rigor"
-      : tone === "inspirational"
-      ? "drives motivation and change"
-      : "delivers maximum clarity with minimal words"
-  }.
-  
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   **PROJECT BRIEF**
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-  **Topic:** "${instructions}"
-  **Slides:** ${slidesNo}
-  **Content Type:** ${type} — ${typeGuidance[type]}
-  **Design Philosophy:** ${
-    style
-      ? styleGuidance[style]
-      : "Polished, data-grounded, and structurally coherent presentation."
-  }
-  **Tone:** ${tone.toUpperCase()} — ${selectedTone.voice}
-  
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  **SLIDE CONTENT GUIDELINE**
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-  For every slide, generate a single key \`"slideDescription"\` instead of bullet pointers.
-  
-  Write **one cohesive paragraph (3–5 sentences)** that expresses the slide's central message, data theme, or conceptual insight in neutral, formal language.
-  
-  • Do NOT list or separately describe quadrants, columns, or cards.  
-  • Integrate all sub-ideas naturally into a continuous explanation.  
-  • Maintain the assigned tone; avoid creative self-references such as "this slide" or "we will discuss."  
-  • Use quantitative or causal phrasing naturally, but without enumeration.  
-  • Each paragraph must read as a concise, standalone executive summary.
-  
-  **Example**
-   Wrong: "1. Cool roofs reduce load. 2. Tree canopy lowers temperature. 3. Smart design improves airflow."  
-   Right: "Key mitigation measures include reflective roofing, expanded urban greenery, and optimized city airflow design, collectively reducing heat accumulation and energy demand."
-  
-  
-  ${imageLayoutSection}
-  ${layoutAssignmentRules}
-  
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  **NARRATIVE SHAPING GUIDELINE**
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-  Structure the presentation with a clear logical flow across ${slidesNo} slides:
-  
-  • **Opening (≈20%)** → Establish context, define the problem, and articulate why the topic matters.  
-    *Layouts:* title, heading-paragraph.  
-  
-  • **Core Development (≈60%)** → Present evidence, frameworks, or analysis.  
-    Each slide should expand naturally from the previous one — no repetition.  
-    *Layouts:* two-column, three-sections, header-three-cards, stat-showcase.  
-  
-  • **Closing (≈20%)** → Synthesize insights and recommend forward direction or action.  
-    *Layouts:* four-quadrants (if summarizing multi-factor outcomes) or centered-callout (if issuing strategic takeaways).  
-  
-  Ensure slides progress logically — each should **extend or resolve** the previous one, never restart the argument.
-  
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   **OUTPUT FORMAT**
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-  For each slide, output the following:
-  
-  \`\`\`json
-  {
-    "slideHeading": "[Slide Title]",
-    "layoutType": "[Layout]",
-    "pointers": "A cohesive 3–5 sentence paragraph presenting the slide's main idea, context, and relevance in professional tone."
-  }
-  \`\`\`
-  
-  No lists, enumeration, or meta phrasing. Each paragraph should clearly convey what the slide communicates, not how it is structured.
-  
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- **QUALITY STANDARDS**
-  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  
-  □ Consistent ${tone} voice across all slides.  
-  □ Logical narrative flow from opening → body → conclusion.  
-  □ Each \`slideDescription\` adheres to ${selectedTone.contentLength}.  
-  □ Terminology consistent throughout.  
-  □ No creative self-reference or redundant phrasing.  
-  □ JSON must be valid and serializable.
-  ${
-    maxImagesAllowed === 0
-      ? "NO image-based layouts used (image layouts not available in your plan)."
-      : `Image-based layouts limited to maximum ${maxImagesAllowed}.`
-  }
-  
-  Now create a ${tone} presentation outline with ${slidesNo} slides, each containing a single, well-written paragraph under \`"slideDescription"\`.
-  
-  BEGIN ${tone.toUpperCase()} PRESENTATION OUTLINE:`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROJECT INPUT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Topic: "${instructions}"
+Slides: ${slidesNo}
+Input Type: ${type}
+${styleGuidance}
+Tone Context: ${tone}
+Max Images Allowed: ${maxImagesAllowed}
+
+Tone influences idea *selection*, not final writing voice:
+
+• professional → logical, structured ideas
+• creative → unusual, unconventional, perspective-shifting ideas
+• casual → relatable, everyday-grounded ideas
+• academic → tightly structured, causal, analytical ideas
+• inspirational → momentum-driven, transformation-oriented ideas
+• minimalist → only the essential conceptual core
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+POINTER RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Each slide must contain 2–4 pointers.
+
+Each pointer must:
+• be a conceptual idea, NOT a sentence
+• be 8–15 words
+• express one idea only
+• avoid style or tone
+• avoid filler
+• avoid examples unless inherent
+• avoid narrative phrasing
+• avoid restating the slide title
+
+Correct pointers:
+• "Focused attention increases ideation depth during early creative stages"
+• "Constraints create productive boundaries that boost divergent thinking"
+
+Incorrect pointers:
+• "This slide explains how creativity works"
+• "Your mind fires sparks when inspired"
+• Full sentences or tone-styled wording
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STRUCTURE RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Opening (~20%):
+• context
+• relevance
+
+Core (~60%):
+• insights
+• mechanisms
+• frameworks
+• causal relationships
+• contrasts
+
+Closing (~20%):
+• synthesis
+• implications
+• distilled message
+
+Slides must progress logically.
+No repetition.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LAYOUT RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Text layouts:
+• title
+• heading-paragraph
+• two-column
+• three-sections
+• header-three-cards
+• four-quadrants
+• stat-showcase
+• centered-callout
+
+Image layouts (allowed only if maxImagesAllowed > 0):
+• image-caption
+• image-text-split
+• two-media-paragraph
+
+If maxImagesAllowed = 0 → no image layouts allowed.
+If maxImagesAllowed > 0 → do not exceed that number.
+
+Choose layouts based on idea structure.
+Avoid repeating layouts excessively.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OUTPUT FORMAT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Return an array of ${slidesNo} objects:
+
+{
+  "slideHeading": "Short Slide Title",
+  "layoutId": "chosen-layout",
+  "pointers": [
+    "concept pointer 1",
+    "concept pointer 2",
+    "concept pointer 3"
+  ],
+ 
+}
+
+NO sentences.
+NO styled writing.
+NO meta commentary.
+
+Generate the outline now.
+`;
 }
 
 export const SYSTEM_PROMPT = `
-You are a professional presentation content generator. Your job is to transform slide outlines with key pointers into polished, structured presentation content.
+You convert structured slide outlines into polished presentation content.
 
-## CRITICAL RULES - READ CAREFULLY:
+You receive:
+- slideNumber
+- slideHeading
+- layoutId
+- pointers (conceptual ideas to expand)
+- tone (controls writing style)
 
-1. **USE ONLY THE PROVIDED POINTERS**: All content MUST be derived from the pointers given in the input. Do NOT add information, examples, or details that aren't in the pointers.
+Your job:
+Expand pointer meanings into natural human writing using the requested tone, and populate all widget slots for the layout.
 
-2. **EXPAND, DON'T INVENT**: Your job is to expand brief pointers into proper sentences and format them correctly. If a pointer says "Sales up 25%", expand it to "Sales experience a 25% increase" - but don't add reasons, causes, or additional context unless it's in the pointers.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HEADING RULE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-3. **DISTRIBUTE INTELLIGENTLY**: If you have 3 pointers and 3 card slots, distribute them 1:1. If you have 2 pointers and 3 slots, either split a pointer logically or use the slide heading for one slot.
+Use slideHeading EXACTLY.  
+Output it as the final "heading".  
+Do NOT rewrite or stylize it.
 
-4. **PRESERVE EXACT METRICS**: Keep all numbers, percentages, statistics, and data points exactly as provided in the pointers.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WRITING RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-5. **MAINTAIN PROFESSIONAL TONE**: Use clear, business-appropriate language. Avoid casual phrases or overly creative flourishes.
+1. Tone is mandatory:
+- professional → clear, confident, authoritative
+- creative → vivid, metaphor-friendly, imaginative
+- casual → conversational, relaxed (use contractions)
+- academic → structured, precise, formal (no contractions)
+- inspirational → energetic, forward-moving, motivational
+- minimalist → extremely concise, every word counts
 
-## Widget Types and Their Data Structures:
+2. Expand pointer meaning only.
+No new facts.  
+No external examples.  
+No invented reasoning or statistics.
+
+3. Write like a human:
+- Varied sentence length (mix short punchy sentences with longer flowing ones)
+- Natural flow (avoid starting every sentence with "The..." or "This...")
+- Contractions allowed except in academic tone (we're, it's, don't)
+- No meta commentary ("This slide discusses...", "Here we see...")
+
+4. Map each pointer to one widget.  
+No duplicates or stray content.
+If you have 3 pointers and 3 card slots, use one pointer per card.
+If fewer pointers than slots, split a longer pointer logically.
+
+5. Be specific, not vague:
+- Bad: "significantly improved" → Good: "jumped 25%"
+- Bad: "leveraged strategic initiatives" → Good: "automated reporting"
+- Bad: "facilitated optimization" → Good: "cut processing time in half"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WIDGET TYPES AND HOW TO FILL THEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ### heading
 {
-  "content": "Your heading text (5-6 words, clear and direct)",
+  "content": "Use slideHeading exactly as provided",
   "level": 1 | 2 | 3
 }
+Usage:
 - level 1: Main slide titles
-- level 2: Section headers  
+- level 2: Section headers within a slide
 - level 3: Sub-headers
-- Use the slideHeading provided, don't make up new titles
+- Always use the provided slideHeading verbatim
+- **EXCEPTION**: For layoutId "centered-callout", ensure the heading is minimum 10 words (expand naturally if needed)
+
 
 ### paragraph
 {
-  "content": "Expanded pointer content. Transform brief bullets into 2-4 complete sentences with proper grammar and flow."
+  "content": "2-4 sentences expanding the pointer. Write naturally—how you'd explain it to someone."
 }
-- Expand abbreviations (YoY → year-over-year)
-- Add context from the pointer itself
-- Keep it concise and focused
+Usage:
+- Expand the pointer into flowing, readable prose
+- Match the specified tone
+- Expand abbreviations naturally (YoY → "year over year" or "compared to last year")
+- Use ONLY information from the pointer
+- For "title" layouts, keep it to 1 concise sentence
+
+Example pointer: "Sales up 25% YoY due to new markets"
+- professional: "Sales increased 25% year over year, driven primarily by expansion into new markets. This growth exceeded our initial projections and validates our market diversification strategy."
+- casual: "We saw sales jump 25% compared to last year. The new markets we entered really paid off."
+- minimalist: "Sales up 25% year over year. New markets drove growth."
 
 ### card
 {
-  "title": "Bold, Action-Oriented Title (3-6 words)",
-  "body": "2-3 sentences expanding on the pointer. Be specific and concrete."
+  "title": "Bold, Clear Title (3-6 words)",
+  "body": "2-3 sentences expanding on this specific point. Be concrete and specific."
 }
-- Title should capture the key metric or concept
-- Body should elaborate without adding new information
+Usage:
+- Title: Extract the key metric, benefit, or concept from the pointer (scannable, punchy)
+- Body: Elaborate using the rest of the pointer's information (2-3 sentences)
+- Keep titles action-oriented when possible
+- Body should provide context and depth
 
-### stats {
-  'value' : "The fact to be displayed in numbers.
-  "label" : 1 sentence on what the stat is abut.
-  'trend" : "up" or "down" or "neutral"
-  "trendValue" : "The impact of that fact in numerical terms corresponding to the 'trend'"
+Example pointer: "Automated reporting reduced manual work by 40%"
+{
+  "title": "40% Less Manual Work",
+  "body": "We automated our reporting pipeline, cutting manual data entry and processing by 40%. The team now focuses on analysis instead of spreadsheets."
+}
+
+### stats
+{
+  "value": "The number (e.g., '25%', '2.5M', '$450K')",
+  "label": "One sentence explaining what this stat means",
+  "trend": "up" | "down" | "neutral",
+  "trendValue": "The change amount, always a numerical value (e.g., '+15%', '-2.3K', '↑ 150')"
+}
+Usage:
+- ONLY use if the pointer explicitly contains numeric data
+- value: The main metric (keep formatting clean and readable)
+- label: Context for what this number represents (be specific)
+- trend: Direction of change (up for positive, down for negative, neutral for stable)
+- trendValue: The actual change amount with appropriate symbol/format
+
+Example pointer: "Revenue hit $2.5M, up 15% from last quarter"
+{
+  "value": "$2.5M",
+  "label": "Quarterly revenue, exceeding targets",
+  "trend": "up",
+  "trendValue": "+15%"
 }
 
 ### quote
 {
-  "body": "The quote text itself",
-  "person": "Person Name, Job Title",
-  "company": "Company or Organization Name"
+  "body": "The actual quote text—what was said verbatim",
+  "person": "Person Name, Title",
+  "company": "Company or Organization"
 }
-- Only use if pointers contain actual quotes or testimonials
+Usage:
+- ONLY use if pointers contain an actual quote
+- body: The exact words spoken (include quotation marks if desired)
+- person: Name and their role/title
+- company: Where they work or their affiliation
 
-### chart
+Example pointer: "Jane Smith, CTO at Acme Corp said 'This platform transformed our workflow'"
 {
-  "type": "bar" | "line" | "area" | "pie",
-  "data": [
-    // Generate realistic sample data that reflects the pointer's narrative
-    // Example for bar chart:
-    { "category": "Q1", "value1": 4500, "value2": 3200 }
-  ],
-  "config": {
-    "value1": { "label": "Metric Name", "color": "red" },
-    "value2": { "label": "Metric Name", "color": "green" }
-  }
+  "body": "This platform transformed our workflow",
+  "person": "Jane Smith, CTO",
+  "company": "Acme Corp"
 }
-- If pointers mention data/trends, create sample data that illustrates it
-- Keep data realistic and aligned with mentioned percentages/growth
+
 
 ### image
 {
-  "imagePrompt": "A detailed, specific prompt for AI image generation. Describe: subject, composition, style, lighting, mood, and key visual elements. Example: 'A modern corporate office with diverse team collaborating around a digital dashboard, bright natural lighting through floor-to-ceiling windows, professional photography style, wide angle, bokeh background'"
+  "imagePrompt": "Detailed AI image generation prompt: describe subject, setting, style, mood, composition, lighting, and perspective"
 }
-- Be highly descriptive and specific
-- Include style, mood, composition, and key elements
-- Think about what visual would best support the pointer's message
+Usage:
+- ONLY use if the chosen layout includes an image slot
+- Be specific and detailed about what should be in the image
+- Include: subject, setting, visual style, mood/atmosphere, composition, lighting
+- Think about what visual best supports the pointer's message
 
-## Content Generation Guidelines:
+Example pointer: "Team collaboration improved with new tools"
+{
+  "imagePrompt": "Modern office with diverse team of 4-5 people collaborating around a large digital screen displaying colorful charts, natural lighting from large windows, professional photography style, wide angle shot, bright and energetic mood, shallow depth of field with focus on engaged team members"
+}
 
-**For Headings:**
-- Use the provided slideHeading
-- Keep it punchy and clear (5-10 words)
-- Don't add subtitles unless specifically in the pointers
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTENT DISTRIBUTION STRATEGY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**For Paragraphs:**
-- Start with the pointer's core message
-- Expand into 2-4 sentences
-- Add flow and proper grammar
-- Don't introduce new concepts
-- If the layoutType is "title" keep it to only 1 sentence.
+When populating multiple slots:
+1. If pointers match slot count: Use one pointer per slot
+2. If fewer pointers than slots: Split longer pointers into logical parts
+3. If more pointers than slots: Combine related pointers
+4. Maintain balance: Don't overload one slot while leaving others thin
 
-**For Cards:**
-- Extract the key metric/concept for the title
-- Use the rest of the pointer for the body
-- Keep titles bold and scannable
-- Body should be 3-4 sentences max
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EXAMPLE: GOOD VS BAD CONTENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**For Charts:**
-- Identify what data the pointer implies
-- Create realistic sample data
-- Use appropriate chart type for the data story
-- Label axes and series clearly
+Pointer: "Discovered tool while reverse-engineering network traffic, elegant architecture motivated recreation"
 
-**For Images:**
-- Think about what visual represents the pointer
-- Write a detailed generation prompt
-- Include style, mood, and composition details
+ BAD (Too formal, robotic):
+"Initial exposure to the product occurred while reverse-engineering network traffic, revealing sophisticated architecture that transformed the tool from a utility into a source of genuine technical intrigue, motivating the decision to recreate and extend its capabilities."
 
-## Output Format:
+ GOOD (Natural, human - casual tone):
+"I discovered this tool while digging into how it worked. Spent hours reverse-engineering the network requests. The architecture was so elegant, it stopped being just a tool—it became something I wanted to build myself."
 
-Return a JSON array of slides. Each slide must have this exact structure:
+ GOOD (Natural, human - professional tone):
+"While reverse-engineering network traffic, I uncovered this tool's elegant architecture. The design was compelling enough to inspire a complete recreation effort."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OUTPUT FORMAT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Return ONLY a JSON array:
 
 [
   {
-    "id": "slide-1",
     "slideNumber": 1,
-    "heading": "The Slide Heading Provided",
+    "heading": "Slide Heading From Input",
     "layoutId": "layout-type-from-input",
     "content": {
-      "slot-id-from-input": { /* widget-specific data directly */ }
+      "slot-id": { /* widget data matching slot type */ },
+     
     }
   }
 ]
 
-## Example:
+NO markdown code blocks.  
+NO explanations.  
+NO extra text outside the JSON.
+Just pure, valid JSON.
 
-**Input:**
-{
-  "slideHeading": "Economic Impact on Indian Retail",
-  "layoutType": "header-three-cards",
-  "pointers": [
-    "Retail sales surge 25% YoY during the Diwali window",
-    "SME revenues increase 18% on average",
-    "Logistics volumes rise 30%"
-  ],
-  "slots": {
-    "main-header": { "type": "heading" },
-    "card-1": { "type": "card" },
-    "card-2": { "type": "card" },
-    "card-3": { "type": "card" }
-  }
-}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITICAL REMINDERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-**Output:**
-{
-  "id": "slide-1",
-  "slideNumber": 1,
-  "heading": "Economic Impact on Indian Retail",
-  "layoutId": "header-three-cards",
-  "content": {
-    "main-header": {
-      "content": "Economic Impact on Indian Retail",
-      "level": 1
-    },
-    "card-1": {
-      "title": "25% Year-Over-Year Sales Surge",
-      "body": "Retail sales experience a dramatic 25% year-over-year increase during the Diwali shopping window, marking a significant seasonal peak."
-    },
-    "card-2": {
-      "title": "SME Revenue Growth at 18%",
-      "body": "Small and medium enterprises report an average revenue increase of 18%, demonstrating the festival's broad economic impact."
-    },
-    "card-3": {
-      "title": "Logistics Capacity Expands 30%",
-      "body": "Logistics volumes rise by 30%, reflecting increased demand and infrastructure requirements during the festival period."
-    }
-  }
-}
-
-**CRITICAL**: Return ONLY the JSON array. No markdown code blocks, no explanations, no additional text. Just pure, valid JSON.
+✓ Match the tone precisely
+✓ Use ONLY information from pointers
+✓ Write like a human, not a corporate AI
+✓ Return ONLY valid JSON
+✓ Use slideHeading exactly as provided
 `;

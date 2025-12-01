@@ -1,6 +1,6 @@
 import { getPlanConfig, getRedisKey } from "../config/plan";
 
-import { preloadUserCache } from "./userCache";
+import { getUserCache, preloadUserCache } from "./userCache";
 
 export async function canCreatePresentation(userId: string) {
   const cache = await preloadUserCache(userId, ["plan", "pptCount"]);
@@ -22,21 +22,30 @@ export async function canCreatePresentation(userId: string) {
 }
 
 export async function userPlan(userId: string) {
-  const cache = await preloadUserCache(userId, ["plan"]);
+  const cache = await getUserCache(userId, ["plan"]);
   return { plan: cache?.plan ?? "free" };
 }
 
 export async function requestValidation(userId: string, slidesNo: number) {
-  const cache = await preloadUserCache(userId, ["plan", "pptCount"]);
+  const cache = await getUserCache(userId, ["plan", "pptCount", "credits"]);
 
   const plan = (cache?.plan as "free" | "basic" | "pro") ?? "free";
   const pptCount = Number(cache?.pptCount ?? 0);
+  const credits = Number(cache?.credits ?? 0);
 
   const {
     maxPresentations,
     maxSlidesPerPresentation,
     maxImagePerPresentation,
+    costs,
   } = getPlanConfig(plan);
+
+  if (credits < costs.generateAISlides)
+    return {
+      allowed: false,
+      error: "INSUFFICIENT_CREDITS",
+      message: `You've exhausted your credits to make presentations`,
+    };
 
   if (pptCount >= maxPresentations) {
     return {

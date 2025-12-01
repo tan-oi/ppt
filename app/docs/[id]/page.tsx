@@ -48,7 +48,7 @@ export default async function PresentationDoc({
         <AccessStatus
           type="deleted"
           title="Presentation not found"
-          description="Either this doesnt exist or the lookup is wrong"
+          description="Either this doesnt exist or the timer has expired"
           backHref="/library"
           backHrefLabel="library"
           homeHref="/"

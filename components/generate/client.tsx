@@ -116,9 +116,9 @@ export function GenerateClient({
         toast.error(error.message);
         setScreen("form");
 
-        setTimeout(() => {
-          alert("upgrade1");
-        }, 3000);
+        // setTimeout(() => {
+        //   alert("upgrade1");
+        // }, 3000);
         return;
       }
 
@@ -137,9 +137,7 @@ export function GenerateClient({
       toast.error("Please provide instructions and slides count");
       return;
     }
-
     setScreen("result");
-
     submit({
       instructions: userInstruction,
       slidesNo: slidesCount,

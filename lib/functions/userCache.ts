@@ -2,42 +2,42 @@ import { getRedisKey } from "../config/plan";
 import { prisma } from "../prisma";
 import { redis } from "../rate-limit";
 
-export async function ensureUserCache(userId: string) {
-  const redisKey = getRedisKey(userId);
+// export async function ensureUserCache(userId: string) {
+//   const redisKey = getRedisKey(userId);
 
-  const exists = await redis.exists(redisKey);
+//   const exists = await redis.exists(redisKey);
+//   console.log("i do exist", exists);
+//   if (exists) return redisKey;
 
-  if (exists) return redisKey;
+//   const user = await prisma.user.findUnique({
+//     where: {
+//       id: userId,
+//     },
+//     select: {
+//       current_plan: true,
+//       current_plan_start: true,
+//       credits: true,
+//       _count: {
+//         select: {
+//           Presentations: true,
+//         },
+//       },
+//     },
+//   });
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      current_plan: true,
-      current_plan_start: true,
-      credits: true,
-      _count: {
-        select: {
-          Presentations: true,
-        },
-      },
-    },
-  });
+//   const credits = user?.credits ?? 0;
+//   const plan = user?.current_plan ?? "free";
 
-  const credits = user?.credits ?? 0;
-  const plan = user?.current_plan ?? "free";
+//   const presentationCount = user?._count?.Presentations ?? 0;
 
-  const presentationCount = user?._count?.Presentations ?? 0;
+//   await redis
+//     .pipeline()
+//     .hset(redisKey, { credits, plan, pptCount: presentationCount })
+//     .expire(redisKey, 86400)
+//     .exec();
 
-  await redis
-    .pipeline()
-    .hset(redisKey, { credits, plan, pptCount: presentationCount })
-    .expire(redisKey, 86400)
-    .exec();
-
-  return redisKey;
-}
+//   return redisKey;
+// }
 
 type fieldsT = "credits" | "plan" | "pptCount";
 
@@ -46,11 +46,33 @@ export async function getUserCache(userId: string, fields: fieldsT[]) {
 
   const values = await redis.hmget(redisKey, ...fields);
 
-  if (!values) return null;
+  if (values && Object.values(values).some((v) => v !== null)) {
+    return values;
+  }
 
-  return values;
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      current_plan: true,
+      credits: true,
+      _count: { select: { Presentations: true } },
+    },
+  });
+
+  const cacheData = {
+    credits: String(user?.credits ?? 0),
+    plan: user?.current_plan ?? "free",
+    pptCount: String(user?._count?.Presentations ?? 0),
+  };
+
+  await redis
+    .pipeline()
+    .hset(redisKey, cacheData)
+    .expire(redisKey, 86400)
+    .exec();
+
+  return cacheData;
 }
-
 export async function updateUserCache(
   userId: string,
   data: Record<string, any>
@@ -60,10 +82,9 @@ export async function updateUserCache(
 }
 
 export async function preloadUserCache(userId: string, fields: fieldsT[]) {
-  await ensureUserCache(userId);
+  // await ensureUserCache(userId);
   return await getUserCache(userId, fields);
 }
-
 
 export async function incrementUserCache(
   userId: string,
