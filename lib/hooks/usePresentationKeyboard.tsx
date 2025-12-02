@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { usePresentationStore } from "../store/presentation-store";
 
 export function usePresentationKeyboard(
-  presentationMode: boolean,
+  fullScreenMode: boolean,
   slides: any[],
   currentSlideIndex: number
 ) {
@@ -14,15 +14,16 @@ export function usePresentationKeyboard(
   const [, setCurrentSlideParam] = useQueryState("slide");
 
   useEffect(() => {
-    if (!presentationMode) return;
+    if (!fullScreenMode) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        const targetSlide = slides[currentSlideIndex];
+        const targetSlide = slides[0];
         setPresentationMode(false);
         if (targetSlide) {
           setCurrentSlideParam(targetSlide.id);
           usePresentationStore.getState().setCurrentSlide(targetSlide.id);
+          useUIStore.getState().setCurrentSlideIndex(0);
         }
       } else if (e.key === "ArrowRight" || e.key === " ") {
         e.preventDefault();
@@ -36,7 +37,7 @@ export function usePresentationKeyboard(
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [
-    presentationMode,
+    fullScreenMode,
     nextSlide,
     prevSlide,
     setPresentationMode,

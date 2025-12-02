@@ -3,6 +3,8 @@ import { cn } from "@/lib/utils";
 import { ChevronLeft, X, ChevronRight } from "lucide-react";
 import { WidgetWrapper } from "./widget-wrapper";
 
+import { Button } from "./ui/button";
+
 export function PresentationModeView({
   currentSlide,
   currentSlideIndex,
@@ -23,16 +25,17 @@ export function PresentationModeView({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[9999] bg-black flex items-center justify-center",
+        "fixed inset-0 z-9999 bg-black flex items-center justify-center",
         pptTheme && pptTheme !== "starter" ? pptTheme : "font-sans"
       )}
     >
-      <button
+      <Button
         onClick={onExit}
-        className="absolute top-4 right-4 z-10 p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+        className="absolute top-4 right-4 z-10 p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
+        title="Exit full screen"
       >
-        <X size={24} className="text-white" />
-      </button>
+        <X size={24} className="text-red-500" />
+      </Button>
 
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-lg">
         <span className="text-white text-sm">

@@ -50,12 +50,12 @@
     const presentationMode = useUIStore((s) => s.presentationMode);
     const setPresentationMode = useUIStore((s) => s.setPresentationMode);
     const currentSlideIndex = useUIStore((s) => s.currentSlideIndex);
+
     const nextSlide = useUIStore((s) => s.nextSlide);
     const prevSlide = useUIStore((s) => s.prevSlide);
     const clearPresentation = usePresentationStore((s) => s.clearPresentation);
     const pptTheme = usePresentationStore((s) => s.theme);
     const setType = usePresentationStore((s) => s.setType);
-
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const [saveError, setSaveError] = useState<Error | null>(null);
     const [isSaving, setIsSaving] = useState(false);
@@ -222,11 +222,13 @@
           slides={slides}
           pptTheme={pptTheme ?? "starter"}
           onExit={() => {
-            const targetSlide = slides[currentSlideIndex];
+            const targetSlide = slides[0];
+
             setPresentationMode(false);
             if (targetSlide) {
               setCurrentSlideParam(targetSlide.id);
               usePresentationStore.getState().setCurrentSlide(targetSlide.id);
+              useUIStore.getState().setCurrentSlideIndex(0);
             }
           }}
           onNext={nextSlide}
