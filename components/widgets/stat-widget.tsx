@@ -58,8 +58,8 @@ export function StatWidget({
     }
   };
 
-  if (!editable)
-    [
+  if (!editable) {
+    return (
       <div className="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-background to-muted/30 rounded-lg p-8">
         <div className="flex items-baseline gap-2 mb-4">
           <span className="text-8xl font-bold bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
@@ -84,8 +84,9 @@ export function StatWidget({
         <p className="text-2xl text-muted-foreground text-center font-medium">
           {currentData.label}
         </p>
-      </div>,
-    ];
+      </div>
+    );
+  }
   return (
     <div
       data-widget

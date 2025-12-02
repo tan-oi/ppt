@@ -13,25 +13,20 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, Minus, Plus } from "lucide-react";
 import { useUIStore } from "@/lib/store/ui-store";
-
-const colors = [
-  "#ef4444",
-  "#22c55e",
-  "#3b82f6",
-  "#eab308",
-  "#a855f7",
-  "#fff",
-  "#000",
-  "#f97316",
-];
+import { presetColors } from "@/lib/const";
 
 export function ColorSelector() {
   const editBuffer = useUIStore((s) => s.editBuffer);
-  const editor = editBuffer?.widgetData?.editor; 
+  const editor = editBuffer?.widgetData?.editor;
   const [selected, setSelected] = useState<string | null>("#fff");
   const [open, setOpen] = useState<boolean>(false);
+  const [showMoreColors, setShowMoreColors] = useState(false);
+
+  const displayedColors = showMoreColors
+    ? presetColors
+    : presetColors.slice(0, 9);
 
   const updateFontColor = () => {
     if (!editor) return;
@@ -64,15 +59,13 @@ export function ColorSelector() {
     editor.commands.setColor(c);
   };
 
-  if(!editor) return null;
+  if (!editor) return null;
   return (
     <TooltipProvider>
       <Popover open={open} onOpenChange={setOpen}>
         <Tooltip>
           <TooltipTrigger className="-mt-1" asChild>
-            <PopoverTrigger 
-            className="shadow-none"
-            asChild>
+            <PopoverTrigger className="shadow-none" asChild>
               <Button
                 variant="outline"
                 className="border-none bg-transparent flex justify-between"
@@ -100,19 +93,42 @@ export function ColorSelector() {
           </TooltipTrigger>
           <TooltipContent>Choose a color</TooltipContent>
         </Tooltip>
-        <PopoverContent 
-        sideOffset={10}
-        className="p-2 border-none bg-muted/70 backdrop-filter-xl rounded">
-          <div className="flex gap-2">
-            {colors.map((c) => (
+        <PopoverContent
+          sideOffset={10}
+          className="p-2 border-none bg-muted/70 backdrop-filter-xl rounded"
+        >
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-wrap gap-2" data-widget>
+              {displayedColors.map((c) => (
+                <button
+                  widget-element="true"
+                  key={c}
+                  onClick={() => handleColorChange(c)}
+                  className="h-4 w-4 rounded-full border-muted"
+                  style={{ backgroundColor: c }}
+                />
+              ))}
+
+              {!showMoreColors && (
+                <button
+                  onClick={() => setShowMoreColors(true)}
+                  className="size-5 rounded-full hover:scale-110 transition-transform flex items-center justify-center"
+                  title="Show more colors"
+                >
+                  <Plus className="size-3" />
+                </button>
+              )}
+            </div>
+
+            {showMoreColors && (
               <button
-                widget-element="true"
-                key={c}
-                onClick={() => handleColorChange(c)}
-                className="h-4 w-4 rounded-full border-muted"
-                style={{ backgroundColor: c }}
-              />
-            ))}
+                onClick={() => setShowMoreColors(false)}
+                className="text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 py-1"
+              >
+                <Minus className="size-3" />
+                Show less
+              </button>
+            )}
           </div>
         </PopoverContent>
       </Popover>

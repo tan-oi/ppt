@@ -22,7 +22,7 @@ export function LinkToolbar() {
 
   return (
     <>
-      <div>
+      <div data-toolbar-input>
         <Tooltip>
           <TooltipTrigger asChild className="-mt-1">
             <Input
@@ -63,7 +63,7 @@ export function LinkToolbar() {
         tooltip="Choose the link style"
       />
 
-      <div className="w-px h-8 bg-gradient-to-b from-transparent via-zinc-600 to-transparent" />
+      <div className="w-px h-8 bg-linear-to-b from-transparent via-zinc-600 to-transparent" />
 
       <BaseColorInput
         icon={PaintBucket}

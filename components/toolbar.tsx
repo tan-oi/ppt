@@ -4,9 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { WidgetOptions } from "./toolbar/widget-options";
 import { useUIStore } from "@/lib/store/ui-store";
 import { ToolbarRegistry } from "@/lib/registry/toolbar";
+import { usePathname } from "next/navigation";
 
 export function Toolbar() {
   const [mounted, setMounted] = useState(false);
+  const pathName = usePathname();
+
   const toolbarOpen = useUIStore((s) => s.toolbarOpen);
   const selectedWidget = useUIStore((s) => s.selectedWidget);
   const isPresentationMode = useUIStore((s) => s.presentationMode === true);
@@ -19,6 +22,8 @@ export function Toolbar() {
     //@ts-ignore
     return ToolbarRegistry[widgetType]?.component || null;
   }, [selectedWidget]);
+
+  if (pathName?.startsWith("/p")) return null;
 
   if (isPresentationMode) return null;
   if (!mounted || !toolbarOpen || !selectedWidget?.data?.position) return null;

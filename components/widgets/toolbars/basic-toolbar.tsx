@@ -7,13 +7,13 @@ export function BasicToolbar() {
   return (
     <>
       <FontSizeDropDown />
-      <div className="w-px h-8 bg-gradient-to-b from-transparent via-zinc-600 to-transparent" />
+      <div className="w-px h-8 bg-linear-to-b from-transparent via-zinc-600 to-transparent" />
 
       <ColorSelector />
-      <div className="w-px h-8 bg-gradient-to-b from-transparent via-zinc-600 to-transparent" />
+      <div className="w-px h-8 bg-linear-to-b from-transparent via-zinc-600 to-transparent" />
 
       <AlignSelector />
-      <div className="w-px h-8 bg-gradient-to-b from-transparent via-zinc-600 to-transparent" />
+      <div className="w-px h-8 bg-linear-to-b from-transparent via-zinc-600 to-transparent" />
 
       <TextFormatting />
     </>

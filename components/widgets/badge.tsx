@@ -32,7 +32,7 @@ export function BadgeWidget({
           backgroundColor,
         };
 
-  if (editable) {
+  if (!editable) {
     return (
       <>
         <div className="w-full flex items-center justify-center">

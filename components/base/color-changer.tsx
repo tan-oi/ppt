@@ -1,14 +1,14 @@
 "use client";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { LucideIcon, Plus, X } from "lucide-react";
+import { LucideIcon, Plus, Minus } from "lucide-react";
 import { useState } from "react";
+import { presetColors } from "@/lib/const";
 
 interface BaseColorInputProps {
   label?: string;
@@ -17,18 +17,6 @@ interface BaseColorInputProps {
   icon?: LucideIcon;
 }
 
-const presetColors = [
-  "#ef4444",
-  "#f97316",
-  "#eab308",
-  "#22c55e",
-  "#3b82f6",
-  "#a855f7",
-  "#ec4899",
-  "#000000",
-  "#ffffff",
-];
-
 export function BaseColorInput({
   label,
   value,
@@ -36,23 +24,16 @@ export function BaseColorInput({
   icon: Icon,
 }: BaseColorInputProps) {
   const [open, setOpen] = useState(false);
-  const [customColor, setCustomColor] = useState(value);
-  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [showMoreColors, setShowMoreColors] = useState(false);
 
   const handlePresetClick = (color: string) => {
     onChange(color);
-    setCustomColor(color);
     setOpen(false);
   };
 
-  const handleCustomColorChange = (color: string) => {
-    setCustomColor(color);
-    onChange(color);
-  };
-
-  const toggleCustomInput = () => {
-    setShowCustomInput(!showCustomInput);
-  };
+  const displayedColors = showMoreColors
+    ? presetColors
+    : presetColors.slice(0, 9);
 
   return (
     <div className="space-y-1">
@@ -72,8 +53,8 @@ export function BaseColorInput({
         </PopoverTrigger>
         <PopoverContent className="p-2 border-none bg-muted/70 backdrop-blur-xl rounded">
           <div className="flex flex-col gap-2">
-            <div className="flex gap-2" data-widget>
-              {presetColors.map((color) => (
+            <div className="flex gap-2 flex-wrap" data-widget>
+              {displayedColors.map((color) => (
                 <button
                   key={color}
                   onClick={() => handlePresetClick(color)}
@@ -82,29 +63,25 @@ export function BaseColorInput({
                 />
               ))}
 
-              <button
-                onClick={toggleCustomInput}
-                className="size-5 rounded-full border-2 border-muted hover:scale-110 transition-transform bg-background flex items-center justify-center"
-              >
-                {showCustomInput ? (
-                  <X className="size-3" />
-                ) : (
+              {!showMoreColors && (
+                <button
+                  onClick={() => setShowMoreColors(true)}
+                  className="size-5 rounded-full hover:scale-110 transition-transform flex items-center justify-center"
+                  title="Show more colors"
+                >
                   <Plus className="size-3" />
-                )}
-              </button>
+                </button>
+              )}
             </div>
 
-            {showCustomInput && (
-              <div className="pt-1">
-                <Input
-                  type="color"
-                  value={customColor}
-                  onChange={(e) => handleCustomColorChange(e.target.value)}
-                  className="w-8 h-8 p-0.5 cursor-pointer"
-                />
-
-              
-              </div>
+            {showMoreColors && (
+              <button
+                onClick={() => setShowMoreColors(false)}
+                className="text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 py-1"
+              >
+                <Minus className="size-3" />
+                Show less
+              </button>
             )}
           </div>
         </PopoverContent>
