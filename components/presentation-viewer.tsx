@@ -95,7 +95,7 @@ export function PresentationViewer({ viewData }: { viewData: any }) {
           ))}
         </div>
 
-        <div className="">
+        <div className="hidden md:block">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button

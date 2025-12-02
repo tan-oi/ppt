@@ -3,7 +3,6 @@
 import { useOptimistic } from "react";
 import { PresentationCard } from "./presentation-view-card";
 
-
 interface Presentation {
   id: string;
   topic: string;
@@ -28,7 +27,7 @@ export function PresentationList({
   );
 
   return (
-    <div className="grid grid-cols-3 gap-4 px-6 pb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-6 pb-6">
       {optimisticPresentations.length === 0 ? (
         <div className="col-span-3 flex flex-col items-center justify-center py-12 text-neutral-500">
           <p className="text-lg">No presentations yet</p>

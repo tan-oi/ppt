@@ -19,7 +19,7 @@ export default async function CreatePage() {
                 Create
               </p>
             </div>
-            <h1 className="text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
+            <h1 className="text-xl sm:text-2xl md:text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
               Get started
             </h1>
             <p className="text-neutral-500 text-sm max-w-md leading-relaxed">
@@ -35,7 +35,7 @@ export default async function CreatePage() {
         <Separator className="w-full text-zinc-600" />
       </div>
 
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="max-w-5xl mx-auto px-6 py-4 sm:py-0">
         <motion.div
           initial="hidden"
           animate="visible"

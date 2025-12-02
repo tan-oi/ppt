@@ -6,7 +6,7 @@ interface ButtonLinkWidgetProps {
   variant?: "filled" | "outline" | "text";
   color?: string;
   showIcon?: boolean;
-  isEditable?: boolean;
+  editable?: boolean;
   className?: string;
 }
 
@@ -22,6 +22,7 @@ export function ButtonLinkWidget({
   variant = "filled",
   color = "#3B82F6",
   showIcon = true,
+  editable,
 }: ButtonLinkWidgetProps) {
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
   const isSelected = useUIStore((s) => s.selectedWidget?.id === id);
@@ -97,6 +98,35 @@ export function ButtonLinkWidget({
 
     window.open(target, "_blank", "noopener,noreferrer");
   };
+
+  if (!editable) {
+    return (
+      <div
+        data-widget
+        className="w-full h-full flex items-center justify-center p-4"
+      >
+        <button
+          className={getButtonStyles()}
+          style={{
+            backgroundColor:
+              currentData.variant === "filled"
+                ? currentData.color
+                : "transparent",
+            borderColor:
+              currentData.variant === "outline"
+                ? currentData.color
+                : "transparent",
+            color:
+              currentData.variant === "filled" ? "white" : currentData.color,
+          }}
+          onClick={handleLinkClick}
+        >
+          {currentData.text}
+          {showIcon && <ExternalLink size={16} />}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div

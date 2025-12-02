@@ -27,14 +27,14 @@ export default async function Library() {
   return (
     <div className="min-h-screen flex flex-col space-y-6 max-w-7xl mx-auto backdrop-blur-xl">
       <div className="relative w-full px-6 py-6 space-y-8">
-        <div className="flex items-start justify-between gap-8">
+        <div className="sm:flex items-start justify-between space-y-2 sm:space-y-0 gap-8">
           <div className="flex-1">
             <div className="inline-block mb-4 px-3 py-1.5 rounded-full bg-neutral-900/40 border border-neutral-800/60">
               <p className="text-xs font-medium text-neutral-500 tracking-widest">
                 Decks
               </p>
             </div>
-            <h1 className="text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
+            <h1 className="text-xl sm:text-2xl md:text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
               Your Decks
             </h1>
             <p className="text-neutral-500 text-sm max-w-md leading-relaxed">

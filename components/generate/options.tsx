@@ -30,7 +30,7 @@ export function PresentationOptions({
   const setTone = useGenerationStore((s) => s.setTone);
   return (
     <>
-      <div className="flex items-center gap-2 max-w-2xl mx-auto rounded-xl">
+      <div className="flex flex-wrap items-center gap-2 max-w-2xl mx-auto rounded-xl p-2">
         <div>
           <Select onValueChange={(value) => setSlidesCount(Number(value))}>
             <SelectTrigger className="w-[130px] bg-neutral-900 border-none focus-within:border-none rounded-xl text-foreground">

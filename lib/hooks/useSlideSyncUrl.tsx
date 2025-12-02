@@ -8,6 +8,16 @@ export function useSlideUrlSync(slideIds: string[]) {
   const [currentSlide, setCurrentSlide] = useQueryState("slide");
   const observerRef = useRef<IntersectionObserver | null>(null);
   const setSlide = usePresentationStore((s) => s.setCurrentSlide);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  //not working rn, cause we're setting the index to 0 on first load.
+  useEffect(() => {
+    if (currentSlide) {
+      document
+        .getElementById(currentSlide)
+        ?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
 
   useEffect(() => {
     if (slideIds.length === 0) return;
@@ -18,18 +28,29 @@ export function useSlideUrlSync(slideIds: string[]) {
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (
-            entry.intersectionRatio > 0.5 &&
-            entry.target.id !== currentSlide
-          ) {
-            setCurrentSlide(entry.target.id);
-            setSlide(entry.target.id);
-          }
+        const mostVisible = entries.reduce((prev, current) => {
+          return current.intersectionRatio > prev.intersectionRatio
+            ? current
+            : prev;
         });
+
+        if (
+          mostVisible.intersectionRatio > 0.5 &&
+          mostVisible.target.id !== currentSlide
+        ) {
+          if (updateTimeoutRef.current) {
+            clearTimeout(updateTimeoutRef.current);
+          }
+
+          updateTimeoutRef.current = setTimeout(() => {
+            setCurrentSlide(mostVisible.target.id);
+            setSlide(mostVisible.target.id);
+          }, 150);
+        }
       },
       {
-        threshold: 0.5,
+        threshold: [0.5, 0.75, 1.0],
+        rootMargin: "0px 0px -20% 0px",
       }
     );
 
@@ -41,10 +62,13 @@ export function useSlideUrlSync(slideIds: string[]) {
     });
 
     return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
       if (observerRef.current) {
         observerRef.current.disconnect();
         observerRef.current = null;
       }
     };
-  }, [slideIds, currentSlide, setCurrentSlide]);
+  }, [slideIds, currentSlide, setCurrentSlide, setSlide]);
 }

@@ -287,8 +287,8 @@ export function Features() {
             </div>
           </div>
           <div className="w-full border border-zinc-800 rounded-lg bg-zinc-900/40 p-6 mt-4">
-            <div className="grid grid-cols-3 gap-4 px-4">
-              <div className="flex flex-col  gap-2 text-zinc-400">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 px-4">
+              <div className="flex flex-col gap-2 text-zinc-400">
                 <div className="flex gap-1 items-center ">
                   <Sparkles size={16} />
                   <p className="text-zinc-100 text-md">Widgets</p>

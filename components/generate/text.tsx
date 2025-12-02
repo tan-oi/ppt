@@ -34,7 +34,7 @@ export function Text({ className }: { className: string }) {
                 Create
               </p>
             </div>
-            <h1 className="text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
+            <h1 className="text-xl sm:text-2xl md:text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
               Paste/write content
             </h1>
             <p className="text-neutral-500 text-sm max-w-md leading-relaxed">
@@ -50,8 +50,8 @@ export function Text({ className }: { className: string }) {
 
         <Separator className="w-full text-zinc-600" />
       </div>
-      <div>
-        <div className="bg-muted/40 rounded-xl text-primary h-80 max-w-3xl mx-auto outline outline-neutral-600">
+      <div className="p-4">
+        <div className="bg-muted/40 rounded-xl text-primary h-50 sm:h-80  max-w-xl sm:max-w-3xl mx-auto outline outline-neutral-600">
           <div
             className={cn("w-full h-full", className)}
             onClick={() => editor?.commands.focus()}

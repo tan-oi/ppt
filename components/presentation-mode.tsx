@@ -37,8 +37,8 @@ export function PresentationModeView({
         <X size={24} className="text-red-500" />
       </Button>
 
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-lg">
-        <span className="text-white text-sm">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-lg z-100">
+        <span className="text-primary text-sm">
           {currentSlideIndex + 1} / {slides.length}
         </span>
       </div>

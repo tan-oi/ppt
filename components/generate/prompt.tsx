@@ -19,8 +19,6 @@ export function PromptInput() {
 
   return (
     <div className="space-y-2">
-     
-
       <div className="relative w-full px-6 py-6 space-y-8">
         <div className="flex items-start justify-between gap-8">
           <div className="flex-1">
@@ -29,7 +27,7 @@ export function PromptInput() {
                 Create
               </p>
             </div>
-            <h1 className="text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
+            <h1 className="text-xl sm:text-2xl md:text-5xl font-semibold text-foreground mb-3 leading-tight text-balance">
               Craft prompt
             </h1>
             <p className="text-neutral-500 text-sm max-w-md leading-relaxed">
@@ -38,17 +36,14 @@ export function PromptInput() {
           </div>
 
           <Link href={"/create"}>
-
-          <Button className="rounded-lg cursor-pointer">
-            Back
-          </Button>
+            <Button className="rounded-lg cursor-pointer">Back</Button>
           </Link>
         </div>
 
         <Separator className="w-full text-zinc-600" />
       </div>
 
-      <div className="space-y-4 max-w-3xl mx-auto">
+      <div className="space-y-4 max-w-xl p-2 sm:p-4 sm:max-w-3xl mx-auto">
         <div className="space-y-2">
           <p className="text-xs text-foreground/60">Topic</p>
           <Input
@@ -70,9 +65,8 @@ export function PromptInput() {
                 setOption(item);
                 setUserInstruction(item);
               }}
-              className="rounded-xl opacity-90 cursor-pointer"
+              className="text-xs sm:text-sm rounded-xl opacity-90 cursor-pointer"
               variant="default"
-              size="sm"
             >
               {item}
             </Button>

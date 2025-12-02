@@ -48,7 +48,6 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
     ? [...baseLayouts, ...imageLayouts]
     : baseLayouts;
 
-  // Loading message rotation (when result is not ready)
   useEffect(() => {
     if (result) return;
     const id = window.setInterval(() => {
@@ -230,13 +229,13 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
   return (
     <div className="min-h-screen bg-transparent p-8">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className=" z-50">
-          <div className="flex items-center gap-3 mb-8 justify-between p-3 rounded-xl">
+        <div className="flex flex-col z-50 mb-8">
+          <div className="flex flex-col sm:flex-row items-center gap-3 justify-between p-3 rounded-xl">
             <div className="flex gap-3 items-center">
               <Sparkles className="w-6 h-6 text-cyan-400" />
               <div className="flex flex-col">
                 <div className="flex items-center gap-4">
-                  <h1 className="text-3xl font-bold text-white">
+                  <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-white">
                     Slides Outline
                   </h1>
                   <span className="text-sm text-zinc-500">
@@ -253,8 +252,7 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
 
             <div className="flex items-center gap-3">
               <Button
-                className="cursor-pointer hover:opacity-80 transition-colors hover:text-zinc-700 text-zinc-900 rounded-lg"
-                size="lg"
+                className="cursor-pointer hover:opacity-80 transition-colors hover:text-zinc-700 text-zinc-900 rounded-lg text-xs sm:text-md"
                 onClick={() => {
                   router.replace("/create");
                   useGenerationStore.getState().setResult(null);
@@ -263,13 +261,9 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
                 Go back
               </Button>
               {result && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-zinc-800 border border-zinc-700">
+                <div className="flex items-center gap-2 px-1 py-1.5 sm:px-3 sm:py-2.5 rounded-md bg-zinc-800 border border-zinc-700">
                   <p className="text-xs text-zinc-400">Time left</p>
-                  <p className="text-[8px] text-zinc-600">
-                    You're required to do proceed to the next step before the
-                    timer runs out, and do not close the window as it would lead
-                    cause no generation
-                  </p>
+
                   <div className="text-sm font-mono text-white">
                     {formatTime(timer)}
                   </div>
@@ -277,6 +271,12 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
               )}
             </div>
           </div>
+
+          <p className="text-xs text-center text-red-500">
+            You're required to do proceed to the next step before the timer runs
+            out, and do not close the window as it would lead to a failure
+            generation
+          </p>
         </div>
 
         {localSlides.length === 0 ? (
@@ -320,12 +320,12 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
                     type="text"
                     value={slide.slideHeading}
                     onChange={(e) => handleHeadingChange(index, e.target.value)}
-                    className="text-xl font-semibold text-white leading-tight bg-transparent border-none outline-none focus:ring-2 focus:ring-cyan-500/50 rounded px-2 py-1 w-full"
+                    className="sm:text-xl font-semibold text-white leading-tight bg-transparent border-none outline-none focus:ring-2 focus:ring-cyan-500/50 rounded px-2 py-1 w-full text-xs"
                     placeholder="Slide heading..."
                   />
                 </div>
 
-                <div className="min-w-[200px] text-zinc-400">
+                <div className="min-w-fit sm:min-w-[200px] text-zinc-400">
                   <BaseDropdown
                     label="Layout"
                     options={layoutOptions.map((layout) => ({
@@ -352,7 +352,7 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
                         t.style.height = "auto";
                         t.style.height = t.scrollHeight + "px";
                       }}
-                      className="flex-1 text-sm leading-tight bg-transparent border-none outline-none focus:ring-2 focus:ring-cyan-500/50 rounded px-1 py-0 resize-none overflow-hidden"
+                      className="flex-1 text-xs sm:text-sm leading-tight bg-transparent border-none outline-none focus:ring-2 focus:ring-cyan-500/50 rounded px-1 py-0 resize-none overflow-hidden"
                       placeholder="Pointer text..."
                       style={{ minHeight: "0px" }}
                       ref={(el) => {
@@ -376,7 +376,7 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
 
                 <button
                   onClick={() => addPointer(index)}
-                  className="flex items-center gap-2 text-xs text-cyan-400 hover:text-cyan-300 ml-6 mt-2 transition-colors"
+                  className="flex items-center gap-2 text-xs text-cyan-400 hover:text-cyan-300 sm:ml-6 sm:mt-2 transition-colors"
                 >
                   <Plus className="w-3 h-3" />
                   Add point
@@ -413,7 +413,7 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
               </button>
             )}
 
-            <div className="flex gap-3 items-end">
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
               {calculateImageCount(localSlides) > 0 && (
                 <BaseDropdown
                   className="bg-white"

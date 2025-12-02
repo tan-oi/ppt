@@ -39,6 +39,7 @@ export function LinkToolbar() {
         <Tooltip>
           <TooltipTrigger asChild className="-mt-1">
             <Input
+              data-toolbar-input
               value={widgetData.text}
               type="text"
               onChange={(e) => handleUpdate("text", e.target.value)}

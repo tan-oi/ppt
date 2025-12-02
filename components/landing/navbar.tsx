@@ -15,7 +15,7 @@ export function Navbar() {
             </span>
           </div>
 
-          <div className="flex items-center gap-1 text-xs font-medium text-zinc-400 mr-2 shrink-0">
+          <div className="hidden sm:flex items-center gap-1 text-xs font-medium text-zinc-400 mr-2 shrink-0">
             <a
               href="#features"
               className="hover:text-white hover:bg-white/5 px-3 py-1.5 rounded-full transition-all whitespace-nowrap"
@@ -39,7 +39,7 @@ export function Navbar() {
 
           <div />
 
-          <div className="flex items-center gap-2 pl-2 border-l border-white/10">
+          <div className="flex items-center gap-2 pl-2 sm:border-l border-white/10">
             <AuthButton type="small" label={"Get started"} />
           </div>
         </div>

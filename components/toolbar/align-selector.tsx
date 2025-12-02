@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import {
   TextAlignCenterIcon,
@@ -13,6 +13,7 @@ export function AlignSelector() {
   const [align, setAlign] = useState<any>("left");
   const editBuffer = useUIStore((s) => s.editBuffer);
   const editor = editBuffer?.widgetData?.editor;
+
   const alignmentOptions = [
     { label: "Left", icon: <TextAlignLeftIcon size={16} />, value: "left" },
     { label: "Right", icon: <TextAlignRightIcon size={16} />, value: "right" },
@@ -28,12 +29,47 @@ export function AlignSelector() {
     },
   ];
 
+  const updateAlignment = () => {
+    if (!editor) return;
+
+    if (editor.isActive({ textAlign: "left" })) {
+      setAlign("left");
+    } else if (editor.isActive({ textAlign: "center" })) {
+      setAlign("center");
+    } else if (editor.isActive({ textAlign: "right" })) {
+      setAlign("right");
+    } else if (editor.isActive({ textAlign: "justify" })) {
+      setAlign("justify");
+    } else {
+      setAlign("left");
+    }
+  };
+
+  useEffect(() => {
+    if (!editor) return;
+
+    updateAlignment();
+
+    const updateHandler = () => {
+      updateAlignment();
+    };
+
+    editor.on("selectionUpdate", updateHandler);
+    editor.on("transaction", updateHandler);
+
+    return () => {
+      editor.off("selectionUpdate", updateHandler);
+      editor.off("transaction", updateHandler);
+    };
+  }, [editor]);
+
   const handleAlignChange = (value: any) => {
     setAlign(value);
-
     editor.commands.setTextAlign(value);
   };
+
   if (!editor) return null;
+
   return (
     <BaseDropdown
       label="Alignment"
