@@ -391,12 +391,21 @@ export const WidgetMetadata = {
     type: "image",
     path: "@/components/widgets/image",
     defaultData: {
-      imageUrl:
-        "https://res.cloudinary.com/dcuxne34n/image/upload/v1761637833/ai-generated-images/jzyhx6xug4nltulbxhgz.png",
+      imageUrl: (() => {
+        const set = [
+          "https://res.cloudinary.com/dcuxne34n/image/upload/minimalism_3_aafgbc.jpg",
+          "https://res.cloudinary.com/dcuxne34n/image/upload/minimalism_1_ygeyja.jpg",
+          "https://res.cloudinary.com/dcuxne34n/image/upload/v1762361474/ai-generated-images/nxmoioapqms97y7elmjr.webp",
+          "https://res.cloudinary.com/dcuxne34n/image/upload/minimalism_2_gqzqhr.jpg",
+        ];
+        const index = Math.floor(Math.random() * set.length);
+
+        return set[index];
+      })(),
       alt: "Slide image demo",
       objectFit: "contain",
     },
-    defaultPosition: { x: 150, y: 150, width: 400, height: 300 },
+    defaultPosition: { x: 150, y: 150, width: 400, height: 400 },
     description: "Add images to your slides with upload support",
   },
   statWidget: {
@@ -606,8 +615,15 @@ export const TIPTAP_TEMPLATES: Record<WidgetType, (text: any) => any> = {
   }),
 };
 
-
-export const heightRequired = (slug : string) => {
-  if(slug === "image" || slug === "divider" || slug === "barChart" || slug === "areaChart" || slug === "pieChart" || slug === "lineChart") return true;
+export const heightRequired = (slug: string) => {
+  if (
+    slug === "image" ||
+    slug === "divider" ||
+    slug === "barChart" ||
+    slug === "areaChart" ||
+    slug === "pieChart" ||
+    slug === "lineChart"
+  )
+    return true;
   else return false;
-}
+};

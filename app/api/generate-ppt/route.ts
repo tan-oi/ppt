@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 import { userPlan } from "@/lib/functions/plan-enforcement";
 import { PLAN_CONFIG } from "@/lib/config/plan";
 import { createPresentationSchema } from "@/lib/config/schema";
+import { incrementUserCache } from "@/lib/functions/userCache";
 type CurrentPlan = "free" | "basic" | "pro";
 const slideSchema = z.object({
   slideNumber: z.number(),
@@ -62,5 +63,6 @@ export async function POST(req: Request) {
     console.log("Finhal object:", finalObject);
   });
 
+  await incrementUserCache(userId, "pptCount", 1);
   return result.toTextStreamResponse();
 }

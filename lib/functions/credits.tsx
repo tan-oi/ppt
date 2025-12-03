@@ -91,9 +91,10 @@ export async function deductCredits({
       where: { id: userId },
       select: { credits: true },
     });
-
     if (!user || user.credits < amount) {
-      updateUserCache(userId, { credits }).catch(console.error);
+      await updateUserCache(userId, { credits: user?.credits }).catch(
+        console.error
+      );
       return { ok: false, error: "INSUFFICIENT_CREDITS" };
     }
 

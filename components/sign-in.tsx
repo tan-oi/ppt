@@ -74,7 +74,7 @@ export default function Signin() {
                 transition={{ delay: 0.2 }}
                 className="text-xl font-medium text-white tracking-tight"
               >
-                Welcome to Slides
+                Welcome to Glyph
               </motion.h2>
               <motion.p
                 initial={{ y: 10, opacity: 0 }}

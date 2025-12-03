@@ -22,6 +22,7 @@ import {
 import { useState } from "react";
 import { usePresentationStore } from "@/lib/store/presentation-store";
 import { motion, AnimatePresence } from "motion/react";
+import { toast } from "sonner";
 
 const templates = [
   {
@@ -429,7 +430,7 @@ export function SlideManager() {
     } else {
       if (slug === "add-blank-slide") {
         const id = usePresentationStore.getState().addSlideAfterCurrent();
-
+        toast.success("Slide added, please scroll below");
         console.log(id);
       } else if (slug === "delete-slide") {
         const currentslide = usePresentationStore.getState().currentSlide;
@@ -535,6 +536,8 @@ export function SlideManager() {
                   const id = usePresentationStore
                     .getState()
                     .addSlideAfterCurrent(item.id);
+
+                  toast.success("Slide added");
                 }}
                 key={item.id}
                 className="group hover:ring hover:ring-zinc-500 flex rounded flex-col bg-zinc-800 gap-2 p-2 cursor-pointer"

@@ -38,9 +38,9 @@ export function PresentationOptions({
             </SelectTrigger>
             <SelectContent className="border-none opacity-80 rounded-xl">
               <SelectGroup>
-                {Array.from({ length: maxSlides }).map((_, index) => (
-                  <SelectItem key={index} value={(index + 1).toString()}>
-                    {index + 1}
+                {Array.from({ length: maxSlides - 1 }).map((_, index) => (
+                  <SelectItem key={index} value={(index + 2).toString()}>
+                    {index + 2}
                   </SelectItem>
                 ))}
                 {plan !== "pro" && (

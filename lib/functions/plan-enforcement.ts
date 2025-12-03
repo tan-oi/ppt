@@ -32,7 +32,6 @@ export async function requestValidation(userId: string, slidesNo: number) {
   const plan = (cache?.plan as "free" | "basic" | "pro") ?? "free";
   const pptCount = Number(cache?.pptCount ?? 0);
   const credits = Number(cache?.credits ?? 0);
-
   const {
     maxPresentations,
     maxSlidesPerPresentation,
@@ -40,12 +39,13 @@ export async function requestValidation(userId: string, slidesNo: number) {
     costs,
   } = getPlanConfig(plan);
 
-  if (credits < costs.generateAISlides)
+  if (credits < costs.generateAISlides) { 
     return {
       allowed: false,
       error: "INSUFFICIENT_CREDITS",
       message: `You've exhausted your credits to make presentations`,
     };
+  }
 
   if (pptCount >= maxPresentations) {
     return {

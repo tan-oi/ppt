@@ -2,7 +2,7 @@ export const PLAN_CONFIG = {
   free: {
     monthlyCredits: 25,
 
-    maxPresentations: 15,
+    maxPresentations: 5,
     maxSlidesPerPresentation: 5,
     maxImagePerPresentation: 0,
 
