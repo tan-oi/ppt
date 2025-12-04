@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Webhooks } from "@dodopayments/nextjs";
-import { CurrentPlan } from "@/lib/generated/prisma";
+import { CurrentPlan } from "@prisma/client";
 
 const PLAN_CONFIG = {
   free: { credits: 25, tier: 0 },
@@ -12,12 +12,11 @@ type Plan = keyof typeof PLAN_CONFIG;
 
 export const POST = Webhooks({
   webhookKey: process.env.DODO_PAYMENTS_WEBHOOK_SECRET!,
-
   onPaymentSucceeded: async (payload) => {
     try {
       const data = payload.data;
       const meta = data.metadata;
-
+      console.log(data);
       if (!meta?.uid || !meta?.plan) {
         console.error("Missing metadata", {
           paymentId: data.payment_id,
