@@ -2,6 +2,7 @@ import * as motion from "motion/react-client";
 import { Badge } from "../ui/badge";
 
 import { AuthButton } from "../base/auth-button";
+import Link from "next/link";
 
 function DeckAnimation() {
   return (
@@ -433,27 +434,29 @@ export function HeroComponent() {
           >
             <AuthButton type={"medium"} label="Start creating" />
 
-            <motion.button
-              className="rounded-full px-8 py-2 text-base bg-transparent border border-white/10 text-white transition-all group flex items-center justify-center cursor-pointer"
-              whileHover={{
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderColor: "rgba(255, 255, 255, 0.2)",
-              }}
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="mr-2 opacity-60 group-hover:opacity-100 transition-opacity"
+            <Link href={"https://www.youtube.com/watch?v=V33sitDROyg"}>
+              <motion.button
+                className="rounded-full px-8 py-2 text-base bg-transparent border border-white/10 text-white transition-all group flex items-center justify-center cursor-pointer"
+                whileHover={{
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderColor: "rgba(255, 255, 255, 0.2)",
+                }}
               >
-                <circle cx="12" cy="12" r="10" />
-                <polygon points="10 8 16 12 10 16 10 8" />
-              </svg>
-              Watch Demo
-            </motion.button>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="mr-2 opacity-60 group-hover:opacity-100 transition-opacity"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polygon points="10 8 16 12 10 16 10 8" />
+                </svg>
+                Watch Demo
+              </motion.button>
+            </Link>
           </motion.div>
         </div>
         <div className="relative w-full max-w-[1000px] h-[300px] md:h-[500px] mt-32 md:mt-36">
