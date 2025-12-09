@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { PLAN_CONFIG } from "@/lib/config/plan";
 import { BaseDropdown } from "../base/dropdown";
 import { baseLayouts, imageLayouts } from "@/lib/registry/layout";
+import { useApiConfigStore } from "@/lib/store/guest-mode-store";
 
 interface Slide {
   slideHeading: string;
@@ -32,7 +33,13 @@ const loadingMessages = [
   "Almost there...",
 ];
 
-export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
+export function OutlineViewer({
+  plan,
+  userId,
+}: {
+  plan: "free" | "pro" | "basic" | null;
+  userId: string | null;
+}) {
   const router = useRouter();
   const result = useGenerationStore((s) => s.result);
   const slidesCount = useGenerationStore((s) => s.slidesCount);
@@ -41,12 +48,16 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
   const [messageIndex, setMessageIndex] = useState(0);
   const [imagePreference, setImagePreference] = useState<"ai" | "stock">("ai");
   const [timer, setTimer] = useState(240); // seconds (4 minutes)
+  const guest = useApiConfigStore((s) => s.config);
 
-  const planConfig = PLAN_CONFIG[plan];
+  let layoutOptions: any[];
+  let planConfig: any;
 
-  const layoutOptions = planConfig.canGenerateImage
-    ? [...baseLayouts, ...imageLayouts]
-    : baseLayouts;
+  layoutOptions = [...baseLayouts, ...imageLayouts];
+  planConfig = {
+    maxImagePerPresentation: Infinity,
+    maxSlidesPerPresentation: Infinity,
+  };
 
   useEffect(() => {
     if (result) return;
@@ -96,12 +107,16 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
 
     const imageCount = calculateImageCount(testSlides);
 
-    if (imageCount > planConfig.maxImagePerPresentation) {
-      toast.error(
-        `Your ${plan} plan allows a maximum of ${planConfig.maxImagePerPresentation} images. This layout would require ${imageCount} images.`
-      );
-      return;
-    }
+    // if (
+    //   !guest.isGuestMode &&
+    //   plan &&
+    //   imageCount > planConfig.maxImagePerPresentation
+    // ) {
+    //   toast.error(
+    //     `Your ${plan} plan allows a maximum of ${planConfig.maxImagePerPresentation} images. This layout would require ${imageCount} images.`
+    //   );
+    //   return;
+    // }
 
     setLocalSlides(testSlides);
   };
@@ -166,19 +181,22 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
   };
 
   const addNewSlide = () => {
-    if (localSlides.length >= planConfig.maxSlidesPerPresentation) {
-      toast.error(
-        `Your ${plan} plan allows a maximum of ${planConfig.maxSlidesPerPresentation} slides per presentation.`
-      );
-      return;
-    }
+    // if (
+    //   !guest.isGuestMode &&
+    //   localSlides.length >= planConfig.maxSlidesPerPresentation
+    // ) {
+    //   toast.error(
+    //     `Your ${plan} plan allows a maximum of ${planConfig.maxSlidesPerPresentation} slides per presentation.`
+    //   );
+    //   return;
+    // }
 
-    if (localSlides.length >= slidesCount) {
-      toast.error(
-        `You opted to generate ${slidesCount} slides. You can only have ${slidesCount} slides.`
-      );
-      return;
-    }
+    // if (localSlides.length >= slidesCount) {
+    //   toast.error(
+    //     `You opted to generate ${slidesCount} slides. You can only have ${slidesCount} slides.`
+    //   );
+    //   return;
+    // }
 
     const newSlide: Slide = {
       slideHeading: "New Slide",
@@ -239,9 +257,7 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
                     Slides Outline
                   </h1>
                   <span className="text-sm text-zinc-500">
-                    {localSlides.length} /{" "}
-                    {Math.min(slidesCount, planConfig.maxSlidesPerPresentation)}{" "}
-                    slides
+                    {localSlides.length} / {slidesCount}, slides
                   </span>
                 </div>
                 <p className="text-zinc-600 text-sm">
@@ -400,18 +416,15 @@ export function OutlineViewer({ plan }: { plan: "free" | "pro" | "basic" }) {
 
         {localSlides.length > 0 && (
           <div className="space-y-4 pt-4">
-            {localSlides.length <
-              Math.min(slidesCount, planConfig.maxSlidesPerPresentation) && (
-              <button
-                onClick={addNewSlide}
-                className="w-full flex items-center justify-center gap-3 bg-zinc-900 hover:bg-zinc-800 text-cyan-400 font-semibold py-4 px-6 rounded-xl transition-all border border-zinc-800 hover:border-cyan-500/50 group"
-              >
-                <div className="bg-cyan-500/10 group-hover:bg-cyan-500/20 rounded-full p-1 transition-colors">
-                  <Plus className="w-5 h-5" />
-                </div>
-                Add New Slide
-              </button>
-            )}
+            <button
+              onClick={addNewSlide}
+              className="w-full flex items-center justify-center gap-3 bg-zinc-900 hover:bg-zinc-800 text-cyan-400 font-semibold py-4 px-6 rounded-xl transition-all border border-zinc-800 hover:border-cyan-500/50 group"
+            >
+              <div className="bg-cyan-500/10 group-hover:bg-cyan-500/20 rounded-full p-1 transition-colors">
+                <Plus className="w-5 h-5" />
+              </div>
+              Add New Slide
+            </button>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
               {calculateImageCount(localSlides) > 0 && (

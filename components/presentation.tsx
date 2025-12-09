@@ -3,7 +3,7 @@
   import { useSlideScale } from "@/lib/hooks/useSlideScale";
   import { useWidgetDeselect } from "@/lib/hooks/useWidgetDeselect";
   import { Slide } from "./slide";
-  import { useEffect, useMemo, useState } from "react";
+  import { useEffect, useMemo, useState, useRef } from "react";
   import { experimental_useObject as useObject } from "@ai-sdk/react";
   import { DndContext, DragOverlay } from "@dnd-kit/core";
   import {
@@ -20,6 +20,7 @@
 
   import { useQueryState } from "nuqs";
   import { useGenerationStore } from "@/lib/store/generation-store";
+  import { useApiConfigStore } from "@/lib/store/guest-mode-store";
   import { useAutoSave } from "@/lib/hooks/useAutoSave";
   import { z } from "zod";
 
@@ -31,18 +32,27 @@
   import { useSlideDragDrop } from "@/lib/hooks/useSlideDragDrop";
   import { PresentationModeView } from "./presentation-mode";
   import { usePresentationStore } from "@/lib/store/presentation-store";
-  import SlideLoader from "./base/loaders/slide-loader";
+  import { SlideLoader } from "./base/loaders/slide-loader";
   import { toast } from "sonner";
+  import {
+    getPresentationFromLocal,
+    savePresentationToLocal,
+  } from "@/lib/local-db";
+  import { useRouter } from "next/navigation";
 
   export function Presentation({
     llmToBeCalled,
     presentationData,
     id,
+    isGuestMode = false,
   }: {
     presentationData: any;
     llmToBeCalled: boolean;
     id: string;
+    isGuestMode?: boolean;
   }) {
+    console.log("guest mode?", isGuestMode);
+    const router = useRouter();
     const slides = usePresentationStore((s) => s.slides) ?? [];
 
     const [, setCurrentSlideParam] = useQueryState("slide");
@@ -59,6 +69,24 @@
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const [saveError, setSaveError] = useState<Error | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [isLoadingGuest, setIsLoadingGuest] = useState(
+      isGuestMode && !presentationData
+    );
+    const config = useApiConfigStore((s) => s.config);
+    const hasInitialized = useRef(false);
+
+    const getApiKeys = () => {
+      if (typeof window === "undefined") {
+        return { groqApiKey: "", replicateApiKey: "" };
+      }
+      const groqKey =
+        localStorage.getItem("guest-groq-key") || config.groqApiKey || "";
+      const replicateKey =
+        localStorage.getItem("guest-replicate-key") ||
+        config.replicateApiKey ||
+        "";
+      return { groqKey, replicateKey };
+    };
 
     const {
       submit,
@@ -68,6 +96,19 @@
     } = useObject({
       api: "/api/generate-ppt",
       schema: z.array(z.any()),
+      fetch: async (url, options) => {
+        const headers = new Headers(options?.headers);
+        const { groqKey } = getApiKeys();
+        if (groqKey) {
+          headers.set("x-groq-api-key", groqKey);
+          headers.set("x-groq-model", config.groqModel || "openai/gpt-oss-120b");
+        }
+
+        return fetch(url, {
+          ...options,
+          headers,
+        });
+      },
 
       onFinish: async (options) => {
         try {
@@ -94,39 +135,69 @@
           const topic =
             useGenerationStore.getState().userInstruction ||
             "Untitled Presentation";
+          if (isGuestMode) {
+            try {
+              console.log(isGuestMode);
+              // const { savePresentationToLocal } = await import("@/lib/local-db");
+              const cleanId = id.startsWith("ai-") ? id.slice(3) : id;
+              await savePresentationToLocal({
+                id: cleanId,
+                title: topic,
+                theme: pptTheme || "starter",
+                slides: updatedSlideData.map((slide) => ({
+                  id: slide.id,
+                  theme: slide.theme || "starter",
+                  slideNumber: parseInt(String(slide.slideNumber)),
+                  heading: slide.heading,
+                  widgets: slide.widgets,
+                })),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                syncedToCloud: false,
+              });
 
-          const payloadToBeSent = {
-            topic,
-            outlineId: id.startsWith("ai-") ? id.slice(3) : id,
-            theme: pptTheme || "starter",
-            isModified: false,
-            slides: updatedSlideData.map((slide) => ({
-              id: slide.id,
-              theme: slide.theme || "starter",
-              slideNumber: parseInt(String(slide.slideNumber)),
-              heading: slide.heading,
-              widgets: slide.widgets,
-            })),
-          };
+              setLastSaved(new Date());
+              toast.success("Presentation saved locally!");
 
-          const res = await fetch(`/api/presentation/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payloadToBeSent),
-          });
+              window.history.replaceState(null, "", `/docs/${cleanId}`);
+            } catch (err: any) {
+              console.error("Error saving to IndexedDB:", err);
+              toast.error("Failed to save presentation locally");
+            }
+          } else {
+            const payloadToBeSent = {
+              topic,
+              outlineId: id.startsWith("ai-") ? id.slice(3) : id,
+              theme: pptTheme || "starter",
+              isModified: false,
+              slides: updatedSlideData.map((slide) => ({
+                id: slide.id,
+                theme: slide.theme || "starter",
+                slideNumber: parseInt(String(slide.slideNumber)),
+                heading: slide.heading,
+                widgets: slide.widgets,
+              })),
+            };
 
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || "Save failed");
+            const res = await fetch(`/api/presentation/${id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payloadToBeSent),
+            });
+
+            if (!res.ok) {
+              const errorData = await res.json();
+              throw new Error(errorData.message || "Save failed");
+            }
+
+            const cleanId = id.startsWith("ai-") ? id.slice(3) : id;
+            window.history.replaceState(null, "", `/docs/${cleanId}`);
+
+            setLastSaved(new Date());
+            toast.success("Presentation created!");
           }
-
-          const cleanId = id.startsWith("ai-") ? id.slice(3) : id;
-          window.history.replaceState(null, "", `/docs/${cleanId}`);
-
-          setLastSaved(new Date());
-          toast.success("Presentation created!");
         } catch (err: any) {
-          console.error(" Error:", err);
+          console.error("Error:", err);
           toast.error(err.message);
           setSaveError(err.message);
         }
@@ -135,8 +206,9 @@
 
     const { saveNow } = useAutoSave({
       presentationId: id,
+      isGuestMode,
       enabled: !presentationMode && slides.length > 0,
-      debounceMs: 20000,
+      debounceMs: isGuestMode ? 4000 : 20000,
       onSaveStart: () => {
         setIsSaving(true);
         setSaveError(null);
@@ -144,7 +216,6 @@
       onSaveSuccess: () => {
         setIsSaving(false);
         setLastSaved(new Date());
-        // toast.success("saved");
       },
       onSaveError: (error) => {
         setIsSaving(false);
@@ -162,9 +233,69 @@
     useSlideUrlSync(slideIds);
     useWidgetDeselect();
     usePresentationKeyboard(presentationMode, slides, currentSlideIndex);
+
     useSaveShortcut(saveNow);
 
     useEffect(() => {
+      if (hasInitialized.current) {
+        return;
+      }
+      hasInitialized.current = true;
+
+      const loadGuestPresentation = async () => {
+        if (isGuestMode && !presentationData && !llmToBeCalled) {
+          try {
+            setIsLoadingGuest(true);
+            // const { getPresentationFromLocal } = await import("@/lib/local-db");
+            const localData = await getPresentationFromLocal(id);
+
+            if (!localData) {
+              toast.error("Presentation not found in local storage");
+              router.replace("/library");
+              return;
+            }
+
+            const transformed = {
+              id: localData.id,
+              topic: localData.title,
+              theme: localData.theme,
+              slides: localData.slides.map((slide: any) => ({
+                id: slide.id,
+                theme: slide.theme,
+                slideNumber: slide.slideNumber,
+                heading: slide.heading,
+                widgets: slide.widgets,
+              })),
+              isModified: true,
+            };
+
+            if (needsTransformation(transformed)) {
+              transformAndStorePresentation(transformed);
+            } else {
+              clearPresentation();
+              usePresentationStore.setState({
+                theme: transformed.theme,
+              });
+              transformed.slides.forEach((slide: any) => {
+                populateStores(slide);
+              });
+            }
+
+            setIsLoadingGuest(false);
+          } catch (error) {
+            console.error("Error loading guest presentation:", error);
+            toast.error("Failed to load presentation");
+            setIsLoadingGuest(false);
+            window.location.href = "/";
+          }
+          return;
+        }
+
+        setIsLoadingGuest(false);
+      };
+
+      loadGuestPresentation();
+
       if (llmToBeCalled && !presentationData) {
         setType("llm");
         const processedOutline = useGenerationStore.getState().processedOutline;
@@ -212,7 +343,8 @@
     }, [presentationMode, currentSlideIndex, slides, setCurrentSlideParam]);
 
     if (!slides) return <p>Loading....</p>;
-    if (isLoading) return <SlideLoader />;
+    if (isLoading) return <SlideLoader type="generating" />;
+    if (isLoadingGuest) return <SlideLoader type="finding" />;
 
     if (presentationMode) {
       return (
@@ -246,13 +378,15 @@
               pptTheme && pptTheme !== "starter" ? `${pptTheme}` : "font-sans"
             )}
           >
-            <div className="fixed bottom-4 right-4 z-10">
-              <AutoSaveIndicator
-                isSaving={isSaving}
-                lastSaved={lastSaved}
-                error={saveError}
-              />
-            </div>
+            {!isGuestMode && (
+              <div className="fixed bottom-4 right-4 z-10">
+                <AutoSaveIndicator
+                  isSaving={isSaving}
+                  lastSaved={lastSaved}
+                  error={saveError}
+                />
+              </div>
+            )}
 
             <div className="fixed background-blur-2xl bottom-6 z-100">
               <DockBase />
@@ -265,6 +399,7 @@
                   data={item}
                   id={item.id}
                   slideScale={slideScale}
+                  isGuestMode={isGuestMode}
                 />
               ))}
             </div>

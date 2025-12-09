@@ -18,10 +18,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBlankPresentation } from "@/app/create/action";
+import { createBlankLocalPresentation } from "@/lib/functions/create-local-presentation";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 
-export function NewPresentation() {
+export function NewPresentation({ userId }: { userId: string | null }) {
   const [open, setOpen] = useState<boolean>(false);
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const router = useRouter();
@@ -30,18 +31,14 @@ export function NewPresentation() {
     setIsCreating(true);
     setOpen(false);
 
-    const result = await createBlankPresentation();
+    const result = userId
+      ? await createBlankLocalPresentation()
+      : await createBlankPresentation();
 
     if (result.success) {
       router.push(`/docs/${result.id}`);
     } else {
       toast.error(result.error || "Failed to create presentation");
-
-      if (result.upgrade) {
-        setTimeout(() => {
-          alert("Upgrade to another plan");
-        }, 2000);
-      }
 
       setIsCreating(false);
     }

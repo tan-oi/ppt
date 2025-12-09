@@ -5,26 +5,30 @@ import { SYSTEM_PROMPT } from "@/lib/config/prompt";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { userPlan } from "@/lib/functions/plan-enforcement";
-import { PLAN_CONFIG } from "@/lib/config/plan";
+
 import { createPresentationSchema } from "@/lib/config/schema";
 import { incrementUserCache } from "@/lib/functions/userCache";
-type CurrentPlan = "free" | "basic" | "pro";
-const slideSchema = z.object({
-  slideNumber: z.number(),
-});
+
 export async function POST(req: Request) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  if (!session) return;
+
+  const groqApiKey = req.headers.get("x-groq-api-key");
   const userId = session?.user?.id;
+  const isGuestMode = !userId;
 
-  const { plan } = await userPlan(userId);
-  const maxImagePerPresentation =
-    PLAN_CONFIG[plan as CurrentPlan].maxImagePerPresentation;
+  if (!session && !isGuestMode) {
+    return new Response("Unauthorized", { status: 401 });
+  }
 
-  const imageAllowed = maxImagePerPresentation > 0;
+  let imageAllowed = true;
+  // if (!isGuestMode) {
+  //   const { plan } = await userPlan(userId);
+  //   const maxImagePerPresentation =
+  //     PLAN_CONFIG[plan as CurrentPlan].maxImagePerPresentation;
+  //   imageAllowed = maxImagePerPresentation > 0;
+  // }
 
   const pptSchema = z.array(createPresentationSchema(imageAllowed));
 
@@ -32,11 +36,14 @@ export async function POST(req: Request) {
   const { processedOutline } = userText;
   console.log(userText);
 
+  const groqModel = req.headers.get("x-groq-model") || "openai/gpt-oss-120b";
+
   const result = streamObject({
-    model: groq("openai/gpt-oss-120b"),
+    model: groq(groqModel),
     system: SYSTEM_PROMPT,
     prompt: JSON.stringify(processedOutline),
     schema: pptSchema,
+    ...(groqApiKey && { providerOptions: { groq: { apiKey: groqApiKey } } }),
     experimental_repairText: async ({ text, error }) => {
       console.log("Repairing text due to:", error);
 
@@ -63,6 +70,8 @@ export async function POST(req: Request) {
     console.log("Finhal object:", finalObject);
   });
 
-  await incrementUserCache(userId, "pptCount", 1);
+  if (!isGuestMode && session) {
+    await incrementUserCache(userId, "pptCount", 1);
+  }
   return result.toTextStreamResponse();
 }

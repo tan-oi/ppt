@@ -1,8 +1,9 @@
 import * as motion from "motion/react-client";
 import { Badge } from "../ui/badge";
 
-import { AuthButton } from "../base/auth-button";
+import { AuthButton, GuestButton } from "../base/auth-button";
 import Link from "next/link";
+import { ChevronRight, CloudIcon, UserIcon } from "lucide-react";
 
 function DeckAnimation() {
   return (
@@ -398,7 +399,7 @@ export function HeroComponent() {
           </motion.div>
 
           <motion.h1
-            className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight text-white leading-[0.9]"
+            className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight text-white leading-[0.9] selection:bg-white selection:text-black"
             initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 1, delay: 0.1, ease: [0.2, 0.8, 0.2, 1] }}
@@ -432,9 +433,11 @@ export function HeroComponent() {
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 1, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
           >
-            <AuthButton type={"medium"} label="Start creating" />
+            <GuestButton type="guest" />
 
-            <Link href={"https://www.youtube.com/watch?v=V33sitDROyg"}>
+            <AuthButton type={"medium"} label="Sign in to get full benefits" />
+
+            {/* <Link href={"https://www.youtube.com/watch?v=V33sitDROyg"}>
               <motion.button
                 className="rounded-full px-8 py-2 text-base bg-transparent border border-white/10 text-white transition-all group flex items-center justify-center cursor-pointer"
                 whileHover={{
@@ -456,7 +459,24 @@ export function HeroComponent() {
                 </svg>
                 Watch Demo
               </motion.button>
-            </Link>
+            </Link> */}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+            className="mt-3 flex items-center gap-2 text-neutral-400 text-sm selection:bg-amber-500 selection:text-black"
+          >
+            <p className="">Requires API keys {"(BYOK)"}</p>
+
+            <p className="inline-flex items-center gap-1">
+              {" "}
+              <span className="select-none">•</span>{" "}
+              <Link href={"https://www.youtube.com/watch?v=V33sitDROyg"}>
+                <span className="underline">Watch demo</span>{" "}
+              </Link>
+            </p>
           </motion.div>
         </div>
         <div className="relative w-full max-w-[1000px] h-[300px] md:h-[500px] mt-32 md:mt-36">

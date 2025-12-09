@@ -1,9 +1,15 @@
 import { useEffect, useRef, useCallback } from "react";
 import { usePresentationStore } from "@/lib/store/presentation-store";
 import { useGenerationStore } from "@/lib/store/generation-store";
+import {
+  savePresentationToLocal,
+  getPresentationFromLocal,
+} from "@/lib/local-db";
+
 
 interface AutoSaveOptions {
   presentationId: string;
+  isGuestMode: boolean;
   enabled?: boolean;
   debounceMs?: number;
   onSaveStart?: () => void;
@@ -13,6 +19,7 @@ interface AutoSaveOptions {
 
 export function useAutoSave({
   presentationId,
+  isGuestMode,
   enabled = true,
   debounceMs = 20000,
   onSaveStart,
@@ -66,24 +73,50 @@ export function useAutoSave({
       ? presentationId.slice(3)
       : presentationId;
 
+    const topic =
+      usePresentationStore.getState().topic ||
+      useGenerationStore.getState().userInstruction ||
+      "Untitled Presentation";
+
     const payload = {
       outlineId: id,
+      topic,
       theme: currentTheme,
       slides: currentSlides,
       isModified: true,
     };
 
+    const savePromises: Promise<any>[] = [];
+
+    if (isGuestMode) {
+      const existingLocal = await getPresentationFromLocal(presentationId);
+      const localPresentation = {
+        id: presentationId,
+        title: topic,
+        slides: currentSlides,
+        theme: currentTheme || "starter",
+        createdAt: existingLocal?.createdAt || new Date(),
+        updatedAt: new Date(),
+        syncedToCloud: false,
+      };
+
+      savePromises.push(savePresentationToLocal(localPresentation));
+    } else {
+      savePromises.push(
+        fetch(`/api/presentation/${presentationId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }).then(async (res) => {
+          if (!res.ok) {
+            throw new Error(`Failed to save: ${res.status}`);
+          }
+        })
+      );
+    }
+
     try {
-      const res = await fetch(`/api/presentation/${presentationId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        throw new Error(`Failed to save: ${res.status}`);
-      }
-
+      await Promise.all(savePromises);
       previousStateRef.current = currentState;
       onSaveSuccessRef.current?.();
     } catch (error) {
@@ -91,12 +124,12 @@ export function useAutoSave({
     } finally {
       isSavingRef.current = false;
     }
-  }, [presentationId]);
+  }, [presentationId, isGuestMode]);
 
   useEffect(() => {
     const unsubscribe = usePresentationStore.subscribe((state, prevState) => {
       if (!enabledRef.current) {
-        console.log(" Auto-save disabled, ignoring change");
+        console.log("Auto-save disabled, ignoring change");
         return;
       }
 
@@ -104,25 +137,25 @@ export function useAutoSave({
       const themeChanged = state.theme !== prevState.theme;
 
       if (slidesChanged || themeChanged) {
-        console.log(" Store changed, scheduling save in", debounceMs, "ms", {
+        console.log("Store changed, scheduling save in", debounceMs, "ms", {
           slidesChanged,
           themeChanged,
         });
 
         if (timeoutRef.current) {
-          console.log(" Clearing  timer");
+          console.log("Clearing timer");
           clearTimeout(timeoutRef.current);
         }
 
         timeoutRef.current = setTimeout(() => {
-          console.log(" Timer");
+          console.log("Timer fired");
           savePresentation();
         }, debounceMs);
       }
     });
 
     return () => {
-      console.log(" Cleaning ");
+      console.log("Cleaning up");
       unsubscribe();
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);

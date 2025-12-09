@@ -11,11 +11,13 @@ export function WidgetWrapper({
   slideScale,
   slideId,
   isPresenting,
+  isGuestMode,
 }: {
   widgetId: string;
   slideScale: number;
   slideId: string;
   isPresenting: boolean;
+  isGuestMode?: boolean;
 }) {
   const widget = usePresentationStore((s) => s.getWidget(slideId, widgetId));
   const selectedWidget = useUIStore((s) => s.selectedWidget?.id === widgetId);
@@ -67,6 +69,7 @@ export function WidgetWrapper({
           content: widgetData?.content,
         }}
         editable={!isPresenting}
+        isGuestMode={isGuestMode}
         id={widgetId}
         slideId={slideId}
         {...widgetData}

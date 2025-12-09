@@ -44,3 +44,34 @@ export const presetColors = [
   "#d4a862", // Wall Street Gold
   "#9575f6", // Crypto Midnight
 ];
+
+export const GROQ_MODELS = [
+  { value: "openai/gpt-oss-120b", label: "GPT-OSS-120B" },
+  { value: "meta-llama/llama-4-maverick-17b-128e-instruct", label: "Llama maverick" },
+  { value: "openai/gpt-oss-20b", label: "GPT-OSS-20B" },
+  { value: "mixtral-8x7b-32768", label: "Mixtral 8x7B" },
+  { value: "gemma-7b-it", label: "Gemma 7B" },
+
+  { value: "moonshotai/kimi-k2-instruct-0905", label: "Kimi K2" },
+];
+
+export const REPLICATE_MODELS = [
+  { value: "black-forest-labs/flux-pro", label: "Flux Pro" },
+  { value: "black-forest-labs/flux-schnell", label: "Flux Schnell" },
+  { value: "black-forest-labs/flux-dev", label: "Flux Dev" },
+  { value: "stability-ai/stable-diffusion-3", label: "Stable Diffusion 3" },
+  { value: "stability-ai/sdxl", label: "Stable Diffusion XL" },
+];
+
+export const ERROR_MESSAGES: Record<string, string> = {
+  UNAUTHORIZED: "You need to be logged in to do this.",
+  VALIDATION_ERROR: "Please check your inputs and try again.",
+  INSUFFICIENT_CREDITS:
+    "You don't have enough credits to generate this presentation.",
+  AI_GENERATION_ERROR:
+    "The AI couldn't generate slides. Try different instructions.",
+  UNKNOWN_ERROR: "Something went wrong. Please try again.",
+  INSUFFICIENT_ALLOWANCE: "You've exhausted your limit",
+  INVALID_API_KEY:
+    "Invalid API key. Please check your Groq API key in settings and try again.",
+};

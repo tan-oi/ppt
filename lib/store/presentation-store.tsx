@@ -7,7 +7,7 @@ import { createWidgetsFromSlots } from "@/components/slideUtils";
 
 import { WidgetMetadata } from "@/lib/core/widget-metadata";
 
-interface WidgetData {
+export interface WidgetData {
   id: string;
   widgetType: string;
   data: any;
@@ -19,7 +19,7 @@ interface WidgetData {
   };
 }
 
-interface Slide {
+export interface Slide {
   id: string;
   slideNumber: number;
   heading: string;

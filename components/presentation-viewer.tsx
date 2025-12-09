@@ -13,8 +13,17 @@ import { useQueryState } from "nuqs";
 import { Button } from "./ui/button";
 import { usePresentationKeyboard } from "@/lib/hooks/usePresentationKeyboard";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { toast } from "sonner";
+import { SlideLoader } from "./base/loaders/slide-loader";
+import { getPresentationFromLocal } from "@/lib/local-db";
 
-export function PresentationViewer({ viewData }: { viewData: any }) {
+export function PresentationViewer({
+  viewData,
+  id,
+}: {
+  viewData: any;
+  id: string;
+}) {
   const [currentSlideParam, setCurrentSlideParam] = useQueryState("slide");
   const currentSlideIndex = useUIStore((s) => s.currentSlideIndex);
   const slides = usePresentationStore((s) => s.slides);
@@ -23,18 +32,54 @@ export function PresentationViewer({ viewData }: { viewData: any }) {
   const clearPresentation = usePresentationStore((s) => s.clearPresentation);
   const presentationMode = useUIStore((s) => s.presentationMode);
   const setPresentationMode = useUIStore((s) => s.setPresentationMode);
+  const [isLoadingGuest, setIsLoadingGuest] = useState(!viewData);
+  const [pptTheme, setPptTheme] = useState<string>("starter");
 
   useEffect(() => {
-    // viewData
-    console.log(viewData);
-    clearPresentation();
+    const loadPresentation = async () => {
+      if (!viewData) {
+        try {
+          setIsLoadingGuest(true);
+          const localData = await getPresentationFromLocal(id);
 
-    viewData.slides.forEach((slide: any) => {
-      populateStores(slide);
-    });
+          if (!localData) {
+            toast.error("Presentation not found in local storage");
+            window.location.href = "/";
+            return;
+          }
 
-    // useUIStore.getState().setPresentationMode(true);
-  }, []);
+          clearPresentation();
+          usePresentationStore.setState({
+            theme: localData.theme,
+          });
+          setPptTheme(localData.theme);
+
+          localData.slides.forEach((slide: any) => {
+            populateStores(slide);
+          });
+
+          setIsLoadingGuest(false);
+        } catch (error) {
+          console.error("Error loading guest presentation:", error);
+          toast.error("Failed to load presentation");
+          setIsLoadingGuest(false);
+          window.location.href = "/?login=true";
+        }
+      } else if (viewData) {
+        clearPresentation();
+        usePresentationStore.setState({
+          theme: viewData.theme,
+        });
+        setPptTheme(viewData.theme);
+
+        viewData.slides.forEach((slide: any) => {
+          populateStores(slide);
+        });
+      }
+    };
+
+    loadPresentation();
+  }, [viewData, id]);
 
   useEffect(() => {
     if (presentationMode && slides.length > 0) {
@@ -49,20 +94,21 @@ export function PresentationViewer({ viewData }: { viewData: any }) {
   const slideIds = useMemo(() => slides?.map((s: any) => s.id) || [], [slides]);
   useSlideUrlSync(slideIds);
   usePresentationKeyboard(presentationMode, slides, currentSlideIndex);
+
+  if (isLoadingGuest) {
+    return <SlideLoader type="finding" />;
+  }
+
   if (presentationMode) {
     return (
       <PresentationModeView
         currentSlide={slides[currentSlideIndex]}
         currentSlideIndex={currentSlideIndex}
         slides={slides}
-        pptTheme={viewData.theme ?? "starter"}
+        pptTheme={pptTheme ?? "starter"}
         onExit={() => {
-          console.log(currentSlideIndex);
           const targetSlide = slides[0];
-          console.log(targetSlide);
-          console.log(slides);
           setPresentationMode(false);
-          useUIStore.getState().setPresentationMode(false);
           if (targetSlide) {
             setCurrentSlideParam(targetSlide.id);
             usePresentationStore.getState().setCurrentSlide(targetSlide.id);
@@ -80,7 +126,7 @@ export function PresentationViewer({ viewData }: { viewData: any }) {
       <div
         className={cn(
           "bg-container min-h-screen overflow-hidden flex flex-col items-center py-6 relative",
-          viewData.theme
+          pptTheme && pptTheme !== "starter" ? `${pptTheme}` : "font-sans"
         )}
       >
         <div className="flex flex-col items-center gap-10">

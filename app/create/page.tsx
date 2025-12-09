@@ -4,10 +4,7 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import * as motion from "motion/react-client";
 
-import { requireUser } from "@/lib/functions/user-check";
-
 export default async function CreatePage() {
-  await requireUser();
 
   return (
     <div className="min-h-screen flex flex-col space-y-6">
