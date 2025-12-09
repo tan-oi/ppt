@@ -1,6 +1,6 @@
 //gotta make the repair work
 import { streamObject } from "ai";
-import { groq } from "@ai-sdk/groq";
+import { createGroq, groq } from "@ai-sdk/groq";
 import { SYSTEM_PROMPT } from "@/lib/config/prompt";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
@@ -38,12 +38,18 @@ export async function POST(req: Request) {
 
   const groqModel = req.headers.get("x-groq-model") || "openai/gpt-oss-120b";
 
+  const groqProvider = groqApiKey
+    ? createGroq({
+        apiKey: groqApiKey,
+      })
+    : groq;
+
   const result = streamObject({
-    model: groq(groqModel),
+    model: groqProvider(groqModel),
     system: SYSTEM_PROMPT,
     prompt: JSON.stringify(processedOutline),
     schema: pptSchema,
-    ...(groqApiKey && { providerOptions: { groq: { apiKey: groqApiKey } } }),
+
     experimental_repairText: async ({ text, error }) => {
       console.log("Repairing text due to:", error);
 

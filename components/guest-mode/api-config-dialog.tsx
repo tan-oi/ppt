@@ -170,9 +170,16 @@ export function GuestModeDialog() {
                         <SelectItem
                           key={model.value}
                           value={model.value}
-                          className="text-white focus:bg-zinc-800"
+                          className="text-white hover:bg-white/5 focus:bg-white/5"
                         >
-                          {model.label}
+                          <div className="flex items-center gap-2">
+                            {model.label}
+                            {model.recommended && (
+                              <span className="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">
+                                Recommended
+                              </span>
+                            )}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -227,9 +234,16 @@ export function GuestModeDialog() {
                         <SelectItem
                           key={model.value}
                           value={model.value}
-                          className="text-white focus:bg-zinc-800"
+                          className="text-white hover:bg-white/5 focus:bg-white/5"
                         >
-                          {model.label}
+                          <div className="flex items-center gap-2">
+                            {model.label}
+                            {model.recommended && (
+                              <span className="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded">
+                                Recommended
+                              </span>
+                            )}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
