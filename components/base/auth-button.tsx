@@ -1,7 +1,7 @@
 "use client";
 import { useUIStore } from "@/lib/store/ui-store";
 import { Button } from "../ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, UserIcon } from "lucide-react";
 
 export function AuthButton({
   type,
@@ -46,6 +46,34 @@ export function AuthButton({
         size={"sm"}
       >
         {label}
+      </Button>
+    );
+  }
+}
+
+export function GuestButton({ type }: { type: "config" | "guest" }) {
+  const toggleConfig = useUIStore((s) => s.setShowConfig);
+
+  if (type === "guest") {
+    return (
+      <>
+        <button
+          className="group flex h-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-transparent px-8 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+          onClick={() => toggleConfig(true)}
+        >
+          <UserIcon className="w-4 h-4" />
+          Start as guest
+        </button>
+      </>
+    );
+  } else {
+    return (
+      <Button
+        onClick={() => toggleConfig(true)}
+        className="rounded-lg"
+        size={"default"}
+      >
+        Config keys
       </Button>
     );
   }

@@ -179,6 +179,31 @@ Your job:
 Expand pointer meanings into natural human writing using the requested tone, and populate all widget slots for the layout.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ CRITICAL: LAYOUT ID MUST NEVER CHANGE ⚠️
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+You will receive a layoutId in the input (e.g., "two-media-paragraph", "image-text-split", "stat-showcase", "four-quadrants").
+
+ABSOLUTE RULES:
+1. Copy the layoutId EXACTLY to your output - character by character
+2. DO NOT change it based on slot structure or content
+3. DO NOT "normalize", "fix", or "improve" layout names
+4. DO NOT substitute similar-sounding layouts (e.g., "two-column" when you see "two-media-paragraph")
+5. The layoutId is a technical identifier - changing it breaks rendering
+
+Examples of CORRECT behavior:
+✓ Input layoutId: "two-media-paragraph" → Output layoutId: "two-media-paragraph"  
+✓ Input layoutId: "image-text-split" → Output layoutId: "image-text-split"
+✓ Input layoutId: "stat-showcase" → Output layoutId: "stat-showcase"
+
+Examples of INCORRECT behavior (DO NOT DO THIS):
+✗ Input: "two-media-paragraph" → Output: "two-column" (WRONG!)
+✗ Input: "image-text-split" → Output: "two-column" (WRONG!)
+✗ Input: "header-three-cards" → Output: "three-sections" (WRONG!)
+
+Think of layoutId like a CSS class name or database ID - it must be copied exactly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 HEADING RULE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -342,13 +367,13 @@ EXAMPLE: GOOD VS BAD CONTENT
 
 Pointer: "Discovered tool while reverse-engineering network traffic, elegant architecture motivated recreation"
 
- BAD (Too formal, robotic):
+❌ BAD (Too formal, robotic):
 "Initial exposure to the product occurred while reverse-engineering network traffic, revealing sophisticated architecture that transformed the tool from a utility into a source of genuine technical intrigue, motivating the decision to recreate and extend its capabilities."
 
- GOOD (Natural, human - casual tone):
+✓ GOOD (Natural, human - casual tone):
 "I discovered this tool while digging into how it worked. Spent hours reverse-engineering the network requests. The architecture was so elegant, it stopped being just a tool—it became something I wanted to build myself."
 
- GOOD (Natural, human - professional tone):
+✓ GOOD (Natural, human - professional tone):
 "While reverse-engineering network traffic, I uncovered this tool's elegant architecture. The design was compelling enough to inspire a complete recreation effort."
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -360,14 +385,19 @@ Return ONLY a JSON array:
 [
   {
     "slideNumber": 1,
-    "heading": "Slide Heading From Input",
-    "layoutId": "layout-type-from-input",
+    "heading": "Exact Slide Heading From Input",
+    "layoutId": "EXACT-layoutId-from-input-DO-NOT-CHANGE",
     "content": {
       "slot-id": { /* widget data matching slot type */ },
-     
+      "another-slot": { /* widget data */ }
     }
   }
 ]
+
+CRITICAL REMINDER FOR OUTPUT:
+- layoutId MUST be copied exactly from input (character-by-character)
+- heading MUST be copied exactly from slideHeading input
+- Return ONLY the JSON array, nothing else
 
 NO markdown code blocks.  
 NO explanations.  
@@ -378,9 +408,11 @@ Just pure, valid JSON.
 CRITICAL REMINDERS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+✓ **NEVER modify the layoutId - copy it exactly from input**
 ✓ Match the tone precisely
 ✓ Use ONLY information from pointers
 ✓ Write like a human, not a corporate AI
 ✓ Return ONLY valid JSON
 ✓ Use slideHeading exactly as provided
+✓ layoutId is a technical identifier - treat it like an ID, not a description
 `;

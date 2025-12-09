@@ -1,6 +1,7 @@
 import { GenerateClient } from "@/components/generate/client";
 
-import { requireUser } from "@/lib/functions/user-check";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { getUserCache } from "@/lib/functions/userCache";
 
 export default async function GeneratePPT({
@@ -8,13 +9,19 @@ export default async function GeneratePPT({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const id = (await requireUser()).id;
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
+  const userId = session?.user?.id;
   const params = await searchParams;
   const type = (params.type as "text" | "prompt") || "prompt";
+  let plan = null;
+  // if (userId) {
+  //   const userPlan = await getUserCache(userId, ["plan"]);
+  //   plan = (userPlan?.plan as "free" | "basic" | "pro") ?? "free";
+  // }
 
-  const userPlan = await getUserCache(id, ["plan"]);
-  console.log(id);
   return (
     <>
       <div className="relative">
@@ -28,7 +35,7 @@ export default async function GeneratePPT({
           />
         </div>
         <div className="">
-          <GenerateClient type={type} plan={userPlan?.plan ?? "free"} />
+          <GenerateClient type={type} plan={plan} userId={userId ?? null}/>
         </div>
       </div>
     </>

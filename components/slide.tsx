@@ -14,10 +14,12 @@ const SlidePresentation = React.memo(
     data,
     slideScale,
     isPresenting,
+    isGuestMode,
   }: {
     data: any;
     slideScale: number;
     isPresenting?: boolean;
+    isGuestMode?: boolean;
   }) => {
     return (
       <div
@@ -39,6 +41,7 @@ const SlidePresentation = React.memo(
               slideScale={slideScale}
               slideId={data.id}
               isPresenting={isPresenting ?? false}
+              isGuestMode={isGuestMode}
             />
           ))}
       </div>
@@ -51,11 +54,13 @@ function SlideBase({
   slideScale,
   isPresenting,
   data,
+  isGuestMode,
 }: {
   data: any;
   id: string;
   slideScale: number;
   isPresenting?: boolean;
+  isGuestMode?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id,
@@ -105,6 +110,7 @@ function SlideBase({
         data={data}
         slideScale={slideScale}
         isPresenting={isPresenting}
+        isGuestMode={isGuestMode}
       />
     </motion.div>
   );

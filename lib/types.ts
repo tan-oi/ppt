@@ -13,9 +13,9 @@ export interface Presentation {
   };
 }
 
-export interface PresentationListProps {
-  initialPresentations: Presentation[];
-}
+// export interface PresentationListProps {
+//   initialPresentations: Presentation[];
+// }
 
 /* Widget types */
 export interface WidgetData {
@@ -104,4 +104,41 @@ export interface BarChartProps {
   chartConfig: any;
   chartData: any;
   xKeyToUse: string | null;
+}
+
+
+
+export interface LocalPresentation {
+  id: string;
+  title: string
+  slides: Slide[];
+  theme: string;
+  createdAt: Date;
+  updatedAt: Date;
+  syncedToCloud: boolean; 
+}
+
+export interface LocalImage {
+  id: string; 
+  presentationId: string; 
+  slideId: string; 
+  widgetId: string; 
+  base64Data: string; 
+  prompt: string;
+  createdAt: Date;
+}
+
+export interface AboutPresentation {
+  id: string;
+  topic: string;
+  updatedAt: Date;
+  isShared?: boolean;
+  _count: {
+    slides: number;
+  };
+}
+
+export interface PresentationListProps {
+  initialCloudPresentations?: AboutPresentation[];
+  userId?: string;
 }

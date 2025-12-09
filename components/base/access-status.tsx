@@ -19,7 +19,7 @@ type Props = {
   description?: string;
   backHref?: string;
   homeHref?: string;
-  backHrefLabel?: string;
+  homeHrefLabel?: string;
 };
 
 export default function AccessStatus({
@@ -27,7 +27,7 @@ export default function AccessStatus({
   title,
   description,
   backHref,
-  backHrefLabel = "library",
+  homeHrefLabel = "library",
   homeHref = "/",
 }: Props) {
   const router = useRouter();
@@ -109,7 +109,7 @@ export default function AccessStatus({
             className={`inline-flex items-center justify-center h-11 px-6 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-neutral-500 ${config.buttonPrimary}`}
           >
             <Home size={16} className="mr-2" />
-            {`Go to ${backHrefLabel}`}
+            {`Go to ${homeHrefLabel}`}
           </button>
 
           <button

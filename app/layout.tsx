@@ -4,6 +4,10 @@ import "./globals.css";
 import { Toolbar } from "@/components/toolbar";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
+import { Suspense } from "react";
+import { LoginGate } from "@/components/base/user-auth";
+import Signin from "@/components/sign-in";
+import { GuestModeDialog } from "@/components/guest-mode/api-config-dialog";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +42,12 @@ export default function RootLayout({
 
         <Toolbar />
         <Toaster richColors />
+
+        <Suspense fallback={null}>
+          <LoginGate />
+        </Suspense>
+        <GuestModeDialog />
+        <Signin />
       </body>
     </html>
   );

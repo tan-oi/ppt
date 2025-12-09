@@ -19,26 +19,28 @@ import { Separator } from "../ui/separator";
 import { ShareOption } from "../share-option";
 import { toggleSharePresentation } from "@/app/docs/[id]/action";
 import { motion } from "motion/react";
+import { deletePresentationFromLocal } from "@/lib/local-db";
 
 interface PresentationCardProps {
   item: {
     id: string;
     topic: string;
-    outlineId: string | null;
     updatedAt: Date;
-    isShared: boolean;
+    isShared?: boolean;
     _count: {
       slides: number;
     };
   };
   index: number;
   onOptimisticDelete: (id: string) => void;
+  isLocal: boolean;
 }
 
 export function PresentationCard({
   item,
   index,
   onOptimisticDelete,
+  isLocal,
 }: PresentationCardProps) {
   const router = useRouter();
   const [openDelete, setOpenDelete] = useState(false);
@@ -53,21 +55,32 @@ export function PresentationCard({
     console.log("Share clicked");
   };
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
     startTransition(async () => {
       setOpenDelete(false);
-
       onOptimisticDelete(item.id);
 
-      const result = await deletePresentation(item.id);
-
-      // router.refresh();
-
-      if (!result.success) {
+      try {
+        if (isLocal) {
+          console.log("Deleting local presentation:", item.id);
+          const result = await deletePresentationFromLocal(item.id);
+          console.log("Local delete result:", result);
+        } else {
+          console.log("Deleting cloud presentation:", item.id);
+          const result = await deletePresentation(item.id);
+          router.refresh();
+          console.log("Cloud delete result:", result);
+        }
+      } catch (error) {
+        console.error("Failed to delete:", error);
         router.refresh();
-        alert(result.error || "Failed to delete presentation");
+        alert(
+          `Failed to delete presentation: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        );
       }
     });
   };
@@ -204,20 +217,23 @@ export function PresentationCard({
               <Edit className="w-3 h-3" />
             </Button>
           </Link>
+          {!isLocal && (
+            <>
+              <Separator orientation="vertical" />
 
-          <Separator orientation="vertical" />
-
-          <ShareOption
-            isShared={item.isShared}
-            type="minimal"
-            shareUrl={`${process.env.NEXT_PUBLIC_APP_URL}/p/${item.id}`}
-            presentationId={`${item.id}`}
-            onToggleShare={toggleSharePresentation.bind(
-              null,
-              item.id,
-              item.isShared
-            )}
-          />
+              <ShareOption
+                isShared={item.isShared || false}
+                type="minimal"
+                shareUrl={`${process.env.NEXT_PUBLIC_APP_URL}/p/${item.id}`}
+                presentationId={`${item.id}`}
+                onToggleShare={toggleSharePresentation.bind(
+                  null,
+                  item.id,
+                  item.isShared || false
+                )}
+              />
+            </>
+          )}
 
           <Separator orientation="vertical" />
 

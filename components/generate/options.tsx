@@ -1,3 +1,4 @@
+"use client";
 import {
   Select,
   SelectContent,
@@ -16,13 +17,17 @@ import { Lock } from "lucide-react";
 export function PresentationOptions({
   type,
   handleClick,
-  plan,
+
+  mode,
 }: {
   type: string;
   handleClick: () => void;
-  plan: "free" | "pro" | "basic";
+
+  mode: "guest" | "auth";
 }) {
-  const maxSlides = PLAN_CONFIG[plan].maxSlidesPerPresentation;
+  console.log(mode);
+  let maxSlides = 15;
+
   const setSlidesCount = useGenerationStore((s) => s.setSlidesCount);
 
   const setWriteStyle = useGenerationStore((s) => s.setWriteStyle);
@@ -39,19 +44,14 @@ export function PresentationOptions({
             <SelectContent className="border-none opacity-80 rounded-xl">
               <SelectGroup>
                 {Array.from({ length: maxSlides - 1 }).map((_, index) => (
-                  <SelectItem key={index} value={(index + 2).toString()}>
+                  <SelectItem
+                    key={index}
+                    defaultValue={2}
+                    value={(index + 2).toString()}
+                  >
                     {index + 2}
                   </SelectItem>
                 ))}
-                {plan !== "pro" && (
-                  <>
-                    <SelectSeparator />
-                    <div className="px-2 py-1.5 text-xs text-muted-foreground flex items-center gap-2">
-                      <Lock className="w-3 h-3" />
-                      <span>Upgrade for more slides</span>
-                    </div>
-                  </>
-                )}
               </SelectGroup>
             </SelectContent>
           </Select>

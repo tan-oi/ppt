@@ -1,8 +1,19 @@
+"use client";
+
 import { Icon } from "@/lib/icon";
 import { AuthButton } from "../base/auth-button";
-
+import { GuestModeDialog } from "../guest-mode/api-config-dialog";
+import { Button } from "../ui/button";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
+  const [guestDialogOpen, setGuestDialogOpen] = useState(false);
+
+  const handleGuestModeClick = () => {
+    setGuestDialogOpen(true);
+  };
+
   return (
     <header>
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 w-[95%] max-w-fit">
@@ -40,10 +51,19 @@ export function Navbar() {
           <div />
 
           <div className="flex items-center gap-2 pl-2">
+            {/* <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleGuestModeClick}
+              className="text-xs text-zinc-400 hover:text-white hover:bg-white/5 px-3 py-1.5 rounded-full transition-all whitespace-nowrap"
+            >
+              {"Open API config"}
+            </Button> */}
             <AuthButton type="small" label={"Get started"} />
           </div>
         </div>
       </nav>
+      {/* <GuestModeDialog /> */}
     </header>
   );
 }
