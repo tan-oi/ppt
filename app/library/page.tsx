@@ -22,7 +22,7 @@ export default async function Library() {
   let cloudPresentations: AboutPresentation[] = [];
 
   if (userId) {
-    data = await preloadUserCache(userId, ["plan", "credits"]);
+    // data = await preloadUserCache(userId, ["plan", "credits"]);
     const getLibrary = await getLibraryData(userId);
     if (getLibrary?.success && getLibrary.presentations) {
       cloudPresentations = getLibrary.presentations;

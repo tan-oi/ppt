@@ -32,8 +32,8 @@ export function NewPresentation({ userId }: { userId: string | null }) {
     setOpen(false);
 
     const result = userId
-      ? await createBlankLocalPresentation()
-      : await createBlankPresentation();
+      ? await createBlankPresentation()
+      : await createBlankLocalPresentation();
 
     if (result.success) {
       router.push(`/docs/${result.id}`);
