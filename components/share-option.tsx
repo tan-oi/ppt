@@ -77,7 +77,7 @@ export function ShareOption({
         {type === "normal" ? (
           <Button
             size="sm"
-            className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white border-0"
+            className="gap-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700"
           >
             <Share2 size={14} />
             Share

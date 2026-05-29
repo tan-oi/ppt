@@ -164,10 +164,10 @@ export function InsertElements() {
           whileHover="hover"
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-          className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors hover:font-semibold"
+          className="flex items-center gap-1.5 py-1.5 px-2.5 hover:bg-white/10 rounded-md transition-colors hover:font-semibold"
         >
           <motion.div variants={iconVariant}>
-            <Plus size={18} className="h  over:text-zinc-300 text-zinc-400" />
+            <Plus size={18} className="hover:text-zinc-300 text-zinc-400" />
           </motion.div>
           <span className="text-sm text-zinc-300">Insert</span>
         </motion.button>
@@ -179,7 +179,7 @@ export function InsertElements() {
             asChild
             forceMount
             sideOffset={16}
-            className="h-96 w-72 p-2 border border-zinc-800 bg-zinc-900 backdrop-blur-md rounded-lg shadow-xl"
+            className="h-96 w-72 p-2 border border-zinc-800 bg-zinc-900 backdrop-blur-md rounded-lg shadow-xl overflow-y-auto scrollbar-subtle"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.92, y: -5 }}
