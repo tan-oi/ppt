@@ -57,7 +57,7 @@ export function ThemeSelector() {
             whileHover="hover"
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-            className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors hover:font-semibold"
+            className="flex items-center gap-1.5 py-1.5 px-2.5 hover:bg-white/10 rounded-md transition-colors hover:font-semibold"
           >
             <motion.div variants={iconVariant}>
               <Palette size={18} className="text-zinc-400" />
@@ -67,7 +67,7 @@ export function ThemeSelector() {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           sideOffset={16}
-          className="h-108 w-72 overflow-y-scroll p-4 border-none bg-zinc-900/95 backdrop-blur-md rounded-xl"
+          className="h-108 w-72 overflow-y-auto scrollbar-subtle p-4 border-none bg-zinc-900/95 backdrop-blur-md rounded-xl"
         >
           <div className="mb-3">
             <div className="w-full flex items-center justify-between gap-4 relative">

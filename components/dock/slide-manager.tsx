@@ -444,7 +444,7 @@ export function SlideManager() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <motion.button
-          className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 py-1.5 px-2.5 hover:bg-white/10 rounded-md transition-colors"
           whileHover={{
             scale: 1.02,
           }}
@@ -529,7 +529,7 @@ export function SlideManager() {
 
           <DropdownMenuSeparator className="w-full" />
 
-          <div className="grid grid-cols-2 gap-2 p-2 w-full max-h-[400px] overflow-y-scroll">
+          <div className="grid grid-cols-2 gap-2 p-2 w-full max-h-[400px] overflow-y-auto scrollbar-subtle">
             {templates.map((item, index) => (
               <motion.button
                 onClick={() => {

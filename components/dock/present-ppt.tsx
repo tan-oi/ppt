@@ -18,7 +18,7 @@ export function Present() {
     <>
       <button
         data-widget-interactive
-        className="flex items-center gap-2 py-2 px-3 hover:bg-white/10 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 py-1.5 px-2.5 hover:bg-white/10 rounded-md transition-colors"
         onClick={handlePresent}
       >
         <Play size={18} className="text-zinc-400" />
