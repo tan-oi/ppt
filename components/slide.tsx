@@ -7,20 +7,19 @@ import { SLIDE_CONFIG } from "@/lib/config/slide";
 import { cn } from "@/lib/utils";
 import { useThemeFonts } from "@/lib/config/theme-loader";
 import * as motion from "motion/react-client";
-import { usePresentationStore } from "@/lib/store/presentation-store";
+import type { Slide as SlideType } from "@/lib/types";
 
-const SlidePresentation = React.memo(
-  ({
-    data,
-    slideScale,
-    isPresenting,
-    isGuestMode,
-  }: {
-    data: any;
-    slideScale: number;
-    isPresenting?: boolean;
-    isGuestMode?: boolean;
-  }) => {
+const SlidePresentation = React.memo(function SlidePresentation({
+  data,
+  slideScale,
+  isPresenting,
+  isGuestMode,
+}: {
+  data: SlideType;
+  slideScale: number;
+  isPresenting?: boolean;
+  isGuestMode?: boolean;
+}) {
     return (
       <div
         className="relative slide-presentation-content"
@@ -56,13 +55,13 @@ function SlideBase({
   data,
   isGuestMode,
 }: {
-  data: any;
+  data: SlideType | null | undefined;
   id: string;
   slideScale: number;
   isPresenting?: boolean;
   isGuestMode?: boolean;
 }) {
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id,
     data: { type: "slide" },
   });
@@ -72,9 +71,9 @@ function SlideBase({
   // );
   //changed each. slideData below it to data.
 
-  if (!data) return null;
+  useThemeFonts(data?.theme);
 
-  useThemeFonts(data.theme);
+  if (!data) return null;
 
   return (
     <motion.div
