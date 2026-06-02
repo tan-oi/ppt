@@ -21,15 +21,6 @@ export function IconToolbar() {
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const [iconSearch, setIconSearch] = React.useState("");
 
-  if (!editBuffer?.widgetData) return null;
-  const widgetData = editBuffer.widgetData;
-
-  const handleUpdate = (key: string, value: any) => {
-    updateEditBuffer({
-      [key]: value,
-    });
-  };
-
   const allLucideIcons = React.useMemo(() => {
     const allKeys = Object.keys(LucideIcons);
     console.log("All Lucide keys:", allKeys.length);
@@ -82,6 +73,15 @@ export function IconToolbar() {
 
     return filteredAll;
   }, [iconSearch, allLucideIcons]);
+
+  if (!editBuffer?.widgetData) return null;
+  const widgetData = editBuffer.widgetData;
+
+  const handleUpdate = (key: string, value: any) => {
+    updateEditBuffer({
+      [key]: value,
+    });
+  };
 
   const slideVariants = {
     hidden: {

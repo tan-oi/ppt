@@ -10,6 +10,6 @@ export async function loadWidgetComponent(widgetType: string) {
     throw new Error(`Unknown widget type: ${widgetType}`);
   }
 
-  const module = await loader();
-  return module; 
+  const mod = await loader();
+  return mod;
 }

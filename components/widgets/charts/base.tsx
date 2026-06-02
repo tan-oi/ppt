@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React, { useMemo } from "react";
 import { BarChartBase } from "./bar-chart";
 import { AreaChartBase } from "./area-chart";
@@ -17,10 +16,10 @@ const defaultData = [
 ];
 
 const chartConfig = {
-  desktop: { label: "Desktop", color: "hsl(220, 90%, 56%)" },
-  mobile: { label: "Mobile", color: "hsl(280, 90%, 60%)" },
-  computer: { label: "Computer", color: "hsl(160, 85%, 45%)" },
-  ipod: { label: "Ipod", color: "hsl(340, 85%, 55%)" },
+  desktop: { label: "Desktop", color: "oklch(0.72 0.16 250)" },
+  mobile: { label: "Mobile", color: "oklch(0.78 0.14 165)" },
+  computer: { label: "Computer", color: "oklch(0.78 0.16 80)" },
+  ipod: { label: "Ipod", color: "oklch(0.7 0.18 25)" },
 } satisfies ChartConfig;
 
 export const chartRegistry: Record<
@@ -49,7 +48,6 @@ export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
 }) => {
   console.log(xKey);
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
-  const ChartComponent = chartRegistry[type];
 
   const editBuffer = useUIStore((s) => s.editBuffer);
   const isSelected = useUIStore((s) => s.selectedWidget?.id === id);
@@ -59,10 +57,13 @@ export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
       ? editBuffer.widgetData
       : {
           type,
-          xKey : xKey ?? null,
+          xKey: xKey ?? null,
           data: data ?? defaultData,
           config: config ?? chartConfig,
         };
+
+  const ChartComponent =
+    chartRegistry[currentData.type as keyof typeof chartRegistry];
 
   // const chartConfigToUse = currentData.config;
   const chartConfigToUse = currentData.config;
@@ -88,20 +89,13 @@ export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
         })
       }
     >
-      <Card className="border-none backdrop-blur-sm bg-linear-to-br from-background/95 to-background/80 shadow-2xl min-w-[180px] min-h-[200px] w-full h-full overflow-hidden">
-        <CardHeader className="">
-          <CardTitle className="text-foreground/70 text-xs font-semibold tracking-wider uppercase">
-            {currentData.type} chart
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="w-full h-[calc(100%-2px)]">
-          <ChartComponent
-            chartData={chartDataToUse}
-            chartConfig={chartConfigToUse}
-            xKeyToUse={xKeyToUse ?? null}
-          />
-        </CardContent>
-      </Card>
+      <div className="w-full h-full min-w-[180px] min-h-[200px] flex flex-col">
+        <ChartComponent
+          chartData={chartDataToUse}
+          chartConfig={chartConfigToUse}
+          xKeyToUse={xKeyToUse ?? null}
+        />
+      </div>
     </div>
   );
 };

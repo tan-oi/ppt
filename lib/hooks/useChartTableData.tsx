@@ -1,16 +1,16 @@
 import { useState, useMemo, useEffect } from "react";
 import { useUIStore } from "@/lib/store/ui-store";
 import { RowData, ChartConfig, EditingCell } from "@/lib/types";
+import { toast } from "sonner";
 
 const COLORS = [
-  "hsl(220, 90%, 56%)",
-  "hsl(280, 90%, 60%)",
-  "hsl(160, 85%, 45%)",
-  "hsl(340, 85%, 55%)",
-  "hsl(20, 85%, 55%)",
-  "hsl(60, 85%, 55%)",
-  "hsl(180, 85%, 45%)",
-  "hsl(300, 85%, 55%)",
+  "oklch(0.72 0.16 250)",
+  "oklch(0.78 0.14 165)",
+  "oklch(0.78 0.16 80)",
+  "oklch(0.7 0.18 25)",
+  "oklch(0.72 0.18 320)",
+  "oklch(0.74 0.14 200)",
+  "oklch(0.68 0.18 350)",
 ];
 
 const MAX_ROWS = 8;
@@ -37,10 +37,10 @@ export function useChartTableData({
   ];
 
   const defaultConfig = {
-    desktop: { label: "Desktop", color: "hsl(220, 90%, 56%)" },
-    mobile: { label: "Mobile", color: "hsl(280, 90%, 60%)" },
-    computer: { label: "Computer", color: "hsl(160, 85%, 45%)" },
-    ipod: { label: "Ipod", color: "hsl(340, 85%, 55%)" },
+    desktop: { label: "Desktop", color: "oklch(0.72 0.16 250)" },
+    mobile: { label: "Mobile", color: "oklch(0.78 0.14 165)" },
+    computer: { label: "Computer", color: "oklch(0.78 0.16 80)" },
+    ipod: { label: "Ipod", color: "oklch(0.7 0.18 25)" },
   };
 
   const [data, setData] = useState<RowData[]>(initialData || defaultData);
@@ -108,7 +108,6 @@ export function useChartTableData({
       newName === xAxisKey ||
       dataColumns.includes(newName)
     ) {
-      alert("Invalid X-axis name!");
       setEditingHeader(null);
       return;
     }
@@ -129,7 +128,6 @@ export function useChartTableData({
       newName === xAxisKey ||
       dataColumns.includes(newName)
     ) {
-      alert("Invalid series name!");
       setEditingHeader(null);
       return;
     }
@@ -205,11 +203,11 @@ export function useChartTableData({
 
   const deleteColumn = (colName: string) => {
     if (colName === xAxisKey) {
-      alert("Cannot delete the X-axis column!");
+      toast.error("Cannot delete the X-axis column");
       return;
     }
     if (dataColumns.length <= 1) {
-      alert("Need at least one series!");
+      toast.error("Need at least one series");
       return;
     }
     setData((prev) =>

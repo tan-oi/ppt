@@ -40,40 +40,13 @@ export const BarChartBase: React.FC<BarChartProps> = ({
     <ChartContainer config={chartConfig} className="w-full h-full">
       <BarChart
         data={chartData}
-        margin={{ top: 10, right: 10, bottom: 5, left: 5 }}
+        margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
+        barCategoryGap="20%"
       >
-        <defs>
-          {dataKeys.map((key, idx) => (
-            <linearGradient
-              key={key}
-              id={`gradient-${key}`}
-              x1="0"
-              y1="0"
-              x2="0"
-              y2="1"
-            >
-              <stop
-                offset="0%"
-                stopColor={
-                  chartConfig[key]?.color || `hsl(${idx * 60}, 70%, 50%)`
-                }
-                stopOpacity={0.9}
-              />
-              <stop
-                offset="100%"
-                stopColor={
-                  chartConfig[key]?.color || `hsl(${idx * 60}, 70%, 50%)`
-                }
-                stopOpacity={0.3}
-              />
-            </linearGradient>
-          ))}
-        </defs>
-
         <CartesianGrid
-          strokeDasharray="3 3"
+          strokeDasharray="2 4"
           stroke="currentColor"
-          className="opacity-30"
+          className="opacity-10"
           vertical={false}
         />
 
@@ -81,29 +54,33 @@ export const BarChartBase: React.FC<BarChartProps> = ({
           dataKey={xKey}
           type="category"
           tickLine={false}
-          tickMargin={12}
+          tickMargin={10}
           axisLine={false}
-          className="text-xs"
-          tick={{ fill: "currentColor", opacity: 0.6 }}
+          tick={{ fill: "currentColor", opacity: 0.55, fontSize: 11 }}
           tickFormatter={(value) =>
-            typeof value === "string" ? value.slice(0, 3) : String(value)
+            typeof value === "string" ? value.slice(0, 6) : String(value)
           }
         />
 
         <YAxis
           tickLine={false}
           axisLine={false}
-          className="text-xs"
-          tick={{ fill: "currentColor", opacity: 0.6 }}
-          width={40}
+          tick={{ fill: "currentColor", opacity: 0.5, fontSize: 11 }}
+          width={44}
+          tickFormatter={(value) => {
+            const n = Number(value);
+            if (Math.abs(n) >= 1000) return `${(n / 1000).toFixed(1)}k`;
+            return String(value);
+          }}
         />
 
         <ChartTooltip
-          cursor={{ fill: "hsl(var(--muted))", opacity: 0.1 }}
+          cursor={{ fill: "currentColor", opacity: 0.05 }}
+          itemSorter={(item) => -(Number(item.value) || 0)}
           content={
             <ChartTooltipContent
               indicator="dot"
-              className="backdrop-blur-sm bg-background/95 border-border/50"
+              className="backdrop-blur-md bg-background/95 border-border/50 shadow-lg"
             />
           }
         />
@@ -112,10 +89,9 @@ export const BarChartBase: React.FC<BarChartProps> = ({
           <Bar
             key={key}
             dataKey={key}
-            fill={`url(#gradient-${key})`}
-            radius={[8, 8, 0, 0]}
-            maxBarSize={60}
-            filter="url(#glow)"
+            fill={`var(--color-${key})`}
+            radius={[6, 6, 0, 0]}
+            maxBarSize={48}
           />
         ))}
       </BarChart>

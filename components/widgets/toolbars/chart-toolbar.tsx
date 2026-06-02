@@ -1,18 +1,17 @@
-import { BaseDropdown } from "@/components/base/dropdown";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/lib/store/ui-store";
 
 export function ChartToolbar() {
   const editBuffer = useUIStore((s) => s.editBuffer);
-  const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
-  
+  //const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
+
   if (!editBuffer?.widgetData) return null;
 
-  const widgetData = editBuffer.widgetData;
+  //const widgetData = editBuffer.widgetData;
 
-  const handleUpdate = (key: string, value: any) => {
-    updateEditBuffer({ [key]: value });
-  };
+  // const handleUpdate = (key: string, value: any) => {
+  //   updateEditBuffer({ [key]: value });
+  // };
 
   return (
     <>
@@ -28,7 +27,7 @@ export function ChartToolbar() {
         onChange={(newValue) => handleUpdate("type", newValue)}
         tooltip="Choose chart type"
       /> */}
-      
+
       <Button
         variant="outline"
         onClick={() => useUIStore.getState().setDrawer()}
