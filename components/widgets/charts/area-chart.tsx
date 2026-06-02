@@ -1,12 +1,10 @@
 "use client";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useState } from "react";
 
 interface AreaChartProps {
   chartConfig: any;
@@ -19,10 +17,6 @@ export const AreaChartBase: React.FC<AreaChartProps> = ({
   chartData,
   xKeyToUse,
 }) => {
-  console.log(chartData)
-  const [xAxis, setXAxis] = useState<number | null>(null);
-  const animationConfig = { glowWidth: 300 };
-
   const dataKeys = Object.keys(chartConfig);
   const xKey =
     xKeyToUse || (chartData?.[0] ? Object.keys(chartData[0])[0] : "month");
@@ -32,86 +26,82 @@ export const AreaChartBase: React.FC<AreaChartProps> = ({
       <AreaChart
         accessibilityLayer
         data={chartData}
-        onMouseMove={(e) => setXAxis(e.chartX as number)}
-        onMouseLeave={() => setXAxis(null)}
-        margin={{ left: 10, right: 10 }}
+        margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
       >
-        <CartesianGrid vertical={false} strokeDasharray="3 3" />
-        <XAxis
-          dataKey={xKey}
-          tickLine={false}
-          axisLine={true}
-          tickMargin={4}
-          tickFormatter={(value) =>
-            typeof value === "string" ? value.slice(0, 3) : value
-          }
-          fontSize={14}
-          interval={0}
-        />
-        <YAxis
-          tickLine={false}
-          axisLine={false}
-          className="text-xs"
-          tick={{ fill: "currentColor", opacity: 0.6 }}
-          width={40}
-        />
-        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <defs>
-          <linearGradient
-            id="animated-highlighted-mask-grad"
-            x1="0"
-            y1="0"
-            x2="1"
-            y2="0"
-          >
-            <stop offset="0%" stopColor="transparent" />
-            <stop offset="50%" stopColor="white" />
-            <stop offset="100%" stopColor="transparent" />
-          </linearGradient>
           {dataKeys.map((key) => (
             <linearGradient
               key={key}
-              id={`animated-highlighted-grad-${key}`}
+              id={`area-grad-${key}`}
               x1="0"
               y1="0"
               x2="0"
               y2="1"
             >
               <stop
-                offset="5%"
+                offset="0%"
                 stopColor={`var(--color-${key})`}
-                stopOpacity={0.4}
+                stopOpacity={0.45}
               />
               <stop
-                offset="95%"
+                offset="100%"
                 stopColor={`var(--color-${key})`}
-                stopOpacity={0}
+                stopOpacity={0.02}
               />
             </linearGradient>
           ))}
-          {xAxis && (
-            <mask id="animated-highlighted-mask">
-              <rect
-                x={xAxis - animationConfig.glowWidth / 2}
-                y={0}
-                width={animationConfig.glowWidth}
-                height="100%"
-                fill="url(#animated-highlighted-mask-grad)"
-              />
-            </mask>
-          )}
         </defs>
+        <CartesianGrid
+          vertical={false}
+          strokeDasharray="2 4"
+          stroke="currentColor"
+          className="opacity-10"
+        />
+        <XAxis
+          dataKey={xKey}
+          tickLine={false}
+          axisLine={false}
+          tickMargin={10}
+          tick={{ fill: "currentColor", opacity: 0.55, fontSize: 11 }}
+          tickFormatter={(value) =>
+            typeof value === "string" ? value.slice(0, 6) : value
+          }
+          interval={0}
+        />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          tick={{ fill: "currentColor", opacity: 0.5, fontSize: 11 }}
+          width={44}
+          tickFormatter={(value) => {
+            const n = Number(value);
+            if (Math.abs(n) >= 1000) return `${(n / 1000).toFixed(1)}k`;
+            return String(value);
+          }}
+        />
+        <ChartTooltip
+          cursor={{
+            stroke: "currentColor",
+            strokeOpacity: 0.15,
+            strokeDasharray: "3 3",
+          }}
+          itemSorter={(item) => -(Number(item.value) || 0)}
+          content={
+            <ChartTooltipContent
+              indicator="line"
+              className="backdrop-blur-md bg-background/95 border-border/50 shadow-lg"
+            />
+          }
+        />
         {dataKeys.map((key) => (
           <Area
             key={key}
             dataKey={key}
-            type="natural"
-            fill={`url(#animated-highlighted-grad-${key})`}
-            fillOpacity={0.4}
+            type="monotone"
+            fill={`url(#area-grad-${key})`}
             stroke={`var(--color-${key})`}
+            strokeWidth={2}
             stackId="a"
-            strokeWidth={0.8}
-            mask="url(#animated-highlighted-mask)"
           />
         ))}
       </AreaChart>

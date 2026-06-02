@@ -44,42 +44,43 @@ export function ChartTable(props: ChartTableProps) {
     initialXKey: props.xKey,
     chartType: props.type,
   });
+  const cellBase =
+    "px-3 py-1.5 rounded-md text-sm transition-colors h-8 border border-transparent flex items-center";
+  const inputBase =
+    "bg-background text-foreground px-3 py-1.5 rounded-md border border-ring/60 outline-none w-full text-sm h-8 box-border";
+
   return (
     <div className="w-full h-full flex flex-col gap-3">
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         <button
           onClick={addRow}
           disabled={isMaxRows}
-          className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm transition-all ${
+          className={`px-3 py-1.5 rounded-md flex items-center gap-1.5 text-xs font-medium transition-colors border ${
             isMaxRows
-              ? "bg-slate-700 cursor-not-allowed opacity-60"
-              : "bg-indigo-600 text-white hover:bg-indigo-500 shadow-md hover:shadow-lg"
+              ? "bg-muted/40 text-muted-foreground border-border/40 cursor-not-allowed"
+              : "bg-zinc-800 text-zinc-100 border-zinc-700 hover:bg-zinc-700"
           }`}
         >
-          <Plus size={18} />
-          <span className="text-gray-50">
-            Add Row {isMaxRows && `(Max ${MAX_ROWS})`}
-          </span>
+          <Plus size={14} />
+          Add row {isMaxRows && `(max ${MAX_ROWS})`}
         </button>
 
         <button
           onClick={addColumn}
           disabled={isMaxColumns || props.type === "pie"}
-          className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm transition-all ${
+          className={`px-3 py-1.5 rounded-md flex items-center gap-1.5 text-xs font-medium transition-colors border ${
             isMaxColumns || props.type === "pie"
-              ? "bg-slate-700 text-slate-500 cursor-not-allowed opacity-60"
-              : "bg-indigo-600 text-white hover:bg-indigo-500 shadow-md hover:shadow-lg"
+              ? "bg-muted/40 text-muted-foreground border-border/40 cursor-not-allowed"
+              : "bg-zinc-800 text-zinc-100 border-zinc-700 hover:bg-zinc-700"
           }`}
         >
-          <Plus size={18} />
-          <span className="text-gray-50">
-            Add Column {isMaxColumns && `(Max ${MAX_COLUMNS - 1})`}
-          </span>
+          <Plus size={14} />
+          Add column {isMaxColumns && `(max ${MAX_COLUMNS - 1})`}
         </button>
       </div>
 
       <div
-        className="flex-1 bg-secondary rounded-xl overflow-hidden border border-muted"
+        className="flex-1 bg-background/50 rounded-lg overflow-hidden border border-border/60"
         data-drawer
         onBlur={() => {
           const currentBuffer = useUIStore.getState().editBuffer?.widgetData;
@@ -91,39 +92,36 @@ export function ChartTable(props: ChartTableProps) {
           });
         }}
       >
-        <div className="w-full h-full overflow-auto">
-          <table className="w-full">
-            <thead className="sticky top-0 bg-accent z-10">
+        <div className="w-full h-full overflow-auto scrollbar-subtle">
+          <table className="w-full border-separate border-spacing-0">
+            <thead className="sticky top-0 bg-muted/60 backdrop-blur-md z-10">
               <tr>
-                <th className="px-6 py-4 text-left group relative bg-blue-900/30 border-r-2 border-blue-700/50">
+                <th className="px-3 py-2.5 text-left group relative border-b border-border/60 border-r border-border/40 min-w-[140px]">
                   {editingHeader === xAxisKey ? (
                     <input
                       type="text"
                       defaultValue={xAxisKey}
                       autoFocus
-                      onBlur={(e) => {
-                        updateXAxisName(e.target.value);
-                      }}
+                      onBlur={(e) => updateXAxisName(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") {
+                        if (e.key === "Enter")
                           updateXAxisName(e.currentTarget.value);
-                        }
                       }}
-                      className="bg-slate-900 text-white px-3 py-2 rounded-lg border-2 border-blue-500 outline-none w-full focus:ring-2 focus:ring-blue-500/50 font-semibold"
+                      className={inputBase}
                     />
                   ) : (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span
-                          onClick={() => setEditingHeader(xAxisKey)}
-                          className="text-blue-300 font-semibold cursor-pointer hover:text-white transition-colors"
-                        >
-                          {xAxisKey}
+                    <div className="flex items-center gap-2">
+                      <span
+                        onClick={() => setEditingHeader(xAxisKey)}
+                        className="text-foreground/90 font-medium text-xs cursor-pointer"
+                      >
+                        {xAxisKey}
+                      </span>
+                      {props.type !== "pie" && (
+                        <span className="text-[9px] tracking-wider text-muted-foreground font-medium px-1.5 py-0.5 bg-background/60 rounded border border-border/60 uppercase">
+                          x-axis
                         </span>
-                        <span className="text-[10px] text-blue-400 font-bold px-2 py-1 bg-blue-900/50 rounded-full border border-blue-500">
-                          X-AXIS
-                        </span>
-                      </div>
+                      )}
                     </div>
                   )}
                 </th>
@@ -131,10 +129,8 @@ export function ChartTable(props: ChartTableProps) {
                 {dataColumns.map((col) => (
                   <th
                     key={col}
-                    className={`px-6 py-4 text-left group relative transition-all ${
-                      newlyAddedColumns.has(col)
-                        ? "bg-emerald-900/30 animate-pulse"
-                        : ""
+                    className={`px-3 py-2.5 text-left group relative border-b border-border/60 min-w-[120px] transition-colors ${
+                      newlyAddedColumns.has(col) ? "bg-foreground/[0.04]" : ""
                     }`}
                   >
                     {editingHeader === col ? (
@@ -142,55 +138,53 @@ export function ChartTable(props: ChartTableProps) {
                         type="text"
                         defaultValue={col}
                         autoFocus
-                        onBlur={(e) => {
-                          updateSeriesName(col, e.target.value);
-                        }}
+                        onBlur={(e) => updateSeriesName(col, e.target.value)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
+                          if (e.key === "Enter")
                             updateSeriesName(col, e.currentTarget.value);
-                          }
                         }}
-                        className="bg-slate-900 text-neutral px-3 py-2 rounded-lg border-2 border-indigo-500 outline-none w-full focus:ring-2 focus:ring-indigo-500/50"
+                        className={inputBase}
                       />
                     ) : (
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{
+                              backgroundColor: config[col]?.color,
+                            }}
+                          />
                           <span
                             onClick={() => setEditingHeader(col)}
-                            className="text-slate-300 font-semibold cursor-pointer hover:text-white transition-colors"
+                            className="text-foreground/90 font-medium text-xs cursor-pointer truncate"
                           >
                             {col}
                           </span>
-                          {newlyAddedColumns.has(col) && (
-                            <span className="text-[10px] text-emerald-400 font-bold px-2 py-1 bg-emerald-900/50 rounded-full border border-emerald-500">
-                              NEW
-                            </span>
-                          )}
                         </div>
                         {dataColumns.length > 1 && (
                           <button
                             onClick={() => deleteColumn(col)}
-                            className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-400 transition-all ml-2"
+                            className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all ml-1"
                           >
-                            <X size={16} />
+                            <X size={13} />
                           </button>
                         )}
                       </div>
                     )}
                   </th>
                 ))}
-                <th className="px-6 py-4 w-16 sticky top-0 bg-accent" />
+                <th className="px-3 py-2.5 w-10 border-b border-border/60" />
               </tr>
             </thead>
             <tbody>
               {data.map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className={`group transition-all ${
-                    newlyAddedRows.has(rowIndex) ? "bg-emerald-900/20" : ""
+                  className={`group transition-colors hover:bg-foreground/[0.02] ${
+                    newlyAddedRows.has(rowIndex) ? "bg-foreground/[0.03]" : ""
                   }`}
                 >
-                  <td className="px-6 py-4 border-r-2 border-blue-700/30">
+                  <td className="px-3 py-1.5 border-b border-border/30 border-r border-border/30">
                     {editingCell?.row === rowIndex &&
                     editingCell?.col === xAxisKey ? (
                       <input
@@ -211,14 +205,14 @@ export function ChartTable(props: ChartTableProps) {
                             setEditingCell(null);
                           }
                         }}
-                        className="bg-slate-900 text-white px-3 py-2 rounded-lg border-2 border-blue-500 outline-none w-full focus:ring-2 focus:ring-blue-500/50 shadow-lg"
+                        className={inputBase}
                       />
                     ) : (
                       <div
                         onClick={() =>
                           setEditingCell({ row: rowIndex, col: xAxisKey })
                         }
-                        className="text-zinc-300 cursor-pointer hover:text-white hover:bg-blue-900/50 px-3 py-2 rounded-lg transition-all min-h-10 flex items-center"
+                        className={`${cellBase} text-foreground/90 cursor-pointer hover:bg-foreground/5`}
                       >
                         {row[xAxisKey] ?? "—"}
                       </div>
@@ -226,7 +220,10 @@ export function ChartTable(props: ChartTableProps) {
                   </td>
 
                   {dataColumns.map((col) => (
-                    <td key={col} className="px-6 py-4">
+                    <td
+                      key={col}
+                      className="px-3 py-1.5 border-b border-border/30"
+                    >
                       {editingCell?.row === rowIndex &&
                       editingCell?.col === col ? (
                         <input
@@ -243,34 +240,29 @@ export function ChartTable(props: ChartTableProps) {
                               setEditingCell(null);
                             }
                           }}
-                          className="bg-slate-900 text-body px-3 py-2 rounded-lg border-2 border-indigo-500 outline-none w-full focus:ring-2 focus:ring-indigo-500/50 shadow-lg"
+                          className={inputBase}
                         />
                       ) : (
                         <div
-                          onClick={() => setEditingCell({ row: rowIndex, col })}
-                          className="text-zinc-600 cursor-pointer hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all min-h-10 flex items-center"
+                          onClick={() =>
+                            setEditingCell({ row: rowIndex, col })
+                          }
+                          className={`${cellBase} text-foreground/70 cursor-pointer hover:bg-foreground/5 font-mono tabular-nums`}
                         >
                           {row[col] ?? "—"}
                         </div>
                       )}
                     </td>
                   ))}
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {newlyAddedRows.has(rowIndex) && (
-                        <span className="text-[10px] text-emerald-400 font-bold px-2 py-1 bg-emerald-900/50 rounded-full border border-emerald-500 whitespace-nowrap">
-                          NEW
-                        </span>
-                      )}
-                      {data.length > 1 && (
-                        <button
-                          onClick={() => deleteRow(rowIndex)}
-                          className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-400 transition-all"
-                        >
-                          <X size={18} />
-                        </button>
-                      )}
-                    </div>
+                  <td className="px-2 py-1.5 border-b border-border/30">
+                    {data.length > 1 && (
+                      <button
+                        onClick={() => deleteRow(rowIndex)}
+                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
