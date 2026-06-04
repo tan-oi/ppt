@@ -53,6 +53,12 @@ export function PresentationList({
     }
   };
 
+  const handleOptimisticRename = (id: string, newTopic: string) => {
+    setPresentations((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, topic: newTopic } : p))
+    );
+  };
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-6 pb-6">
@@ -77,6 +83,7 @@ export function PresentationList({
             item={item}
             index={i}
             onOptimisticDelete={handleOptimisticDelete}
+            onOptimisticRename={handleOptimisticRename}
             isLocal={isLocal}
           />
         ))
