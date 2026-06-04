@@ -15,16 +15,16 @@ import { commonIcons } from "@/lib/config/slide";
 import { BaseColorInput } from "@/components/base/color-changer";
 import { AnimatePresence } from "motion/react";
 
+const EASE_STD: [number, number, number, number] = [0.4, 0, 0.2, 1];
+const EASE_IN: [number, number, number, number] = [0.4, 0, 1, 1];
+
 export function IconToolbar() {
   const editBuffer = useUIStore((s) => s.editBuffer);
-  console.log(editBuffer);
   const updateEditBuffer = useUIStore((s) => s.updateEditBuffer);
   const [iconSearch, setIconSearch] = React.useState("");
 
   const allLucideIcons = React.useMemo(() => {
     const allKeys = Object.keys(LucideIcons);
-    console.log("All Lucide keys:", allKeys.length);
-    console.log("Sample keys:", allKeys.slice(0, 20));
 
     const icons = allKeys
       .filter((key) => {
@@ -41,9 +41,6 @@ export function IconToolbar() {
         label: iconName.replace(/([A-Z])/g, " $1").trim(),
         icon: iconName,
       }));
-
-    console.log("Filtered icons:", icons.length);
-    console.log("First 10 icons:", icons.slice(0, 10));
 
     return icons;
   }, []);
@@ -68,9 +65,6 @@ export function IconToolbar() {
         icon.toLowerCase().includes(iconSearch.toLowerCase())
     );
 
-    console.log("Filtered all lucide:", filteredAll.length);
-    console.log("Sample:", filteredAll.slice(0, 5));
-
     return filteredAll;
   }, [iconSearch, allLucideIcons]);
 
@@ -89,28 +83,28 @@ export function IconToolbar() {
       opacity: 0,
       marginLeft: 0,
       marginRight: 0,
-      transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as any },
+      transition: { duration: 0.5, ease: EASE_STD },
     },
     visible: {
       width: "auto",
       opacity: 1,
       marginLeft: 0,
       marginRight: 0,
-      transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] as any, delay: 0.1 },
+      transition: { duration: 0.5, ease: EASE_STD, delay: 0.1 },
     },
     exit: {
       width: 0,
       opacity: 0,
       marginLeft: 0,
       marginRight: 0,
-      transition: { duration: 0.5, ease: [0.4, 0, 1, 1] as any },
+      transition: { duration: 0.5, ease: EASE_IN },
     },
   };
 
   const layoutTransition = {
     layout: {
       duration: 0.65,
-      ease: [0.4, 0, 0.2, 1] as any,
+      ease: EASE_STD,
     },
   };
 

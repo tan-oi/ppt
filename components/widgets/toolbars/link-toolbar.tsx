@@ -24,7 +24,7 @@ export function LinkToolbar() {
     <>
       <div data-toolbar-input>
         <Tooltip>
-          <TooltipTrigger asChild className="-mt-1">
+          <TooltipTrigger asChild>
             <Input
               value={widgetData.url}
               type="url"
@@ -37,7 +37,7 @@ export function LinkToolbar() {
 
       <div>
         <Tooltip>
-          <TooltipTrigger asChild className="-mt-1">
+          <TooltipTrigger asChild>
             <Input
               data-toolbar-input
               value={widgetData.text}
