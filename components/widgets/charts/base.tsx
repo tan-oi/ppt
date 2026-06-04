@@ -46,7 +46,6 @@ export const BaseChartRender: React.FC<BaseChartRenderProps> = ({
   xKey,
   ...props
 }) => {
-  console.log(xKey);
   const { widgetRef, handleClick } = useWidgetSelection(id, slideId);
 
   const editBuffer = useUIStore((s) => s.editBuffer);

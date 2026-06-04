@@ -74,7 +74,7 @@ export function TextFormatting() {
     <TooltipProvider>
       <DropdownMenu>
         <Tooltip>
-          <TooltipTrigger className="-mt-1" asChild>
+          <TooltipTrigger asChild>
             <DropdownMenuTrigger className="shadow-none" asChild>
               <Button
                 variant="outline"

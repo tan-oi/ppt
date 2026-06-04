@@ -75,7 +75,7 @@ export function BaseDropdown({
     <TooltipProvider>
       <DropdownMenu onOpenChange={setIsOpen}>
         <Tooltip>
-          <TooltipTrigger className="-mt-1" asChild>
+          <TooltipTrigger asChild>
             <DropdownMenuTrigger className="shadow-none" asChild>
               <motion.div
                 whileHover={{ scale: 1.02 }}

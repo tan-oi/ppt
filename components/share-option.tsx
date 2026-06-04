@@ -7,7 +7,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "./ui/dialog";
 
 import {
@@ -23,27 +22,27 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 
-interface ShareOptionProps {
+interface ShareDialogProps {
   shareUrl: string;
   isShared: boolean;
-  presentationId: string;
-  type: "minimal" | "normal";
   onToggleShare: () => Promise<{
     success: boolean;
     isShared: boolean;
     error?: string;
   }>;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function ShareOption({
+export function ShareDialog({
   shareUrl,
   isShared,
-  type = "normal",
   onToggleShare,
-}: ShareOptionProps) {
+  open,
+  onOpenChange,
+}: ShareDialogProps) {
   const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [isOpen, setIsOpen] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);
@@ -60,39 +59,18 @@ export function ShareOption({
           toast.success(
             result.isShared ? "Presentation is now live!" : "Share link revoked"
           );
-
-          if (!result.isShared) setIsOpen(false);
+          if (!result.isShared) onOpenChange(false);
         } else if (result.error) {
           toast.error(result.error);
         }
-      } catch (error) {
+      } catch {
         toast.error("Failed to update share status");
       }
     });
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {type === "normal" ? (
-          <Button
-            size="sm"
-            className="gap-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700"
-          >
-            <Share2 size={14} />
-            Share
-          </Button>
-        ) : (
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 text-zinc-400 hover:text-blue-500 transition-colors hover:bg-transparent hover:scale-110 hover:cursor-pointer"
-          >
-            <Share2 size={16} />
-          </Button>
-        )}
-      </DialogTrigger>
-
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-zinc-950 border-zinc-800 sm:max-w-md p-0 overflow-hidden gap-0">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-xl text-zinc-100 flex items-center gap-2">
@@ -210,5 +188,57 @@ export function ShareOption({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+interface ShareOptionProps {
+  shareUrl: string;
+  isShared: boolean;
+  presentationId: string;
+  type: "minimal" | "normal";
+  onToggleShare: () => Promise<{
+    success: boolean;
+    isShared: boolean;
+    error?: string;
+  }>;
+}
+
+export function ShareOption({
+  shareUrl,
+  isShared,
+  type = "normal",
+  onToggleShare,
+}: ShareOptionProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      {type === "normal" ? (
+        <Button
+          size="sm"
+          onClick={() => setIsOpen(true)}
+          className="gap-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700"
+        >
+          <Share2 size={14} />
+          Share
+        </Button>
+      ) : (
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={() => setIsOpen(true)}
+          className="h-8 w-8 text-zinc-400 hover:text-blue-500 transition-colors hover:bg-transparent hover:scale-110 hover:cursor-pointer"
+        >
+          <Share2 size={16} />
+        </Button>
+      )}
+      <ShareDialog
+        shareUrl={shareUrl}
+        isShared={isShared}
+        onToggleShare={onToggleShare}
+        open={isOpen}
+        onOpenChange={setIsOpen}
+      />
+    </>
   );
 }

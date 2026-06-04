@@ -64,7 +64,7 @@ export function ColorSelector() {
     <TooltipProvider>
       <Popover open={open} onOpenChange={setOpen}>
         <Tooltip>
-          <TooltipTrigger className="-mt-1" asChild>
+          <TooltipTrigger asChild>
             <PopoverTrigger className="shadow-none" asChild>
               <Button
                 variant="outline"
