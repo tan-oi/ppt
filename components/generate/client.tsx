@@ -8,14 +8,14 @@ import { OutlineViewer } from "./outline-viewer";
 import { useEffect, useState } from "react";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { z } from "zod";
-import { createBlankPresentation } from "@/app/create/action";
-import { createBlankLocalPresentation } from "@/lib/functions/create-local-presentation";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { PLAN_CONFIG } from "@/lib/config/plan";
 import { createOutlineSchema } from "@/lib/config/schema";
 import { ERROR_MESSAGES } from "@/lib/const";
 
+type ApiError = Error & { code?: string; status?: number };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const COMPONENTS: Record<"text" | "prompt", React.FC<any>> = {
   text: Text,
   prompt: PromptInput,
@@ -26,17 +26,10 @@ export function GenerateClient({
   ...props
 }: {
   type: "text" | "prompt";
-  [key: string]: any;
+  [key: string]: unknown;
 }) {
   const plan = props.plan as "free" | "pro" | "basic";
   const userId = props.userId as string | null;
-  // let maxImagesAllowed;
-
-  // if (!plan) {
-  //   maxImagesAllowed = 4;
-  // } else maxImagesAllowed = PLAN_CONFIG[plan].maxImagePerPresentation;
-
-  const [isCreatingScratch, setIsCreatingScratch] = useState(false);
 
   const router = useRouter();
   const setGenerateType = useGenerationStore((s) => s.setGenerateType);
@@ -91,9 +84,9 @@ export function GenerateClient({
       if (!response.ok) {
         const data = await response.json();
         console.log(data);
-        const error = new Error(data.message || "Request failed");
-        (error as any).code = data.error;
-        (error as any).status = response.status;
+        const error: ApiError = new Error(data.message || "Request failed");
+        error.code = data.error;
+        error.status = response.status;
         throw error;
       }
 
@@ -119,10 +112,10 @@ export function GenerateClient({
       );
     },
 
-    onError: (error: any) => {
-      console.log(error.code);
+    onError: (rawError) => {
+      const error = rawError as ApiError;
       const message =
-        ERROR_MESSAGES[error.code] ||
+        (error.code && ERROR_MESSAGES[error.code]) ||
         error.message ||
         ERROR_MESSAGES.UNKNOWN_ERROR;
 
@@ -172,6 +165,9 @@ export function GenerateClient({
       toast.error("Please provide instructions and slides count");
       return;
     }
+    setResult(null);
+    setId("");
+    setTicket("");
     setScreen("result");
     submit({
       instructions: userInstruction,
@@ -181,21 +177,6 @@ export function GenerateClient({
       tone,
       messages: [],
     });
-  };
-
-  const handleStartFromScratch = async () => {
-    setIsCreatingScratch(true);
-
-    const result = userId
-      ? await createBlankPresentation()
-      : await createBlankLocalPresentation();
-
-    if (result.success) {
-      router.push(`/docs/${result.id}`);
-    } else {
-      toast.error(result.error || "Failed to create presentation");
-      setIsCreatingScratch(false);
-    }
   };
 
   if (!mount) return <p>Loading...</p>;
