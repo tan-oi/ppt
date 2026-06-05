@@ -5,4 +5,3 @@ Presentation platform for building slides.
 
 Built with Next.js, Tailwind, Shadcn, Tiptap, Redis.
 
-(PS : Unstable. BYOK pending.)
