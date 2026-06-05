@@ -1,10 +1,11 @@
 export const themes = [
     {
-        name : "Starter",
-        slug : "starter",
-        backgroundColor : "#000",
-        accentColor : "#fff",
-        category : "Minimal"
+        name: "Starter",
+        slug: "starter",
+        backgroundColor: "oklch(0.16 0.005 250)",
+        accentColor: "oklch(0.72 0.16 240)",
+        foregroundColor: "oklch(0.97 0 0)",
+        category: "Minimal"
     },
     {
       name: "Newspaper Riot",

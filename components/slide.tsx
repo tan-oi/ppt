@@ -102,7 +102,7 @@ function SlideBase({
       }}
       className={cn(
         "grid grid-cols-24 grid-rows-24 bg-background rounded-lg",
-        data.theme && data.theme !== "starter" ? data.theme : ""
+        data.theme || ""
       )}
     >
       <SlidePresentation
