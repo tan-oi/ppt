@@ -77,15 +77,15 @@
 
     const getApiKeys = () => {
       if (typeof window === "undefined") {
-        return { groqApiKey: "", replicateApiKey: "" };
+        return { googleKey: "", replicateKey: "" };
       }
-      const groqKey =
-        localStorage.getItem("guest-groq-key") || config.groqApiKey || "";
+      const googleKey =
+        localStorage.getItem("guest-google-key") || config.googleApiKey || "";
       const replicateKey =
         localStorage.getItem("guest-replicate-key") ||
         config.replicateApiKey ||
         "";
-      return { groqKey, replicateKey };
+      return { googleKey, replicateKey };
     };
 
     const {
@@ -98,10 +98,10 @@
       schema: z.array(z.any()),
       fetch: async (url, options) => {
         const headers = new Headers(options?.headers);
-        const { groqKey } = getApiKeys();
-        if (groqKey) {
-          headers.set("x-groq-api-key", groqKey);
-          headers.set("x-groq-model", config.groqModel || "openai/gpt-oss-120b");
+        const { googleKey } = getApiKeys();
+        if (googleKey) {
+          headers.set("x-google-api-key", googleKey);
+          headers.set("x-google-model", config.googleModel || "gemini-2.5-flash");
         }
 
         return fetch(url, {

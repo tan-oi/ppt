@@ -1,14 +1,12 @@
 import { auth } from "@/lib/auth";
 import { buildPresentationPrompt } from "@/lib/config/prompt";
 import { prisma } from "@/lib/prisma";
-import { groq, createGroq } from "@ai-sdk/groq";
+import { google, createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { nanoid } from "nanoid";
-import { deductCredits, refundCredits } from "@/lib/functions/credits";
-import { requestValidation } from "@/lib/functions/plan-enforcement";
 import { createOutlineSchema, requestSchema } from "@/lib/config/schema";
 import { redis } from "@/lib/rate-limit";
 import { getGenerationRedisKey } from "@/lib/config/plan";
@@ -18,7 +16,7 @@ export async function POST(req: Request) {
 
   const userId = session?.user?.id;
 
-  const groqApiKey = req.headers.get("x-groq-api-key");
+  const googleApiKey = req.headers.get("x-google-api-key");
 
   const isGuestMode = !userId;
 
@@ -29,7 +27,7 @@ export async function POST(req: Request) {
   //   );
   // }
 
-  console.log(userId, groqApiKey);
+  console.log(userId, googleApiKey);
 
   try {
     const body = await req.json();
@@ -100,15 +98,15 @@ export async function POST(req: Request) {
       });
 
       const outlineSchema = createOutlineSchema(maxImagesAllowed > 0);
-      const groqModel =
-        req.headers.get("x-groq-model") || "openai/gpt-oss-120b";
+      const googleModel =
+        req.headers.get("x-google-model") || "gemini-2.5-flash";
 
-      const groqProvider = groqApiKey
-        ? createGroq({ apiKey: groqApiKey })
-        : groq;
+      const googleProvider = googleApiKey
+        ? createGoogleGenerativeAI({ apiKey: googleApiKey })
+        : google;
 
       const { object } = await generateObject({
-        model: groqProvider(groqModel),
+        model: googleProvider(googleModel),
         output: "array",
         schema: outlineSchema,
         system: systemPrompt,
@@ -136,7 +134,7 @@ export async function POST(req: Request) {
           {
             error: "INVALID_API_KEY",
             message:
-              "Invalid Groq API key. Please check your API key and try again.",
+              "Invalid Google API key. Please check your API key and try again.",
           },
           { status: 401 }
         );
