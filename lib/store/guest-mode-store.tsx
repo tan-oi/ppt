@@ -4,17 +4,17 @@ import { create } from "zustand";
 import { persist, StorageValue } from "zustand/middleware";
 
 export interface ApiConfig {
-  groqApiKey: string;
+  googleApiKey: string;
   replicateApiKey: string;
-  groqModel: string;
+  googleModel: string;
   replicateModel: string;
 }
 
 interface ApiConfigState {
   config: ApiConfig;
-  setGroqApiKey: (key: string) => void;
+  setGoogleApiKey: (key: string) => void;
   setReplicateApiKey: (key: string) => void;
-  setGroqModel: (model: string) => void;
+  setGoogleModel: (model: string) => void;
   setReplicateModel: (model: string) => void;
   updateConfig: (config: Partial<ApiConfig>) => void;
   clearApiKeys: () => void;
@@ -22,9 +22,9 @@ interface ApiConfigState {
 }
 
 const defaultConfig: ApiConfig = {
-  groqApiKey: "",
+  googleApiKey: "",
   replicateApiKey: "",
-  groqModel: "openai/gpt-oss-120b",
+  googleModel: "gemini-2.5-flash",
   replicateModel: "black-forest-labs/flux-schnell",
 };
 
@@ -32,17 +32,17 @@ export const useApiConfigStore = create<ApiConfigState>()(
   persist(
     (set) => ({
       config: defaultConfig,
-      setGroqApiKey: (key: string) =>
+      setGoogleApiKey: (key: string) =>
         set((state) => ({
-          config: { ...state.config, groqApiKey: key },
+          config: { ...state.config, googleApiKey: key },
         })),
       setReplicateApiKey: (key: string) =>
         set((state) => ({
           config: { ...state.config, replicateApiKey: key },
         })),
-      setGroqModel: (model: string) =>
+      setGoogleModel: (model: string) =>
         set((state) => ({
-          config: { ...state.config, groqModel: model },
+          config: { ...state.config, googleModel: model },
         })),
       setReplicateModel: (model: string) =>
         set((state) => ({
@@ -56,7 +56,7 @@ export const useApiConfigStore = create<ApiConfigState>()(
         set((state) => ({
           config: {
             ...state.config,
-            groqApiKey: "",
+            googleApiKey: "",
             replicateApiKey: "",
           },
         })),

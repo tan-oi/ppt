@@ -63,9 +63,9 @@ export function GenerateClient({
     fetch: async (url, options) => {
       const headers = new Headers(options?.headers);
 
-      if (config.groqApiKey) {
-        headers.set("x-groq-api-key", config.groqApiKey);
-        headers.set("x-groq-model", config.groqModel || "openai/gpt-oss-120b");
+      if (config.googleApiKey) {
+        headers.set("x-google-api-key", config.googleApiKey);
+        headers.set("x-google-model", config.googleModel || "gemini-2.5-flash");
       }
 
       if (config.replicateApiKey) {

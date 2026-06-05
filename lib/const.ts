@@ -45,15 +45,12 @@ export const presetColors = [
   "#9575f6", // Crypto Midnight
 ];
 
-export const GROQ_MODELS = [
-  { value: "openai/gpt-oss-120b", label: "GPT-OSS-120B", recommended: true },
-  {
-    value: "meta-llama/llama-4-maverick-17b-128e-instruct",
-    label: "Llama maverick",
-  },
-  { value: "openai/gpt-oss-20b", label: "GPT-OSS-20B" },
-
-  { value: "moonshotai/kimi-k2-instruct-0905", label: "Kimi K2" },
+export const GOOGLE_MODELS = [
+  { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash", recommended: true },
+  { value: "gemini-3.5-flash", label: "Gemini 3.5 Flash" },
+  { value: "gemini-3.1-flash-lite", label: "Gemini 3.1 Flash Lite" },
+  { value: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+  { value: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash Lite" },
 ];
 
 export const REPLICATE_MODELS = [
@@ -78,5 +75,5 @@ export const ERROR_MESSAGES: Record<string, string> = {
   UNKNOWN_ERROR: "Something went wrong. Please try again.",
   INSUFFICIENT_ALLOWANCE: "You've exhausted your limit",
   INVALID_API_KEY:
-    "Invalid API key. Please check your Groq API key in settings and try again.",
+    "Invalid API key. Please check your Google API key in settings and try again.",
 };

@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { X, Key, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 
-import { GROQ_MODELS, REPLICATE_MODELS } from "@/lib/const";
+import { GOOGLE_MODELS, REPLICATE_MODELS } from "@/lib/const";
 import { useUIStore } from "@/lib/store/ui-store";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -29,29 +29,30 @@ export function GuestModeDialog() {
 
   const showConfig = useUIStore((s) => s.showConfig);
   const setShowConfig = useUIStore((s) => s.setShowConfig);
-  const [groqKey, setGroqKey] = useState("");
+  const [googleKey, setGoogleKey] = useState("");
   const [replicateKey, setReplicateKey] = useState("");
-  const [groqModel, setGroqModelLocal] = useState("");
+  const [googleModel, setGoogleModelLocal] = useState("");
   const [replicateModel, setReplicateModelLocal] = useState("");
 
   useEffect(() => {
-    setGroqKey(config.groqApiKey);
-    setReplicateKey(config.replicateApiKey);
-    setGroqModelLocal(config.groqModel);
-    setReplicateModelLocal(config.replicateModel);
+    setGoogleKey(config.googleApiKey || "");
+    setReplicateKey(config.replicateApiKey || "");
+    setGoogleModelLocal(config.googleModel || "gemini-2.5-flash");
+    setReplicateModelLocal(
+      config.replicateModel || "black-forest-labs/flux-schnell"
+    );
   }, [config]);
 
-  console.log(showConfig);
   const handleSave = async () => {
-    if (!groqKey.trim()) {
-      toast.error("Groq API key is required");
+    if (!googleKey.trim()) {
+      toast.error("Google API key is required");
       return;
     }
 
     updateConfig({
-      groqApiKey: groqKey.trim(),
+      googleApiKey: googleKey.trim(),
       replicateApiKey: replicateKey.trim(),
-      groqModel,
+      googleModel,
       replicateModel,
     });
 
@@ -129,13 +130,13 @@ export function GuestModeDialog() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label
-                    htmlFor="groq-key"
+                    htmlFor="google-key"
                     className="text-sm font-medium text-zinc-300"
                   >
-                    Groq API Key *
+                    Google API Key *
                   </Label>
                   <a
-                    href="https://console.groq.com/keys"
+                    href="https://aistudio.google.com/apikey"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-indigo-400 hover:text-indigo-300 hover:underline transition-colors"
@@ -144,29 +145,29 @@ export function GuestModeDialog() {
                   </a>
                 </div>
                 <Input
-                  id="groq-key"
+                  id="google-key"
                   type="text"
-                  placeholder="gsk_..."
-                  value={groqKey}
-                  onChange={(e) => setGroqKey(e.target.value)}
+                  placeholder="AIza..."
+                  value={googleKey}
+                  onChange={(e) => setGoogleKey(e.target.value)}
                   className="bg-zinc-900/50 border-white/10 text-white placeholder:text-zinc-500 focus:border-indigo-500/50"
                 />
                 <div className="space-y-2">
                   <Label
-                    htmlFor="groq-model"
+                    htmlFor="google-model"
                     className="text-sm font-medium text-zinc-300"
                   >
-                    Groq Model
+                    Google Model
                   </Label>
-                  <Select value={groqModel} onValueChange={setGroqModelLocal}>
+                  <Select value={googleModel} onValueChange={setGoogleModelLocal}>
                     <SelectTrigger
-                      id="groq-model"
+                      id="google-model"
                       className="bg-zinc-900/50 border-white/10 text-white"
                     >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-zinc-900 border-white/10">
-                      {GROQ_MODELS.map((model) => (
+                      {GOOGLE_MODELS.map((model) => (
                         <SelectItem
                           key={model.value}
                           value={model.value}
