@@ -54,15 +54,16 @@ export const GOOGLE_MODELS = [
 ];
 
 export const REPLICATE_MODELS = [
-  { value: "black-forest-labs/flux-pro", label: "Flux Pro" },
   {
-    value: "black-forest-labs/flux-schnell",
-    label: "Flux Schnell",
+    value: "google/nano-banana-2-lite",
+    label: "Nano Banana 2 Lite",
     recommended: true,
   },
-  { value: "black-forest-labs/flux-dev", label: "Flux Dev" },
-  { value: "stability-ai/stable-diffusion-3", label: "Stable Diffusion 3" },
-  { value: "stability-ai/sdxl", label: "Stable Diffusion XL" },
+  { value: "google/nano-banana-2", label: "Nano Banana 2" },
+  { value: "google/nano-banana-pro", label: "Nano Banana Pro" },
+  { value: "black-forest-labs/flux-2-pro", label: "FLUX 2 Pro" },
+  { value: "bytedance/seedream-4", label: "Seedream 4" },
+  { value: "openai/gpt-image-1.5", label: "GPT Image 1.5" },
 ];
 
 export const ERROR_MESSAGES: Record<string, string> = {

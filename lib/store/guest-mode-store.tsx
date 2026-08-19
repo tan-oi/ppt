@@ -25,7 +25,7 @@ const defaultConfig: ApiConfig = {
   googleApiKey: "",
   replicateApiKey: "",
   googleModel: "gemini-2.5-flash",
-  replicateModel: "black-forest-labs/flux-schnell",
+  replicateModel: "google/nano-banana-2-lite",
 };
 
 export const useApiConfigStore = create<ApiConfigState>()(
@@ -67,6 +67,18 @@ export const useApiConfigStore = create<ApiConfigState>()(
     }),
     {
       name: "api-config-storage",
+      version: 2,
+      migrate: (persistedState) => {
+        const state = persistedState as ApiConfigState;
+        return {
+          ...state,
+          config: {
+            ...defaultConfig,
+            ...state.config,
+            replicateModel: defaultConfig.replicateModel,
+          },
+        };
+      },
       storage: {
         getItem: (name): StorageValue<ApiConfigState> | null => {
           try {

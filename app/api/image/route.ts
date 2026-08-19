@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     const { prompt } = await req.json();
     const replicateModel =
-      req.headers.get("x-replicate-model") || "black-forest-labs/flux-schnell";
+      req.headers.get("x-replicate-model") || "google/nano-banana-2-lite";
 
     try {
       const replicateProvider = replicateApiKey

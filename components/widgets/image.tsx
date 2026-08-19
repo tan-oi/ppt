@@ -130,7 +130,7 @@ export function ImageWidget({
       const { url: generatedUrl, isLocal } = await callImageAPI(
         currentData.imagePrompt,
         replicateKey,
-        config.replicateModel || "black-forest-labs/flux-schnell"
+      config.replicateModel || "google/nano-banana-2-lite"
       );
 
       setUrl(generatedUrl);

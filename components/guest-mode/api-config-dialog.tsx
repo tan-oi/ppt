@@ -39,7 +39,7 @@ export function GuestModeDialog() {
     setReplicateKey(config.replicateApiKey || "");
     setGoogleModelLocal(config.googleModel || "gemini-2.5-flash");
     setReplicateModelLocal(
-      config.replicateModel || "black-forest-labs/flux-schnell"
+      config.replicateModel || "google/nano-banana-2-lite"
     );
   }, [config]);
 
